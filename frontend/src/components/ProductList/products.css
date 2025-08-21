@@ -1,0 +1,74 @@
+.product {
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  width: 310px;
+  height: 380px;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product img {
+  width: 300px;
+  height: 170px;
+  border-radius: 8px;
+  margin: 0 auto 30px;
+  display: block;
+  object-fit: cover;
+}
+
+.product h2 {
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.productDetails {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  row-gap: 10px;
+  column-gap: 2px;
+  
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.greenButton {
+  background-color: #007b00ff;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  font-weight: bold;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.greenButton:hover {
+  background-color: #2eae00ff;
+}
+
+.redButton {
+  background-color: #ff0202c6;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  font-weight: bold;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.redButton:hover {
+  background-color: #c50101ff;
+}

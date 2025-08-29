@@ -18,7 +18,7 @@ function Home() {
 
   return (
     <div>
-      <Navbar />
+      
 
       {products && <ProductList products={products} />}
 

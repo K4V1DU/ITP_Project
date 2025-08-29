@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../NavBar/NavBar";
 import axios from "axios";
-import ProductList from "../ProductList/ProductList"; 
+import ProductList from "./ProductList/ProductList"; 
+
 
 const URL = "http://localhost:5000/inventory";
 
@@ -18,8 +18,8 @@ function Home() {
 
   return (
     <div>
-      <Navbar />
-
+      
+    
       {products && <ProductList products={products} />}
 
 

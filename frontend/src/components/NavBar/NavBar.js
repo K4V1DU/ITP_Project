@@ -5,8 +5,8 @@ import "./NavBar.css";
 function Navbar({ role }) {
   let links = [];
 
-  // you can pass role from App.js or hardcode for testing
-  // role = "customer";
+  
+   role = "customer";
   // role = "staff";
   // role = "admin";
 

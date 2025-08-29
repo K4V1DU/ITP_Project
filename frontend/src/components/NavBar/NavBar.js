@@ -28,7 +28,7 @@ function Navbar({ role }) {
         {links.map((link) => (
           <Link 
             key={link} 
-            to={`/${link.toLowerCase().replace(/ /g, '-')}`}  // e.g. /offers
+            to={`/${link.toLowerCase().replace(/ /g, '-')}`}  
           >
             {link}
           </Link>

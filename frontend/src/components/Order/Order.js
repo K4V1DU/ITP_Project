@@ -19,18 +19,28 @@ function Order() {
   }, [id]);
 
   return (
+
     <div>
       <h2>Order Page</h2>
       {product ? (
         <div>
           <h3>{product.Name}</h3>
-          <p>{product.Description}</p>
-          <p>Price: Rs {product.Price}</p>
+          <img src={product.URL} alt={product.Name} style={{ width: "200px", marginBottom: "10px" }} />
+          <p><strong>Description:</strong> {product.Description}</p>
+          <p><strong>Price:</strong> Rs {product.Price}</p>
+          <p><strong>In Stock:</strong> {product.Quantity}</p>
+          <p><strong>Capacity:</strong> {product.Capacity}</p>
+          <p><strong>Flavour:</strong> {product.Flavour}</p>
           <button>Add to Cart</button>
         </div>
       ) : (
         <p>Loading product...</p>
       )}
+
+
+
+
+
     </div>
   );
 }

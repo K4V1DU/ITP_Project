@@ -10,7 +10,8 @@ const CouponsController = require("../Controllers/CouponsController");
 router.get("/",CouponsController.getAllCoupons);
 router.post("/",CouponsController.addCoupon);
 router.get("/:id",CouponsController.getBycouponId);
-
+router.put("/:id",CouponsController.updateCoupon);
+router.delete("/:id",CouponsController.deleteCoupon);
 
 //export
 module.exports = router;

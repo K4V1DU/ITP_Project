@@ -19,19 +19,15 @@ const getAllCoupons = async (req, res, next) => {
 };
 
 
-// Insert
 
+// Create a coupon
 const addCoupon = async(req, res, next) =>{
-
-    const {Code,DiscountValue,MinAmount,UsageLimit,UsageCount,ExpiryDate,Active} = req.body;
-
+    const {Code,discountType,DiscountValue,MinAmount,UsageLimit,UsageCount,ExpiryDate,Active} = req.body;
     let Coupon;
 
     try {
-        
-        Coupon = new Coupons({Code,DiscountValue,MinAmount,UsageLimit,UsageCount,ExpiryDate,Active});
+        Coupon = new Coupons({Code,discountType,DiscountValue,MinAmount,UsageLimit,UsageCount,ExpiryDate,Active});
         await Coupon.save();
-
     } catch (err) {
         console.log(err);
     }
@@ -42,30 +38,65 @@ const addCoupon = async(req, res, next) =>{
 };
 
 
+
 //getById
-
-
 const getBycouponId = async(req, res, next) => {
-
     const id = req.params.id;
-
     let Coupon;
 
     try {
         Coupon = await Coupons.findById(id);    
+    } catch (err) {
+        console.log(err);
+    }
+    if(!Coupon){
+        return res.status(404).json({message:"Coupon not found"});
+    }
+    return res.status(200).json({Coupon});
+};
+
+
+//Delete coupon
+const deleteCoupon = async(req, res, next) => {
+    const id = req.params.id;
+    let Coupon;
+
+    try {
+        Coupon = await Coupons.findByIdAndDelete(id);
 
     } catch (err) {
         console.log(err);
     }
     if(!Coupon){
-        return res.status(404).json({message:"Coupon Not Found"});
+        return res.status(404).json({message:"Coupon not found"});
     }
     return res.status(200).json({Coupon});
-
-
 };
+
+
+//Update coupon
+const updateCoupon = async(req, res, next) => {
+    const id = req.params.id;
+    const {Code,discountType,DiscountValue,MinAmount,UsageLimit,UsageCount,ExpiryDate,Active} = req.body;
+    let Coupon;
+
+    try {
+        Coupon = await Coupons.findByIdAndUpdate(id,{Code,discountType,DiscountValue,MinAmount,UsageLimit,UsageCount,ExpiryDate,Active});
+        await Coupon.save();
+    } catch (err) {
+        console.log(err);
+    }
+    if(!Coupon){
+        return res.status(404).json({message:"Unable this coupon to update"});
+    }
+    return res.status(200).json({Coupon});
+};
+
+
 
 
 exports.getAllCoupons = getAllCoupons;
 exports.addCoupon = addCoupon;
 exports.getBycouponId = getBycouponId;
+exports.deleteCoupon = deleteCoupon;
+exports.updateCoupon = updateCoupon;

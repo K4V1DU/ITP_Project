@@ -14,7 +14,7 @@ function Navbar() {
   } else if (role === "admin") {
     links = ["Admin Panel", "Manage Users", "Reports", "Inventory"];
   } else {
-    links = ["Home", "Notifications", "Offers", "Track Orders", "Contact"];
+    links = ["Home", "Notifications", "Cart", "Track Orders", "Contact"];
   }
 
   useEffect(() => {

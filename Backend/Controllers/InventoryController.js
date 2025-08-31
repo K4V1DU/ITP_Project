@@ -121,6 +121,7 @@ const deleteProduct = async(req, res, next) => {
 
 
 
+
 exports.addProducts = addProducts;
 exports.getAllProducts = getAllProducts;
 exports.getById = getById;

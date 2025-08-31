@@ -1,126 +1,196 @@
 const Cart = require("../Model/CartModel");
+const Inventory = require("../Model/InventoryModel");
+
+
 
 
 //Display All
 
-const getAllItems = async(req, res, next) => {
+const getAllItems = async (req, res, next) => {
+  let Items;
 
-    let Items;
-
-    try {
-        Items = await Cart.find();
-
-    } catch (err) {
-        console.log(err);
-    }
-    if(!Items){
-        return res.status(404).json({message:"Cart is empty"});
-    }
-    return res.status(200).json({Items});
-
-
+  try {
+    Items = await Cart.find();
+  } catch (err) {
+    console.log(err);
+  }
+  if (!Items) {
+    return res.status(404).json({ message: "Cart is empty" });
+  }
+  return res.status(200).json({ Items });
 };
+
+
+
 
 
 
 
 
 // Insert
-const addToCart = async(req, res, next) =>{
+const addToCart = async (req, res, next) => {
+  const { UserID, ProductID, Name, Price, Quantity, URL } = req.body;
+  const qtyToAdd = parseInt(Quantity, 10);
 
-    const {UserID,ProductID,Name,Price,Quantity,Total,URL} = req.body;
-
-    let Items;
-
-    try {
-        
-        Items = new Cart({UserID,ProductID,Name,Price,Quantity,Total,URL});
-        await Items.save();
-
-    } catch (err) {
-        console.log(err);
+  try {
+    const product = await Inventory.findById(ProductID);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
-    if(!Items){
-        return res.status(404).json({message:"Insert failed"});
+
+    
+    const existingItem = await Cart.findOne({ UserID, ProductID });
+    const alreadyInCart = existingItem ? existingItem.Quantity : 0;
+
+    const newQty = alreadyInCart + qtyToAdd;
+
+    
+    if (alreadyInCart >= product.Quantity) {
+      return res.status(400).json({
+        message: `You already have all ${product.Quantity} items of this product in your cart`,
+      });
     }
-    return res.status(200).json({ Items });
+
+    
+    if (newQty > product.Quantity) {
+      return res.status(400).json({
+        message: `You can only add ${product.Quantity - alreadyInCart} more items of this product`,
+      });
+    }
+
+    if (existingItem) {
+      existingItem.Quantity = newQty;
+      existingItem.Total = newQty * Price;
+      await existingItem.save();
+      return res.status(200).json({ message: "Cart updated", Items: existingItem });
+    } else {
+      const newItem = new Cart({
+        UserID,
+        ProductID,
+        Name,
+        Price,
+        Quantity: qtyToAdd,
+        Total: Price * qtyToAdd,
+        URL,
+      });
+      await newItem.save();
+      return res.status(201).json({ message: "Item added to cart", Items: newItem });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Error adding to cart" });
+  }
 };
+
+
+
+
+
+
 
 
 
 
 //getById
-const getById = async(req, res, next) => {
+const getById = async (req, res, next) => {
+  const id = req.params.id;
 
-    const id = req.params.id;
+  let Items;
 
-    let Items;
-
-    try {
-        Items = await Cart.findById(id);    
-
-    } catch (err) {
-        console.log(err);
-    }
-    if(!Items){
-        return res.status(404).json({message:"Items Not Found"});
-    }
-    return res.status(200).json({Items});
-
-
+  try {
+    Items = await Cart.findById(id);
+  } catch (err) {
+    console.log(err);
+  }
+  if (!Items) {
+    return res.status(404).json({ message: "Items Not Found" });
+  }
+  return res.status(200).json({ Items });
 };
+
+
+
+
+
+
 
 
 
 //Update
 
-const updateCart = async(req, res, next) => {
+const updateCart = async (req, res, next) => {
+  const id = req.params.id;
+  const { UserID, ProductID, Name, Price, Quantity, Total, URL } = req.body;
 
-    const id = req.params.id;
-    const {UserID,ProductID,Name,Price,Quantity,Total,URL} = req.body;
+  let Items;
 
-    let Items;
-
-    try {
-
-        Items = await Cart.findByIdAndUpdate(id,{UserID,ProductID,Name,Price,Quantity,Total,URL});
-        await Items.save();
-
-
-    } catch (err) {
-        console.log(err);
-    }
-    if(!Items){
-        return res.status(404).json({message:"unable to update"});
-    }
-    return res.status(200).json({Items});
-
-
+  try {
+    Items = await Cart.findByIdAndUpdate(id, {
+      UserID,
+      ProductID,
+      Name,
+      Price,
+      Quantity,
+      Total,
+      URL,
+    });
+    await Items.save();
+  } catch (err) {
+    console.log(err);
+  }
+  if (!Items) {
+    return res.status(404).json({ message: "unable to update" });
+  }
+  return res.status(200).json({ Items });
 };
+
+
+
+
+
+
 
 
 
 //Delete
 
-const deleteItem = async(req, res, next) => {
+const deleteItem = async (req, res, next) => {
+  const id = req.params.id;
 
-    const id = req.params.id;
+  let Items;
 
-    let Items;
-
-    try {
-        Items = await Cart.findByIdAndDelete(id);
-
-    } catch (err) {
-        console.log(err);
-    }
-    if(!Items){
-        return res.status(404).json({message:"Items Not Found"});
-    }
-    return res.status(200).json({Items});
-
-
+  try {
+    Items = await Cart.findByIdAndDelete(id);
+  } catch (err) {
+    console.log(err);
+  }
+  if (!Items) {
+    return res.status(404).json({ message: "Items Not Found" });
+  }
+  return res.status(200).json({ Items });
 };
+
+
+
+const getItemsByUser = async (req, res, next) => {
+  const userId = req.params.userId;
+
+  try {
+    const items = await Cart.find({ UserID: userId });
+    if (!items || items.length === 0) {
+      return res.status(404).json({ message: "Cart is empty" });
+    }
+    return res.status(200).json({ Items: items });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Error fetching cart items" });
+  }
+};
+
+
+
+
+
 
 
 exports.addToCart = addToCart;
@@ -128,3 +198,4 @@ exports.getAllItems = getAllItems;
 exports.getById = getById;
 exports.updateCart = updateCart;
 exports.deleteItem = deleteItem;
+exports.getItemsByUser = getItemsByUser;

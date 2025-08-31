@@ -8,6 +8,7 @@ import "./Cart.css";
 function Cart() {
   const [Items, setItems] = useState([]);
   const [coupon, setCoupon] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null); 
   const [warnings, setWarnings] = useState({});
   const userId = "456";
 
@@ -17,7 +18,6 @@ function Cart() {
       const res = await axios.get(`http://localhost:5000/Cart/user/${userId}`);
       const cartItems = res.data.Items || [];
 
-      // Fetch stock for each item
       const itemsWithStock = await Promise.all(
         cartItems.map(async (item) => {
           const stockRes = await axios.get(
@@ -33,7 +33,7 @@ function Cart() {
       setItems(itemsWithStock);
     } catch (err) {
       console.error("Error fetching cart:", err);
-      toast.error("❌ Failed to load cart items", { autoClose: 3000 });
+      toast.error("Failed to load cart items", { autoClose: 3000 });
     }
   };
 
@@ -41,16 +41,7 @@ function Cart() {
     fetchHandler();
   }, []);
 
-  // Handle coupon
-  const handleCoupon = () => {
-    if (coupon === "DISCOUNT10") {
-      toast.success("✅ 10% discount applied!", { autoClose: 3000 });
-    } else {
-      toast.error("❌ Invalid coupon", { autoClose: 3000 });
-    }
-  };
-
-  // Increment quantity
+  // Increment
   const incrementQuantity = (id) => {
     const updatedItems = Items.map((item) => {
       if (item._id === id) {
@@ -63,7 +54,7 @@ function Cart() {
         } else {
           setWarnings((prev) => ({
             ...prev,
-            [id]: `⚠️ Only ${item.Stock} items available`,
+            [id]: `Only ${item.Stock} items available`,
           }));
         }
       }
@@ -72,7 +63,7 @@ function Cart() {
     setItems(updatedItems);
   };
 
-  // Decrement quantity
+  // Decrement
   const decrementQuantity = (id) => {
     const updatedItems = Items.map((item) =>
       item._id === id && item.Quantity > 1
@@ -101,7 +92,6 @@ function Cart() {
         { items: payload }
       );
 
-      // Preserve Stock from previous state
       const updatedItems = res.data.updatedItems.map((item) => {
         const originalItem = Items.find((i) => i._id === item._id);
         return {
@@ -111,39 +101,68 @@ function Cart() {
       });
 
       setItems(updatedItems);
-
-      // Show success toast
-      toast.success("✅ Cart updated successfully!", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.success("Cart updated successfully!", { autoClose: 3000 });
     } catch (err) {
       console.error(err);
-      toast.error("❌ Failed to update cart", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error("Failed to update cart", { autoClose: 3000 });
     }
   };
 
-  const subtotal = Items.reduce((sum, item) => sum + item.Total, 0);
-  const discount = coupon === "DISCOUNT10" ? subtotal * 0.1 : 0;
-  const totalCost = subtotal - discount;
-
+  // Delete item
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/Cart/${id}`);
-
-      // Remove the item from state immediately
       const updatedItems = Items.filter((item) => item._id !== id);
       setItems(updatedItems);
-
-      toast.success("✅ Item removed from cart!", { autoClose: 3000 });
+      toast.success("Item removed from cart!", { autoClose: 3000 });
     } catch (err) {
       console.error("Delete error:", err);
-      toast.error("❌ Failed to remove item", { autoClose: 3000 });
+      toast.error("Failed to remove item", { autoClose: 3000 });
     }
   };
+
+  // Apply coupon (only one allowed)
+  const handleCoupon = async () => {
+    if (!coupon) {
+      toast.warning("Enter a coupon code");
+      return;
+    }
+
+    if (appliedCoupon) {
+      toast.warning("You can only use one coupon at a time");
+      return;
+    }
+
+    try {
+      const res = await axios.post("http://localhost:5000/Coupons/validate", {
+        code: coupon,
+        subtotal: subtotal,
+      });
+
+      setAppliedCoupon(res.data);
+      toast.success(`Coupon applied!`);
+      setCoupon("");
+    } catch (err) {
+      toast.error(
+        `${err.response?.data?.message || "Invalid coupon"}`,
+        { autoClose: 3000 }
+      );
+    }
+  };
+
+  // Totals
+  const subtotal = Items.reduce((sum, item) => sum + item.Total, 0);
+  let discount = 0;
+
+  if (appliedCoupon) {
+    if (appliedCoupon.type === "percentage") {
+      discount = subtotal * (appliedCoupon.discountValue / 100);
+    } else {
+      discount = appliedCoupon.discountValue;
+    }
+  }
+
+  const totalCost = subtotal - discount;
 
   return (
     <div className="cart-page">
@@ -153,6 +172,7 @@ function Cart() {
         <div className="empty">🛒 Your cart is empty.</div>
       ) : (
         <div className="cart-wrapper">
+          {/* LEFT */}
           <div className="cart-left">
             <div className="title-row">
               <h2>Shopping Cart</h2>
@@ -196,7 +216,7 @@ function Cart() {
                               qty = item.Stock;
                               setWarnings((prev) => ({
                                 ...prev,
-                                [item._id]: `⚠️ Only ${item.Stock} items available`,
+                                [item._id]: `Only ${item.Stock} items available`,
                               }));
                             } else {
                               setWarnings((prev) => ({
@@ -239,6 +259,7 @@ function Cart() {
             </table>
           </div>
 
+          {/* RIGHT SUMMARY */}
           <div className="cart-right">
             <h2>Order Summary</h2>
             <div className="summary">
@@ -252,6 +273,15 @@ function Cart() {
                 <button onClick={handleCoupon}>Apply</button>
               </div>
 
+              {/* Show applied coupon (only one) */}
+              {appliedCoupon && (
+                <div className="coupon-tag">
+                  {appliedCoupon.code} ({appliedCoupon.discountValue}
+                  {appliedCoupon.type === "percentage" ? "%" : "Rs"})
+                  <button onClick={() => setAppliedCoupon(null)}>✖</button>
+                </div>
+              )}
+
               <p>Sub Total: Rs {subtotal.toFixed(2)}</p>
               <p>Discount: -Rs {discount.toFixed(2)}</p>
               <hr />
@@ -263,17 +293,7 @@ function Cart() {
         </div>
       )}
 
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      <ToastContainer />
     </div>
   );
 }

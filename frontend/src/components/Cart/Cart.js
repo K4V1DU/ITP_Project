@@ -130,6 +130,21 @@ function Cart() {
   const discount = coupon === "DISCOUNT10" ? subtotal * 0.1 : 0;
   const totalCost = subtotal - discount;
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/Cart/${id}`);
+
+      // Remove the item from state immediately
+      const updatedItems = Items.filter((item) => item._id !== id);
+      setItems(updatedItems);
+
+      toast.success("✅ Item removed from cart!", { autoClose: 3000 });
+    } catch (err) {
+      console.error("Delete error:", err);
+      toast.error("❌ Failed to remove item", { autoClose: 3000 });
+    }
+  };
+
   return (
     <div className="cart-page">
       <Navbar />
@@ -207,7 +222,16 @@ function Cart() {
                     </td>
                     <td>Rs: {item.Total.toFixed(2)}</td>
                     <td>
-                      <button className="remove">🗑️</button>
+                      <button
+                        className="remove"
+                        onClick={() => handleDelete(item._id)}
+                      >
+                        <img
+                          src="/images/bin.png"
+                          alt="Delete"
+                          className="delete-icon"
+                        />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -239,7 +263,6 @@ function Cart() {
         </div>
       )}
 
-     
       <ToastContainer
         position="top-right"
         autoClose={3000}

@@ -8,7 +8,8 @@ const Coupons = require("../Model/CouponsModel");
 const CouponsController = require("../Controllers/CouponsController");
 
 router.get("/",CouponsController.getAllCoupons);
-
+router.post("/",CouponsController.addCoupon);
+router.get("/:id",CouponsController.getBycouponId);
 
 
 //export

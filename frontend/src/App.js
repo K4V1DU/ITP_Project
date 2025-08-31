@@ -5,6 +5,7 @@ import Offers from "./components/Home/Offers.js";
 import AddProducts from "./components/AddProducts/AddProducts.js";
 import Order from "./components/Order/Order.js";
 import Cart from './components/Cart/Cart.js';
+import ProtionAndCoupon from './components/Promotion_and_Coupons/CouponsDashboard.js';
 
 
 
@@ -18,6 +19,7 @@ function App() {
       <Route path="/cart" element={<Cart />} />
       <Route path="/Order/:id" element={<Order />} />
       <Route path="/Notifications" element={<AddProducts />} />
+      <Route path="/Contact" element={<ProtionAndCoupon />} />
 
       
     </Routes>

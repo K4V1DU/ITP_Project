@@ -56,7 +56,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   const success = await sendRequest();
   if (success) {
-    history("/home"); // only redirect if insert/update worked
+    history("/cart"); 
   }
 };
 

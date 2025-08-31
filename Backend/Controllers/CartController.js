@@ -190,6 +190,36 @@ const getItemsByUser = async (req, res, next) => {
 
 
 
+const updateMultipleCartItems = async (req, res, next) => {
+  const { items } = req.body; // array of { id, Quantity, Total }
+
+  try {
+    const updatedItems = await Promise.all(
+      items.map(async (item) => {
+        const cartItem = await Cart.findById(item.id);
+        if (!cartItem) return null;
+
+        const product = await Inventory.findById(cartItem.ProductID);
+        if (item.Quantity > product.Quantity) {
+          item.Quantity = product.Quantity; // cap at stock
+          item.Total = product.Quantity * cartItem.Price;
+        }
+
+        return await Cart.findByIdAndUpdate(
+          item.id,
+          { Quantity: item.Quantity, Total: item.Total },
+          { new: true }
+        );
+      })
+    );
+
+    return res.status(200).json({ updatedItems });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 
 
@@ -199,3 +229,4 @@ exports.getById = getById;
 exports.updateCart = updateCart;
 exports.deleteItem = deleteItem;
 exports.getItemsByUser = getItemsByUser;
+exports.updateMultipleCartItems = updateMultipleCartItems;

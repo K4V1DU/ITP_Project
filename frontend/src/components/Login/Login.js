@@ -23,12 +23,12 @@ function Login() {
         alert("Login Success");
         const role = response.data.user.role;
   
-        if (role === "admin") {
-          history("/admin-dashboard");
-        } else if (role === "customer") {
-          history("/userdetails");
+        if (role === "Admin") {
+          history("/cart");
+        } else if (role === "Customer") {
+          history("/home");
         } else {
-          history("/");
+          history("/login");
         }
       } else {
         alert(response.data.message || "Login Error");

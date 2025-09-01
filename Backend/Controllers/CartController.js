@@ -221,7 +221,16 @@ const updateMultipleCartItems = async (req, res, next) => {
 };
 
 
-
+const deleteUserCart = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    await Cart.deleteMany({ UserID: userId });
+    res.status(200).json({ message: "Cart cleared" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to clear cart" });
+  }
+};
 
 exports.addToCart = addToCart;
 exports.getAllItems = getAllItems;
@@ -230,3 +239,4 @@ exports.updateCart = updateCart;
 exports.deleteItem = deleteItem;
 exports.getItemsByUser = getItemsByUser;
 exports.updateMultipleCartItems = updateMultipleCartItems;
+exports.deleteUserCart = deleteUserCart;

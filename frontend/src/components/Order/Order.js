@@ -28,29 +28,32 @@ function Order() {
     URL: "",
   });
 
-  
-  useEffect(() => {
-    const fetchHandler = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5000/inventory/${id}`);
-        const prod = res.data.products;
-        setProduct(prod);
+useEffect(() => {
+  const fetchHandler = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/inventory/${id}`);
+      const prod = res.data.products;
+      setProduct(prod);
 
-        setInputs({
-          UserID: "456", // REPLACE with actual logged-in user ID
-          ProductID: prod._id,
-          Name: prod.Name,
-          Price: prod.Price,
-          Quantity: 1,
-          Total: prod.Price,
-          URL: prod.URL,
-        });
-      } catch (err) {
-        console.error("Error fetching product:", err);
-      }
-    };
-    fetchHandler();
-  }, [id]);
+      
+      const userId = localStorage.getItem("userId");
+
+      setInputs({
+        UserID: userId,
+        ProductID: prod._id,
+        Name: prod.Name,
+        Price: prod.Price,
+        Quantity: 1,
+        Total: prod.Price,
+        URL: prod.URL,
+      });
+    } catch (err) {
+      console.error("Error fetching product:", err);
+    }
+  };
+
+  fetchHandler();
+}, [id]);
 
 const handleSubmit = async (e) => {
   e.preventDefault();

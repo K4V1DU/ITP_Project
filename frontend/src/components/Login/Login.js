@@ -18,11 +18,19 @@ function Login() {
         username: user.username,
         password: user.password
       });
-  
+
       if (response.data.status === "ok") {
-        alert("Login Success");
-        const role = response.data.user.role;
-  
+        
+
+       
+        const role = response.data.user.Role; 
+        const id = response.data.user._id;
+
+        
+        localStorage.setItem("role", role);
+        localStorage.setItem("userId", id);
+
+        
         if (role === "Admin") {
           history("/cart");
         } else if (role === "Customer") {
@@ -34,11 +42,10 @@ function Login() {
         alert(response.data.message || "Login Error");
       }
     } catch (err) {
-      alert("error: " + err.message);
+      alert("Error: " + err.message);
     }
   };
 
-  
   return (
     <div>
       <h1>User Login</h1>

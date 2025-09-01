@@ -119,7 +119,28 @@ const deleteProduct = async(req, res, next) => {
 
 };
 
+// PUT /inventory/update/:id
+const updateInventory = async (req, res) => {
+  const { id } = req.params;
+  const { quantity } = req.body; // quantity to subtract
 
+  try {
+    const product = await Inventory.findById(id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    if (product.Quantity < quantity) {
+      return res.status(400).json({ message: "Insufficient stock" });
+    }
+
+    product.Quantity -= quantity;
+    await product.save();
+
+    res.status(200).json({ message: "Inventory updated", product });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error updating inventory" });
+  }
+};
 
 
 exports.addProducts = addProducts;
@@ -127,3 +148,4 @@ exports.getAllProducts = getAllProducts;
 exports.getById = getById;
 exports.updateProduct = updateProduct;
 exports.deleteProduct = deleteProduct;
+exports.updateInventory = updateInventory;

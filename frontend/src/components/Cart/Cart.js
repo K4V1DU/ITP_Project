@@ -4,13 +4,14 @@ import Navbar from "../NavBar/NavBar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Cart.css";
+import { useNavigate } from "react-router-dom";
 
 function Cart() {
   const [Items, setItems] = useState([]);
   const [coupon, setCoupon] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(null); 
   const [warnings, setWarnings] = useState({});
-  const userId = "456";
+  const userId = localStorage.getItem("userId");
 
   // Fetch cart items
   const fetchHandler = async () => {
@@ -36,9 +37,10 @@ function Cart() {
       toast.error("Failed to load cart items", { autoClose: 3000 });
     }
   };
-
+  
   useEffect(() => {
     fetchHandler();
+    // eslint-disable-next-line
   }, []);
 
   // Increment
@@ -121,7 +123,7 @@ function Cart() {
     }
   };
 
-  // Apply coupon (only one allowed)
+ 
   const handleCoupon = async () => {
     if (!coupon) {
       toast.warning("Enter a coupon code");
@@ -150,7 +152,7 @@ function Cart() {
     }
   };
 
-  // Totals
+  
   const subtotal = Items.reduce((sum, item) => sum + item.Total, 0);
   let discount = 0;
 
@@ -164,6 +166,26 @@ function Cart() {
 
   const totalCost = subtotal - discount;
 
+
+
+
+
+const navigate = useNavigate();
+
+const handleCheckout = () => {
+navigate("/checkout", {
+  state: {
+    items: Items,
+    subtotal,
+    discount,
+    totalCost,
+    appliedCoupon,
+    userId: userId,
+  },
+});
+};
+
+
   return (
     <div className="cart-page">
       <Navbar />
@@ -172,7 +194,7 @@ function Cart() {
         <div className="empty">🛒 Your cart is empty.</div>
       ) : (
         <div className="cart-wrapper">
-          {/* LEFT */}
+          
           <div className="cart-left">
             <div className="title-row">
               <h2>Shopping Cart</h2>
@@ -259,7 +281,7 @@ function Cart() {
             </table>
           </div>
 
-          {/* RIGHT SUMMARY */}
+          
           <div className="cart-right">
             <h2>Order Summary</h2>
             <div className="summary">
@@ -273,7 +295,7 @@ function Cart() {
                 <button onClick={handleCoupon}>Apply</button>
               </div>
 
-              {/* Show applied coupon (only one) */}
+              
               {appliedCoupon && (
                 <div className="coupon-tag">
                   {appliedCoupon.code} ({appliedCoupon.discountValue}
@@ -287,7 +309,9 @@ function Cart() {
               <hr />
               <p className="total">Total: Rs {totalCost.toFixed(2)}</p>
 
-              <button className="checkout-btn">Checkout Now</button>
+              <button className="checkout-btn" onClick={handleCheckout}>
+  Checkout Now
+</button>
             </div>
           </div>
         </div>

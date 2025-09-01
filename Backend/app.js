@@ -4,9 +4,8 @@ const mongoose = require("mongoose");
 const inventoryRouter = require("./Routes/InventoryRoute");
 const CartRouter = require("./Routes/CartRoute");
 const UsersRouter = require("./Routes/UsersRoute");
-
 const Coupons = require("./Routes/CouponsRoute");
-
+const orderRoutes = require("./Routes/OrdersRoute");
 
 
 const app = express(); 
@@ -17,11 +16,13 @@ const cors = require("cors");
 //Middleware
 app.use(express.json());
 app.use(cors());
+
+
 app.use("/inventory", inventoryRouter);
 app.use("/Cart", CartRouter);
 app.use("/Users", UsersRouter);
 app.use("/Coupons",Coupons);
-
+app.use("/orders", orderRoutes);
 
 
 

@@ -89,29 +89,29 @@ const deleteUsers = async (req, res, next) => {
 
 //login
 const loginUser = async (req, res) => {
-    const { username, password } = req.body;
-  
-    try {
-      const user = await Users.findOne({ UserName: username, Password: password });
-  
-      if (!user) {
-        return res.json({ status: "error", message: "Invalid username or password" });
-      }
-  
-      return res.json({
-        status: "ok",
-        message: "Login successful",
-        user: {
-          id: user._id,
-          username: user.UserName,
-          role: user.Role
-        }
-      });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ status: "error", message: "Server error" });
+  const { username, password } = req.body;
+
+  try {
+    const user = await Users.findOne({ UserName: username, Password: password });
+
+    if (!user) {
+      return res.json({ status: "error", message: "Invalid username or password" });
     }
-  };
+
+    return res.json({
+      status: "ok",
+      message: "Login successful",
+      user: {
+        _id: user._id,
+        UserName: user.UserName,
+        Role: user.Role,  
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ status: "error", message: "Server error" });
+  }
+};
   
   module.exports = {
     getAllUsers,
@@ -119,5 +119,5 @@ const loginUser = async (req, res) => {
     getById,
     updateUsers,
     deleteUsers,
-    loginUser, // <-- export the new login function
+    loginUser, 
   };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router';
 import axios from "axios";
+import Navbar from "../NavBar/NavBar";
 
 function AddProducts() {
     const history = useNavigate();
@@ -54,6 +55,7 @@ function AddProducts() {
 
   return (
     <div>
+      <Navbar/>
     <form onSubmit={handleSubmit} className="productForm">
       <input
         type="text"

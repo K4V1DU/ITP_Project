@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 //insert routes
 const inventoryRouter = require("./Routes/InventoryRoute");
 const CartRouter = require("./Routes/CartRoute");
+const UsersRouter = require("./Routes/UsersRoute");
 
 const Coupons = require("./Routes/CouponsRoute");
 
@@ -18,9 +19,9 @@ app.use(express.json());
 app.use(cors());
 app.use("/inventory", inventoryRouter);
 app.use("/Cart", CartRouter);
-app.use("/Cart", CartRouter);
-
+app.use("/Users", UsersRouter);
 app.use("/Coupons",Coupons);
+
 
 
 
@@ -30,3 +31,4 @@ app.use("/Coupons",Coupons);
     app.listen(5000);
  })
  .catch((err)=> console.log((err)));
+

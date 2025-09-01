@@ -13,6 +13,8 @@ function CouponsDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [editingCoupon, setEditingCoupon] = useState(null);
+  const [activeTab, setActiveTab] = useState("active"); // "active" or "expired"
+
   const [formData, setFormData] = useState({
     Code: "",
     discountType: "percentage",
@@ -37,7 +39,6 @@ function CouponsDashboard() {
         const expiryDate = new Date(c.ExpiryDate);
         if (expiryDate < now) {
           expired.push({ ...c, Active: false, daysPast: Math.floor((now - expiryDate) / (1000 * 60 * 60 * 24)) });
-          // Optional: automatically deactivate in DB
           if (c.Active) {
             axios.put(`${API_URL}/${c._id}`, { ...c, Active: false }).catch(console.error);
           }
@@ -61,7 +62,7 @@ function CouponsDashboard() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    if (type === "number" && value < 0) return; // no negative numbers
+    if (type === "number" && value < 0) return;
 
     if (name === "ExpiryDate") {
       const selectedDate = new Date(value);
@@ -113,6 +114,13 @@ function CouponsDashboard() {
         await axios.put(`${API_URL}/${editingCoupon._id}`, updateData);
         toast.success("Coupon updated ✅", { position: "top-center" });
       } else {
+        // Check for duplicate Code
+        const duplicate = coupons.concat(expiredCoupons).find(c => c.Code.toLowerCase() === formData.Code.toLowerCase());
+        if (duplicate) {
+          toast.error("Coupon Code must be unique!", { position: "top-center" });
+          return;
+        }
+
         await axios.post(API_URL, formData);
         toast.success("Coupon created ✅", { position: "top-center" });
       }
@@ -164,13 +172,18 @@ function CouponsDashboard() {
     }
   };
 
+  // FILTER + SEARCH for both tables
   const filteredCoupons = coupons.filter(
     (c) =>
       c.Code.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (statusFilter === "" || (statusFilter === "active" ? c.Active : !c.Active))
   );
 
-  const filteredExpired = expiredCoupons.filter((c) => c.Code.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredExpired = expiredCoupons.filter(
+    (c) =>
+      c.Code.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (statusFilter === "" || (statusFilter === "active" ? c.Active : !c.Active))
+  );
 
   const formatDiscount = (coupon) =>
     coupon.discountType === "percentage" ? `${coupon.DiscountValue}%` : `Rs. ${coupon.DiscountValue}`;
@@ -252,111 +265,121 @@ function CouponsDashboard() {
             type="text"
             placeholder="Search by Code..."
             className="filter-input"
+            value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <select className="filter-input" onChange={(e) => setStatusFilter(e.target.value)}>
+          <select
+            className="filter-input"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
         </div>
 
-        {/* Active Coupon Table */}
-        <h2>Active / Upcoming Coupons</h2>
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Type</th>
-                <th>Discount</th>
-                <th>Min Amount</th>
-                <th>Used</th>
-                <th>Expiry</th>
-                <th>Days Left</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCoupons.map((c) => (
-                <tr key={c._id}>
-                  <td>{c.Code}</td>
-                  <td>{c.discountType}</td>
-                  <td>{formatDiscount(c)}</td>
-                  <td>Rs. {c.MinAmount}</td>
-                  <td>
-                    {c.UsageCount}/{c.UsageLimit}
-                  </td>
-                  <td>{new Date(c.ExpiryDate).toLocaleDateString()}</td>
-                  <td>{c.daysLeft} day(s)</td>
-                  <td>
-                    <span className={`badge ${c.Active ? "badge-active" : "badge-inactive"}`}>
-                      {c.Active ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="actions">
-                    <button className="btn btn-green" onClick={() => handleEdit(c)}>
-                      Edit
-                    </button>
-                    <button className="btn btn-orange" onClick={() => handleToggleActive(c)}>
-                      {c.Active ? "Deactivate" : "Activate"}
-                    </button>
-                    <button className="btn btn-red" onClick={() => handleDelete(c._id)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Navigation Tabs */}
+        <div className="tab-navigation">
+          <button
+            className={`tab-btn ${activeTab === "active" ? "tab-active" : ""}`}
+            onClick={() => setActiveTab("active")}
+          >
+            Active / Upcoming Coupons
+          </button>
+          <button
+            className={`tab-btn ${activeTab === "expired" ? "tab-active" : ""}`}
+            onClick={() => setActiveTab("expired")}
+          >
+            Expired Coupons
+          </button>
         </div>
 
-        {/* Expired Coupon Table */}
-        <h2>Expired Coupons</h2>
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Type</th>
-                <th>Discount</th>
-                <th>Min Amount</th>
-                <th>Used</th>
-                <th>Expiry</th>
-                <th>Days Past Expiry</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredExpired.map((c) => (
-                <tr key={c._id}>
-                  <td>{c.Code}</td>
-                  <td>{c.discountType}</td>
-                  <td>{formatDiscount(c)}</td>
-                  <td>Rs. {c.MinAmount}</td>
-                  <td>
-                    {c.UsageCount}/{c.UsageLimit}
-                  </td>
-                  <td>{new Date(c.ExpiryDate).toLocaleDateString()}</td>
-                  <td>{c.daysPast} day(s)</td>
-                  <td>
-                    <span className={`badge badge-inactive`}>Expired</span>
-                  </td>
-                  <td className="actions">
-                    <button className="btn btn-green" onClick={() => handleEdit(c)}>
-                      Edit
-                    </button>
-                    <button className="btn btn-red" onClick={() => handleDelete(c._id)}>
-                      Delete
-                    </button>
-                  </td>
+        {/* Tables */}
+        {activeTab === "active" && (
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Type</th>
+                  <th>Discount</th>
+                  <th>Min Amount</th>
+                  <th>Used</th>
+                  <th>Expiry</th>
+                  <th>Days Left</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filteredCoupons.map((c) => (
+                  <tr key={c._id}>
+                    <td>{c.Code}</td>
+                    <td>{c.discountType}</td>
+                    <td>{formatDiscount(c)}</td>
+                    <td>Rs. {c.MinAmount}</td>
+                    <td>{c.UsageCount}/{c.UsageLimit}</td>
+                    <td>{new Date(c.ExpiryDate).toLocaleDateString()}</td>
+                    <td>{c.daysLeft} day(s)</td>
+                    <td>
+                      <span className={`badge ${c.Active ? "badge-active" : "badge-inactive"}`}>
+                        {c.Active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="actions">
+                      <button className="btn btn-green" onClick={() => handleEdit(c)}>Edit</button>
+                      <button className="btn btn-orange" onClick={() => handleToggleActive(c)}>
+                        {c.Active ? "Deactivate" : "Activate"}
+                      </button>
+                      <button className="btn btn-red" onClick={() => handleDelete(c._id)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {activeTab === "expired" && (
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Type</th>
+                  <th>Discount</th>
+                  <th>Min Amount</th>
+                  <th>Used</th>
+                  <th>Expiry</th>
+                  <th>Days Past Expiry</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredExpired.map((c) => (
+                  <tr key={c._id}>
+                    <td>{c.Code}</td>
+                    <td>{c.discountType}</td>
+                    <td>{formatDiscount(c)}</td>
+                    <td>Rs. {c.MinAmount}</td>
+                    <td>{c.UsageCount}/{c.UsageLimit}</td>
+                    <td>{new Date(c.ExpiryDate).toLocaleDateString()}</td>
+                    <td>{c.daysPast} day(s)</td>
+                    <td>
+                      <span className={`badge badge-inactive`}>Expired</span>
+                    </td>
+                    <td className="actions">
+                      <button className="btn btn-green" onClick={() => handleEdit(c)}>Edit</button>
+                      <button className="btn btn-red" onClick={() => handleDelete(c._id)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         <ToastContainer />
       </div>

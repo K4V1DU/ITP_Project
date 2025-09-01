@@ -95,8 +95,62 @@ const updateCoupon = async(req, res, next) => {
 
 
 
+// Validate Coupon
+const validateCoupon = async (req, res, next) => {
+  const { code, subtotal } = req.body;
+
+  try {
+    const coupon = await Coupons.findOne({ Code: code });
+
+    if (!coupon) {
+      return res.status(404).json({ message: "Invalid coupon" });
+    }
+
+    // Active check
+    if (!coupon.Active) {
+      return res.status(400).json({ message: "Coupon is not active" });
+    }
+
+    // Expiry check
+    if (new Date() > coupon.ExpiryDate) {
+      return res.status(400).json({ message: "Coupon expired" });
+    }
+
+    // Minimum amount check
+    if (subtotal < coupon.MinAmount) {
+      return res
+        .status(400)
+        .json({ message: `Minimum order Rs ${coupon.MinAmount} required` });
+    }
+
+    // Usage limit check
+    if (coupon.UsageCount >= coupon.UsageLimit) {
+      return res.status(400).json({ message: "Coupon usage limit reached" });
+    }
+
+    // If valid, return discount details
+    return res.status(200).json({
+      message: "Coupon applied successfully",
+      discountValue: coupon.DiscountValue,
+      type: "percentage", // you can change later if you want fixed
+      code: coupon.Code,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error", error: err });
+  }
+};
+
+
+
+
+
 exports.getAllCoupons = getAllCoupons;
 exports.addCoupon = addCoupon;
 exports.getBycouponId = getBycouponId;
 exports.deleteCoupon = deleteCoupon;
 exports.updateCoupon = updateCoupon;
+exports.validateCoupon = validateCoupon;
+
+
+

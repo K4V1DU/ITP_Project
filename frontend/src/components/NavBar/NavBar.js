@@ -17,10 +17,10 @@ function Navbar() {
 
 
   let links = [];
-  if (role === "staff") {
-    links = ["Dashboard", "Orders", "Deliveries"];
+  if (role === "MarketingManager") {
+    links = ["Promotions", "Notifications", "History"];
   } else if (role === "Admin") {
-    links = ["Admin Panel", "Manage Users", "Reports", "Inventory"];
+    links = ["Admin Panel", "Manage Users", "Notifications", "Inventory"];
   } else {
     links = ["Home", "Notifications", "Cart", "Track Orders", "Contact"];
   }

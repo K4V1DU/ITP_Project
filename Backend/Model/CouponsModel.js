@@ -12,7 +12,7 @@ const CouponSchema = new Schema({
 
     discountType: {
         type: String,
-        enum: ["percentage", "flat"],
+        enum: ["Coupon", "Promotion"],
         required: true
     },
 

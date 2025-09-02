@@ -14,7 +14,7 @@ router.put("/update-multiple", CartController.updateMultipleCartItems);
 router.get("/:id",CartController.getById);
 router.put("/:id",CartController.updateCart);
 router.delete("/:id",CartController.deleteItem);
-
+router.delete("/user/:userId", CartController.deleteUserCart);
 
 //export
 module.exports = router;

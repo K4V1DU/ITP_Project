@@ -1,0 +1,104 @@
+/* Page layout */
+.checkout-page {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff; /* white background */
+  color: #000000; /* black text */
+  font-family: Arial, sans-serif;
+  border-radius: 15px;           /* rounded corners */
+  border: 3px solid #000000;     /* black border */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Headings */
+.checkout-page h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+.checkout-page h3 {
+  font-size: 22px;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #000;
+  padding-bottom: 5px;
+}
+
+/* Order summary list */
+.checkout-page ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 15px;
+}
+
+.checkout-page ul li {
+  padding: 6px 0;
+  border-bottom: 1px dashed #000;
+}
+
+/* Extra fields section */
+.extra-fields {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.extra-fields label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.extra-fields input,
+.extra-fields select {
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 8px;  /* rounded input fields */
+  background: #fff;
+  color: #000;
+}
+
+.extra-fields input:focus,
+.extra-fields select:focus {
+  outline: none;
+  border-color: #000;
+}
+
+/* Place order button */
+.checkout-page button {
+  margin-top: 25px;
+  padding: 14px 20px;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;   /* rounded button */
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.checkout-page button:hover {
+  background: #fff;
+  color: #000;
+  border: 2px solid #000;
+}
+
+/* Paragraphs */
+.checkout-page p {
+  margin: 6px 0;
+  font-weight: 500;
+}
+
+/* Coupon info */
+.checkout-page p:last-child {
+  font-style: italic;
+}
+
+
+

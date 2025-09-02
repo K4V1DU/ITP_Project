@@ -2,32 +2,35 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import "./Checkout.css"; // your page styles first
+import "react-toastify/dist/ReactToastify.css"; // toast styles last
+import Navbar from "../NavBar/NavBar";
 
 function Checkout() {
   const location = useLocation();
-  const { items, subtotal, discount, totalCost, appliedCoupon, userId } = location.state || {};
+  const { items, subtotal, discount, totalCost, appliedCoupon, userId } =
+    location.state || {};
 
   const [scheduleDate, setScheduleDate] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
   const [shippingAddress, setShippingAddress] = useState("");
   const [contactNumber, setContactNumber] = useState("");
 
-  // Minimum selectable date = today + 2 days
   const minDateObj = new Date();
   minDateObj.setDate(minDateObj.getDate() + 2);
   const minDate = minDateObj.toISOString().split("T")[0];
 
-  // Fetch user data on mount and pre-fill address & phone
+  // Fetch user data and fill address & phone
   useEffect(() => {
     if (userId) {
-      axios.get(`http://localhost:5000/Users/${userId}`)
-        .then(res => {
+      axios
+        .get(`http://localhost:5000/Users/${userId}`)
+        .then((res) => {
           const user = res.data.user; // <-- access 'user' property from backend
           if (user.Address) setShippingAddress(user.Address);
           if (user.Mobile) setContactNumber(user.Mobile);
         })
-        .catch(err => {
+        .catch((err) => {
           console.error("Failed to fetch user data:", err);
           toast.error("Failed to load user information");
         });
@@ -43,7 +46,9 @@ function Checkout() {
     try {
       // Check stock for each item
       const stockCheckPromises = items.map(async (item) => {
-        const res = await axios.get(`http://localhost:5000/inventory/${item.ProductID}`);
+        const res = await axios.get(
+          `http://localhost:5000/inventory/${item.ProductID}`
+        );
         return {
           ...item,
           Stock: res.data.products.Quantity,
@@ -52,15 +57,16 @@ function Checkout() {
 
       const itemsWithStock = await Promise.all(stockCheckPromises);
 
-      const outOfStock = itemsWithStock.filter(item => item.Quantity > item.Stock);
+      const outOfStock = itemsWithStock.filter(
+        (item) => item.Quantity > item.Stock
+      );
 
       if (outOfStock.length > 0) {
-        const names = outOfStock.map(i => i.Name).join(", ");
+        const names = outOfStock.map((i) => i.Name).join(", ");
         toast.error(`Insufficient stock for: ${names}`);
         return;
       }
 
-      // Handle schedule & estimated delivery
       let scheduledDateToUse = null;
       let estimatedDelivery = "";
 
@@ -79,7 +85,7 @@ function Checkout() {
       const orderPayload = {
         OrderNumber: `ORD${Date.now()}`,
         UserID: userId,
-        Items: items.map(item => ({
+        Items: items.map((item) => ({
           ProductID: item.ProductID,
           Name: item.Name,
           Price: item.Price,
@@ -94,16 +100,16 @@ function Checkout() {
         ScheduledDelivery: scheduledDateToUse,
         ShippingAddress: shippingAddress,
         ContactNumber: contactNumber,
-        EstimatedDelivery: estimatedDelivery
+        EstimatedDelivery: estimatedDelivery,
       };
 
       // Place order
       await axios.post("http://localhost:5000/orders", orderPayload);
 
       // Update inventory quantities
-      const updateInventoryPromises = items.map(item =>
+      const updateInventoryPromises = items.map((item) =>
         axios.put(`http://localhost:5000/inventory/update/${item.ProductID}`, {
-          quantity: item.Quantity
+          quantity: item.Quantity,
         })
       );
       await Promise.all(updateInventoryPromises);
@@ -119,58 +125,77 @@ function Checkout() {
   };
 
   return (
-    <div className="checkout-page">
-      <h2>Checkout Page</h2>
+    <div>
+      <Navbar />
+      <div className="checkout-page">
+        <h2>Checkout</h2>
 
-      <h3>Order Summary</h3>
-      <ul>
-        {items?.map(item => (
-          <li key={item._id}>
-            {item.Name} x {item.Quantity} = Rs {item.Total.toFixed(2)}
-          </li>
-        ))}
-      </ul>
-      <p>Subtotal: Rs {subtotal?.toFixed(2)}</p>
-      <p>Discount: Rs {discount?.toFixed(2)}</p>
-      <p>Total: Rs {totalCost?.toFixed(2)}</p>
-      {appliedCoupon && <p>Coupon Applied: {appliedCoupon.code}</p>}
+        <div className="extra-fields">
+          <label>Shipping Address:</label>
+          <input
+            type="text"
+            value={shippingAddress}
+            onChange={(e) => setShippingAddress(e.target.value)}
+          />
 
-      <div className="extra-fields">
-        <label>Shipping Address:</label>
-        <input
-          type="text"
-          value={shippingAddress}
-          onChange={(e) => setShippingAddress(e.target.value)}
-        />
+          <label>Contact Number:</label>
+          <input
+            type="text"
+            value={contactNumber}
+            onChange={(e) => setContactNumber(e.target.value)}
+          />
 
-        <label>Contact Number:</label>
-        <input
-          type="text"
-          value={contactNumber}
-          onChange={(e) => setContactNumber(e.target.value)}
-        />
+          <label>Schedule Delivery Date (optional):</label>
+          <input
+            type="date"
+            value={scheduleDate}
+            min={minDate}
+            onChange={(e) => setScheduleDate(e.target.value)}
+          />
 
-        <label>Schedule Delivery Date (optional):</label>
-        <input
-          type="date"
-          value={scheduleDate}
-          min={minDate}
-          onChange={(e) => setScheduleDate(e.target.value)}
-        />
+          <label>Payment Method:</label>
+          <select
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+          >
+            <option value="Cash on Delivery">Cash on Delivery</option>
+            <option value="Bank Deposit">Bank Deposit</option>
+          </select>
+        </div>
 
-        <label>Payment Method:</label>
-        <select
-          value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
-        >
-          <option value="Cash on Delivery">Cash on Delivery</option>
-          <option value="Bank Deposit">Bank Deposit</option>
-        </select>
+        <ul>
+          {items?.map((item) => (
+            <li key={item._id}>
+              {item.Name} x {item.Quantity} = Rs {item.Total.toFixed(2)}
+            </li>
+          ))}
+        </ul>
+        <p>
+          <strong>Subtotal:</strong> Rs {subtotal?.toFixed(2)}
+        </p>
+        <p>
+          <strong>Discount:</strong> Rs {discount?.toFixed(2)}
+        </p>
+        {appliedCoupon && <p>Coupon Applied: {appliedCoupon.code}</p>}
+        <p>
+          <strong>Total: Rs {totalCost?.toFixed(2)}</strong>
+        </p>
+
+        <button onClick={handlePlaceOrder}>Place Order</button>
+
+      <ToastContainer
+  position="top-right"
+  autoClose={3000}
+  hideProgressBar={false}
+  newestOnTop={false}
+  closeOnClick={false}       
+  closeButton={false}       
+  pauseOnFocusLoss
+  draggable
+  pauseOnHover
+  style={{ background: "white" }}
+/>
       </div>
-
-      <button onClick={handlePlaceOrder}>Place Order</button>
-
-      <ToastContainer />
     </div>
   );
 }

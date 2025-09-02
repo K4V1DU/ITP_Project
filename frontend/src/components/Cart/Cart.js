@@ -9,8 +9,9 @@ import { useNavigate } from "react-router-dom";
 function Cart() {
   const [Items, setItems] = useState([]);
   const [coupon, setCoupon] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState(null); 
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [warnings, setWarnings] = useState({});
+  const [loading, setLoading] = useState(true); // ✅ loading state
   const userId = localStorage.getItem("userId");
 
   // Fetch cart items
@@ -34,10 +35,11 @@ function Cart() {
       setItems(itemsWithStock);
     } catch (err) {
       console.error("Error fetching cart:", err);
-      toast.error("Failed to load cart items", { autoClose: 3000 });
+    } finally {
+      setLoading(false); // ✅ stop loading no matter what
     }
   };
-  
+
   useEffect(() => {
     fetchHandler();
     // eslint-disable-next-line
@@ -123,7 +125,7 @@ function Cart() {
     }
   };
 
- 
+  // Apply coupon
   const handleCoupon = async () => {
     if (!coupon) {
       toast.warning("Enter a coupon code");
@@ -145,14 +147,12 @@ function Cart() {
       toast.success(`Coupon applied!`);
       setCoupon("");
     } catch (err) {
-      toast.error(
-        `${err.response?.data?.message || "Invalid coupon"}`,
-        { autoClose: 3000 }
-      );
+      toast.error(`${err.response?.data?.message || "Invalid coupon"}`, {
+        autoClose: 3000,
+      });
     }
   };
 
-  
   const subtotal = Items.reduce((sum, item) => sum + item.Total, 0);
   let discount = 0;
 
@@ -166,35 +166,35 @@ function Cart() {
 
   const totalCost = subtotal - discount;
 
+  const navigate = useNavigate();
 
-
-
-
-const navigate = useNavigate();
-
-const handleCheckout = () => {
-navigate("/checkout", {
-  state: {
-    items: Items,
-    subtotal,
-    discount,
-    totalCost,
-    appliedCoupon,
-    userId: userId,
-  },
-});
-};
-
+  const handleCheckout = () => {
+    navigate("/checkout", {
+      state: {
+        items: Items,
+        subtotal,
+        discount,
+        totalCost,
+        appliedCoupon,
+        userId: userId,
+      },
+    });
+  };
 
   return (
     <div className="cart-page">
       <Navbar />
 
-      {Items.length === 0 ? (
-        <div className="empty">🛒 Your cart is empty.</div>
-      ) : (
+      
+      {loading ? (
+  <div className="loading">
+    <div className="loader"></div>
+    <p>Cart is loading...</p>
+  </div>
+) : Items.length === 0 ? (
+  <div className="empty">Your cart is empty.</div>
+) : (
         <div className="cart-wrapper">
-          
           <div className="cart-left">
             <div className="title-row">
               <h2>Shopping Cart</h2>
@@ -207,9 +207,9 @@ navigate("/checkout", {
               <thead>
                 <tr>
                   <th>Product</th>
-                  <th>Quantity</th>
+                  <th style={{ paddingLeft: "60px" }}>Quantity</th>
                   <th>Total</th>
-                  <th>Action</th>
+                  <th>Remove</th>
                 </tr>
               </thead>
               <tbody>
@@ -234,6 +234,9 @@ navigate("/checkout", {
                           max={item.Stock}
                           onChange={(e) => {
                             let qty = Number(e.target.value);
+
+                            if (qty < 1) qty = 1;
+
                             if (qty > item.Stock) {
                               qty = item.Stock;
                               setWarnings((prev) => ({
@@ -246,6 +249,7 @@ navigate("/checkout", {
                                 [item._id]: "",
                               }));
                             }
+
                             const updated = Items.map((i) =>
                               i._id === item._id
                                 ? { ...i, Quantity: qty, Total: qty * i.Price }
@@ -281,7 +285,6 @@ navigate("/checkout", {
             </table>
           </div>
 
-          
           <div className="cart-right">
             <h2>Order Summary</h2>
             <div className="summary">
@@ -295,7 +298,6 @@ navigate("/checkout", {
                 <button onClick={handleCoupon}>Apply</button>
               </div>
 
-              
               {appliedCoupon && (
                 <div className="coupon-tag">
                   {appliedCoupon.code} ({appliedCoupon.discountValue}
@@ -310,8 +312,8 @@ navigate("/checkout", {
               <p className="total">Total: Rs {totalCost.toFixed(2)}</p>
 
               <button className="checkout-btn" onClick={handleCheckout}>
-  Checkout Now
-</button>
+                Checkout Now
+              </button>
             </div>
           </div>
         </div>
@@ -323,3 +325,4 @@ navigate("/checkout", {
 }
 
 export default Cart;
+

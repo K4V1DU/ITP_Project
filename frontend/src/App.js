@@ -9,6 +9,7 @@ import DisplayUsers from "./components/AdminDashboard/DisplayUsers.js";
 import AddUsers from "./components/AdminDashboard/AddUsers.js";
 import UpdateUsers from "./components/AdminDashboard/UpdateUsers.js"
 import Checkout from "./components/Checkout/Checkout.js";
+import ProtionReport from "./components/Promotion_and_Coupons/CouponsReport.js";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Route path="/Promotions" element={<ProtionAndCoupon />} />
       <Route path="/Login" element={<Login />} />
       <Route path="/checkout" element={<Checkout />} />
+      <Route path="/History" element={<ProtionReport />} />
 
 
     </Routes>

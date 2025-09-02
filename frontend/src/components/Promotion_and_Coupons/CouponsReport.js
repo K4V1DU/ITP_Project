@@ -89,8 +89,8 @@ function CouponsReport() {
     <div>
       <Navbar />
       <div className="report-container">
+        
         <style>{`
-          /* General Layout */
           .report-container {
             padding: 2rem;
             font-family: 'Roboto', sans-serif;

@@ -6,6 +6,10 @@ import Order from "./components/Order/Order.js";
 import Cart from './components/Cart/Cart.js';
 import ProtionAndCoupon from './components/Promotion_and_Coupons/CouponsDashboard.js';
 import Login from "./components/Login/Login.js";
+import DisplayUsers from "./components/AdminDashboard/DisplayUsers.js";
+import AddUsers from "./components/AdminDashboard/AddUsers.js";
+import UpdateUsers from "./components/AdminDashboard/UpdateUsers.js";
+
 
 
 function App() {
@@ -18,6 +22,9 @@ function App() {
       <Route path="/Order/:id" element={<Order />} />
       <Route path="/Notifications" element={<AddProducts />} />
       <Route path="/Contact" element={<ProtionAndCoupon />} />
+      <Route path="/users" element={<DisplayUsers />} />
+      <Route path="/add-user" element={<AddUsers />} />
+      <Route path="/update-user/:id" element={<UpdateUsers />} />
 
     </Routes>
   );

@@ -24,9 +24,14 @@ function Login() {
         const role = response.data.user.role;
   
         if (role === "Admin") {
-          history("/cart");
+          history("/users");
+
         } else if (role === "Customer") {
           history("/home");
+
+        }  else if (role === "Marketing Manager") {
+            history("/Contact");  //meka wenas karanna oni........
+
         } else {
           history("/login");
         }

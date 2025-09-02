@@ -4,15 +4,23 @@ import "./NavBar.css";
 import axios from "axios";
 
 function Navbar() {
-  const role = "customer"; // hardcoded for now
-  const userId = "456";    // hardcoded user ID for testing
+ 
   const [cartTotal, setCartTotal] = useState(0);
+    const [role, setRole] = useState("");
+    const [userId, setUserId] = useState("");
+
+
+  useEffect(() => {
+    setRole(localStorage.getItem("role"));
+    setUserId(localStorage.getItem("userId"));
+  }, []); 
+
 
   let links = [];
-  if (role === "staff") {
-    links = ["Dashboard", "Orders", "Deliveries"];
-  } else if (role === "admin") {
-    links = ["Admin Panel", "Manage Users", "Reports", "Inventory"];
+  if (role === "Marketing Manager") {
+    links = ["Promotions", "Notifications", "History"];
+  } else if (role === "Admin") {
+    links = ["Admin Panel", "Manage Users", "Notifications", "Inventory"];
   } else {
     links = ["Home", "Notifications", "Cart", "Track Orders", "Contact"];
   }
@@ -29,10 +37,10 @@ function Navbar() {
       }
     };
 
-    if (role === "customer") {
+    if (role === "Customer") {
       fetchCartTotal();
     }
-  }, [role]);
+  }, [role, userId]);
 
   return (
     <nav className="NavBar">
@@ -51,7 +59,7 @@ function Navbar() {
         ))}
       </div>
 
-      {role === "customer" && (
+      {role === "Customer" && (
         <div className="wishlist">
           <div className="cart">
             <img src="/images/logoblack.png" alt="cart" className="cartIcon" />

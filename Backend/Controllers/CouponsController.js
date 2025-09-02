@@ -96,53 +96,45 @@ const updateCoupon = async(req, res, next) => {
 
 
 // Validate Coupon
+
 const validateCoupon = async (req, res, next) => {
   const { code, subtotal } = req.body;
 
+  if (!code || subtotal === undefined) {
+    return res.status(400).json({ message: "Coupon code and subtotal are required" });
+  }
+
   try {
     const coupon = await Coupons.findOne({ Code: code });
+    if (!coupon) return res.status(404).json({ message: "Invalid coupon" });
 
-    if (!coupon) {
-      return res.status(404).json({ message: "Invalid coupon" });
-    }
+    if (!coupon.Active) return res.status(400).json({ message: "Coupon is not active" });
 
-    // Active check
-    if (!coupon.Active) {
-      return res.status(400).json({ message: "Coupon is not active" });
-    }
-
-    // Expiry check
-    if (new Date() > coupon.ExpiryDate) {
+    if (!coupon.ExpiryDate || new Date() > new Date(coupon.ExpiryDate))
       return res.status(400).json({ message: "Coupon expired" });
-    }
 
-    // Minimum amount check
-    if (subtotal < coupon.MinAmount) {
-      return res
-        .status(400)
-        .json({ message: `Minimum order Rs ${coupon.MinAmount} required` });
-    }
+    if (Number(subtotal) < coupon.MinAmount)
+      return res.status(400).json({ message: `Minimum order Rs ${coupon.MinAmount} required` });
 
-    // Usage limit check
-    if (coupon.UsageCount >= coupon.UsageLimit) {
+    if (coupon.UsageCount >= coupon.UsageLimit)
       return res.status(400).json({ message: "Coupon usage limit reached" });
-    }
 
-    // If valid, return discount details
+    //usage count increment
+    coupon.UsageCount +=1;
+    await coupon.save();
+    
+    // Only return details, increment usage AFTER successful order
     return res.status(200).json({
       message: "Coupon applied successfully",
       discountValue: coupon.DiscountValue,
-      type: "percentage", // you can change later if you want fixed
+      type: coupon.discountType,
       code: coupon.Code,
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server error", error: err });
+    console.error("Coupon validation error:", err);
+    return res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
-
-
 
 
 exports.getAllCoupons = getAllCoupons;

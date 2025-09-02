@@ -1,16 +1,14 @@
 import './App.css';
 import { Routes, Route } from "react-router-dom";
 import Home from "./components/Home/Home.js";
-import AddProducts from "./components/AddProducts/AddProducts.js";
 import Order from "./components/Order/Order.js";
 import Cart from './components/Cart/Cart.js';
 import ProtionAndCoupon from './components/Promotion_and_Coupons/CouponsDashboard.js';
 import Login from "./components/Login/Login.js";
 import DisplayUsers from "./components/AdminDashboard/DisplayUsers.js";
 import AddUsers from "./components/AdminDashboard/AddUsers.js";
-import UpdateUsers from "./components/AdminDashboard/UpdateUsers.js";
-
-
+import UpdateUsers from "./components/AdminDashboard/UpdateUsers.js"
+import Checkout from "./components/Checkout/Checkout.js";
 
 function App() {
   return (
@@ -20,11 +18,13 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/Order/:id" element={<Order />} />
-      <Route path="/Notifications" element={<AddProducts />} />
-      <Route path="/Contact" element={<ProtionAndCoupon />} />
       <Route path="/users" element={<DisplayUsers />} />
       <Route path="/add-user" element={<AddUsers />} />
       <Route path="/update-user/:id" element={<UpdateUsers />} />
+      <Route path="/Promotions" element={<ProtionAndCoupon />} />
+      <Route path="/Login" element={<Login />} />
+      <Route path="/checkout" element={<Checkout />} />
+
 
     </Routes>
   );

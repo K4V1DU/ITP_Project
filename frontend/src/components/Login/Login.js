@@ -30,7 +30,7 @@ function Login() {
           history("/cart");
         } else if (role === "Customer") {
           history("/home");
-        } else if (role === "MarketingManager") {
+        } else if (role === "Marketing Manager") {
           history("/Promotions");
         } else {
           history("/login");

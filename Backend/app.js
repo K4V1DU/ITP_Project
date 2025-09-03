@@ -13,7 +13,7 @@ const cors = require("cors");
 app.use(express.json());
 app.use(cors());
 app.use("/inventory", inventoryRouter);
-app.use("/Notification",NotificationRoute)
+app.use("/Notifications",NotificationRoute)
 
 
  mongoose.connect("mongodb+srv://K4V1DU:ekwpjA9nDZid3iqR@cluster0.23nczaf.mongodb.net/Coolcart")

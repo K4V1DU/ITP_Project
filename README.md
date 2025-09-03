@@ -1,3 +1,3 @@
 # ITP_Project
 
-creating cart page
+npm install sweetalert2 react-toastify recharts

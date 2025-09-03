@@ -1,53 +1,77 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 import "./NavBar.css";
+import axios from "axios";
 
-function Navbar({ role }) {
+function Navbar() {
+ 
+  const [cartTotal, setCartTotal] = useState(0);
+    const [role, setRole] = useState("");
+    const [userId, setUserId] = useState("");
+
+
+  useEffect(() => {
+    setRole(localStorage.getItem("role"));
+    setUserId(localStorage.getItem("userId"));
+  }, []); 
+
+
   let links = [];
-
-  role="customer";
-  //role="staff";
- //role="admin";
-
-  if (role === "staff") {
-    links = ["Dashboard", "Orders", "Deliveries"];
-  } else if (role === "admin") {
-    links = ["Admin Panel", "Manage Users", "Reports", "Inventory"];
+  if (role === "Marketing Manager") {
+    links = ["Promotions", "Notifications", "History"];
+  } else if (role === "Admin") {
+    links = ["Admin Panel", "Manage Users", "Notifications", "Inventory"];
   } else {
-    links = ["Home", "Notifications", "Offers", "Track Orders", "Contact"];
+    links = ["Home", "Notifications", "Cart", "Track Orders", "Contact"];
   }
+
+  useEffect(() => {
+    const fetchCartTotal = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/Cart/user/${userId}`);
+        const cartItems = res.data.Items || [];
+        const total = cartItems.reduce((sum, item) => sum + item.Total, 0);
+        setCartTotal(total);
+      } catch (err) {
+        console.error("Error fetching cart total:", err);
+      }
+    };
+
+    if (role === "Customer") {
+      fetchCartTotal();
+    }
+  }, [role, userId]);
 
   return (
     <nav className="NavBar">
-  
       <div className="Logo">
-        <img src="images/navlogo.png" alt="logo" className="coolCartLogo" />
-        
+        <img src="/images/navlogo.png" alt="logo" className="coolCartLogo" />
       </div>
 
-    
       <div className="Links">
         {links.map((link) => (
-          <a key={link} href={`#${link.toLowerCase().replace(/ /g, '-')}`}>
+          <Link 
+            key={link} 
+            to={`/${link.toLowerCase().replace(/ /g, '-')}`}  
+          >
             {link}
-          </a>
+          </Link>
         ))}
       </div>
 
-     
-<div className="wishlist">
-  {role === "customer" && (
-    <div className="cart">
-      <img src="images/logoblack.png" alt="cart" className="cartIcon" />
-      <div className="cartAmount">
-        <span>25430.00 LKR</span>
-        <div className="text">My Orders</div>
-      </div>
-    </div>
-  )}
-</div>
+      {role === "Customer" && (
+        <div className="wishlist">
+          <div className="cart">
+            <img src="/images/logoblack.png" alt="cart" className="cartIcon" />
+            <div className="cartAmount">
+              <span>Rs: {cartTotal.toFixed(2)}</span>
+              <div className="text">My Cart</div>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
-
 
 export default Navbar;

@@ -10,6 +10,8 @@ import AddUsers from "./components/AdminDashboard/AddUsers.js";
 import UpdateUsers from "./components/AdminDashboard/UpdateUsers.js"
 import Checkout from "./components/Checkout/Checkout.js";
 import ProtionReport from "./components/Promotion_and_Coupons/CouponsReport.js";
+import Inventory from "./components/Inventory/inventory.js";
+
 
 function App() {
   return (
@@ -26,7 +28,7 @@ function App() {
       <Route path="/Login" element={<Login />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/History" element={<ProtionReport />} />
-
+      <Route path="/Inventory" element={<Inventory />} />
 
     </Routes>
   );

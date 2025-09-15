@@ -1,11 +1,13 @@
 import React from 'react'
+import Navbar from '../NavBar/NavBar'
+import axios from "axios";
 
-function inventory() {
+function Inventory() {
   return (
     <div>
-      <h1>Inventory</h1>
+      <Navbar/>
     </div>
   )
 }
 
-export default inventory
+export default Inventory

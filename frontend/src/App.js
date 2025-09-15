@@ -10,7 +10,7 @@ import AddUsers from "./components/AdminDashboard/AddUsers.js";
 import UpdateUsers from "./components/AdminDashboard/UpdateUsers.js"
 import Checkout from "./components/Checkout/Checkout.js";
 import ProtionReport from "./components/Promotion_and_Coupons/CouponsReport.js";
-import Inventory from "./components/Inventory/inventory.js";
+import Inventory from "./components/Inventory/Inventory.js";
 
 
 function App() {

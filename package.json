@@ -1,0 +1,19 @@
+{
+  "name": "itp_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/K4V1DU/ITP_Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/K4V1DU/ITP_Project/issues"
+  },
+  "homepage": "https://github.com/K4V1DU/ITP_Project#readme"
+}

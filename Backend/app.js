@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 //insert routes
 const inventoryRouter = require("./Routes/InventoryRoute");
+const NotificationRoute = require("./Routes/NotificationRoute");
 const CartRouter = require("./Routes/CartRoute");
 const UsersRouter = require("./Routes/UsersRoute");
 const Coupons = require("./Routes/CouponsRoute");
@@ -19,10 +20,12 @@ app.use(cors());
 
 
 app.use("/inventory", inventoryRouter);
+app.use("/Notifications",NotificationRoute);
 app.use("/Cart", CartRouter);
 app.use("/Users", UsersRouter);
 app.use("/Coupons",Coupons);
 app.use("/orders", orderRoutes);
+
 
 
 

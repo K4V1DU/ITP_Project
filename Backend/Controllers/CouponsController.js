@@ -94,6 +94,9 @@ const updateCoupon = async(req, res, next) => {
 
 
 
+
+// Validate Coupon
+
 const validateCoupon = async (req, res, next) => {
   const { code, subtotal } = req.body;
 
@@ -116,6 +119,10 @@ const validateCoupon = async (req, res, next) => {
     if (coupon.UsageCount >= coupon.UsageLimit)
       return res.status(400).json({ message: "Coupon usage limit reached" });
 
+    //usage count increment
+    coupon.UsageCount +=1;
+    await coupon.save();
+    
     // Only return details, increment usage AFTER successful order
     return res.status(200).json({
       message: "Coupon applied successfully",
@@ -128,8 +135,6 @@ const validateCoupon = async (req, res, next) => {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
-
 
 
 exports.getAllCoupons = getAllCoupons;

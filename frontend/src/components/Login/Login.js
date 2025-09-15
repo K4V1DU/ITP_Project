@@ -27,11 +27,14 @@ function Login() {
         localStorage.setItem("userId", id);
 
         if (role === "Admin") {
-          history("/cart");
+          history("/users");
+
         } else if (role === "Customer") {
           history("/home");
+
         } else if (role === "Marketing Manager") {
           history("/Promotions");
+
         } else {
           history("/login");
         }

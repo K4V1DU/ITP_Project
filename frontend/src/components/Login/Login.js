@@ -35,6 +35,9 @@ function Login() {
         } else if (role === "Marketing Manager") {
           history("/Promotions");
 
+        } else if (role === "Supply Manager") {
+          history("/Inventory");  
+
         } else {
           history("/login");
         }

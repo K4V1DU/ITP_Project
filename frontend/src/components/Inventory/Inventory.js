@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-
 import Navbar from '../NavBar/NavBar';
 import axios from "axios";
 import InventoryItem from '../Inventory/Inventory';
@@ -11,8 +10,8 @@ const fetchHandler = async () =>{
 }
 
 function Inventory() {
-
   const [Inventory, setInventory] = useState([]);
+
   useEffect(()=> {
     fetchHandler().then((data) => setInventory(data.Inventory));
   },[])

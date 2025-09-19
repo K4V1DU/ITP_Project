@@ -12,7 +12,8 @@ const getAllCoupons = async (req, res, next) => {
         else{
             return res.status(200).json({Coupon});
         }
-    }catch (err){
+    }
+    catch (err){
         console.error(err);
         return res.status(500).json({message: "Error.!", error: err});
     }
@@ -28,7 +29,8 @@ const addCoupon = async(req, res, next) =>{
     try {
         Coupon = new Coupons({Code,discountType,DiscountValue,MinAmount,UsageLimit,UsageCount,ExpiryDate,Active});
         await Coupon.save();
-    } catch (err) {
+    } 
+    catch (err) {
         console.log(err);
     }
     if(!Coupon){
@@ -46,7 +48,8 @@ const getBycouponId = async(req, res, next) => {
 
     try {
         Coupon = await Coupons.findById(id);    
-    } catch (err) {
+    } 
+    catch (err) {
         console.log(err);
     }
     if(!Coupon){
@@ -63,8 +66,8 @@ const deleteCoupon = async(req, res, next) => {
 
     try {
         Coupon = await Coupons.findByIdAndDelete(id);
-
-    } catch (err) {
+    } 
+    catch (err) {
         console.log(err);
     }
     if(!Coupon){
@@ -83,7 +86,8 @@ const updateCoupon = async(req, res, next) => {
     try {
         Coupon = await Coupons.findByIdAndUpdate(id,{Code,discountType,DiscountValue,MinAmount,UsageLimit,UsageCount,ExpiryDate,Active});
         await Coupon.save();
-    } catch (err) {
+    } 
+    catch (err) {
         console.log(err);
     }
     if(!Coupon){
@@ -130,7 +134,8 @@ const validateCoupon = async (req, res, next) => {
       type: coupon.discountType,
       code: coupon.Code,
     });
-  } catch (err) {
+  } 
+  catch (err) {
     console.error("Coupon validation error:", err);
     return res.status(500).json({ message: "Server error", error: err.message });
   }

@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../NavBar/NavBar";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./OrderDetails.css";
 
 function OrderDetails() {
@@ -17,14 +19,12 @@ function OrderDetails() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch order
         const orderRes = await axios.get(
           `http://localhost:5000/orders/number/${orderNumber}`
         );
         const orderData = orderRes.data.order;
         setOrder(orderData);
 
-        // Fetch user info
         if (orderData.UserID) {
           try {
             const userRes = await axios.get(
@@ -37,7 +37,6 @@ function OrderDetails() {
           }
         }
 
-        // Fetch existing receipt
         try {
           const receiptRes = await axios.get(
             `http://localhost:5000/payments/order/${orderData.OrderNumber}`
@@ -53,6 +52,7 @@ function OrderDetails() {
         }
       } catch (err) {
         console.error(err);
+        toast.error("Failed to fetch order details");
       } finally {
         setLoading(false);
       }
@@ -81,7 +81,7 @@ function OrderDetails() {
 
   const handleSubmitReceipt = async (e) => {
     e.stopPropagation();
-    if (!receipt) return alert("Please select a file first.");
+    if (!receipt) return toast.warn("Please select a file first.");
 
     const formData = new FormData();
     formData.append("receipt", receipt);
@@ -93,19 +93,17 @@ function OrderDetails() {
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      alert(res.data.message);
+      toast.success(res.data.message);
 
       setExistingReceipt({
-        url: `http://localhost:5000${
-          res.data.receiptURL
-        }?t=${new Date().getTime()}`,
+        url: `http://localhost:5000${res.data.receiptURL}?t=${new Date().getTime()}`,
         name: res.data.receiptName || receipt.name,
       });
 
       setReceipt(null);
     } catch (err) {
       console.error(err);
-      alert("Failed to upload receipt.");
+      toast.error("Failed to upload receipt.");
     }
   };
 
@@ -117,11 +115,11 @@ function OrderDetails() {
       await axios.delete(
         `http://localhost:5000/payments/order/${order.OrderNumber}`
       );
-      alert("Receipt deleted successfully.");
+      toast.success("Receipt deleted successfully.");
       setExistingReceipt(null);
     } catch (err) {
       console.error(err);
-      alert("Failed to delete receipt.");
+      toast.error("Failed to delete receipt.");
     }
   };
 
@@ -138,6 +136,7 @@ function OrderDetails() {
   return (
     <div>
       <Navbar />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="order-container">
         {/* Header */}
         <div className="order-header">
@@ -202,7 +201,6 @@ function OrderDetails() {
                 >
                   <h3>Bank Receipt</h3>
 
-                  {/* Delete button - top right */}
                   {existingReceipt &&
                     order.PaymentStatus?.toLowerCase() === "pending" && (
                       <button
@@ -213,7 +211,6 @@ function OrderDetails() {
                       </button>
                     )}
 
-                  {/* Existing receipt */}
                   {existingReceipt && (
                     <div className="upload-preview">
                       <img
@@ -227,7 +224,6 @@ function OrderDetails() {
                     </div>
                   )}
 
-                  {/* Upload only if pending */}
                   {order.PaymentStatus?.toLowerCase() === "pending" && (
                     <div
                       className={`bank-upload ${dragActive ? "active" : ""}`}
@@ -243,7 +239,7 @@ function OrderDetails() {
                         cursor: "pointer",
                       }}
                     >
-                      <h4>Add / Update Bank Receipt</h4>
+                      <h4>Add Bank Receipt</h4>
                       <input
                         type="file"
                         ref={inputRef}
@@ -282,7 +278,6 @@ function OrderDetails() {
               )}
             </section>
 
-            {/* Customer info */}
             <section className="customer-info">
               <h2>Customer Info</h2>
               {user ? (

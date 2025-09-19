@@ -11,6 +11,9 @@ import UpdateUsers from "./components/AdminDashboard/UpdateUsers.js"
 import Checkout from "./components/Checkout/Checkout.js";
 import ProtionReport from "./components/Promotion_and_Coupons/CouponsReport.js";
 import Inventory from "./components/Inventory/inventory.js";
+import Orders  from "./components/Orders/Orders.js";
+import OrderDetails from "./components/OrderDetails/OrderDetails.js";
+
 
 
 function App() {
@@ -29,6 +32,8 @@ function App() {
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/History" element={<ProtionReport />} />
       <Route path="/Inventory" element={<Inventory />} />
+      <Route path="/Orders" element={<Orders />} />
+      <Route path="/OrderDetails/:orderNumber" element={<OrderDetails />} />
 
     </Routes>
   );

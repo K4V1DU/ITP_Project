@@ -6,15 +6,15 @@ import { useNavigate } from "react-router";
 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+//import { ToastContainer } from "react-toastify";
 
 const URL = "http://localhost:5000/Inventory";
 
 function Inventory() {
-  const [inventory, setInventory] = useState([]);
+  const [Inventory, setInventory] = useState([]);
   const { id } = useParams();
   const history = useNavigate();
-  const [warning, setWarning] = useState("");
+  //const [warning, setWarning] = useState("");
 
   const [inputs, setInputs] = useState({
     ProductID: "",
@@ -30,7 +30,7 @@ function Inventory() {
   useEffect(() => {
     const fetchHandler = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/inventory/${id}`);
+        const res = await axios.get(`http://localhost:5000/Inventory/${id}`);
         const Item = res.data.Item;
         setInventory(Item);
 
@@ -92,7 +92,7 @@ const handleSubmit = async (e) => {
     <div>
       <Navbar/>
       <div>
-        {inventory && inventory.map((item, i) => (
+        {Inventory && Inventory.map((item, i) => (
           <div key={i} className="inventory-item">
             <h3>{item.name}</h3>
             <p>Quantity: {item.quantity}</p>

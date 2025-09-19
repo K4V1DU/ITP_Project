@@ -1,130 +1,72 @@
-const Order = require("../Model/OrdersModel");
 const OrderManager = require("../Model/orderManageModel");
 
-
-// Display all Orders from orders
-const getAllManagerOrders = async (req, res, next) => {
+// GET all orders
+const getAllManagerOrders = async (req, res) => {
   try {
-    let managerOrders = await OrderManager.find();
-
-    if (!managerOrders || managerOrders.length === 0) {
-      return res.status(404).json({ message: "No manager orders found..." });
-    }
-
-    // Auto fill from order
-    const filledOrders = await Promise.all(
-      managerOrders.map(async (mgr) => {
-        const orderData = await Order.findOne({ OrderNumber: mgr.OrderNumber });
-        return {
-          ...mgr.toObject(),
-          OrderDetails: orderData || null, // order details
-        };
-      })
-    );
-
-    return res.status(200).json({ managerOrders: filledOrders });
-  } 
-  catch (err) {
+    const orders = await OrderManager.find();
+    res.status(200).json(orders);
+  } catch (err) {
     console.error(err);
-    return res
-      .status(500)
-      .json({ message: "Error fetching manager orders", error: err });
+    res.status(500).json({ message: "Error fetching orders", error: err });
   }
 };
 
-
-// Display manage order by ID
-const getManagerOrderById = async (req, res, next) => {
-  const id = req.params.id;
-
+// GET order by ID
+const getManagerOrderById = async (req, res) => {
   try {
-    let managerOrder = await OrderManager.findById(id);
-    if (!managerOrder) {
-      return res.status(404).json({ message: "Manager order not found" });
-    }
-
-    // Auto fill from order
-    const orderData = await Order.findOne({
-      OrderNumber: managerOrder.OrderNumber,
-    });
-
-    return res
-      .status(200)
-      .json({ managerOrder: { ...managerOrder.toObject(), OrderDetails: orderData || null } });
-  } 
-  catch (err) {
+    const order = await OrderManager.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    res.status(200).json(order);
+  } catch (err) {
     console.error(err);
-    return res
-      .status(500)
-      .json({ message: "Error fetching manager order", error: err });
+    res.status(500).json({ message: "Error fetching order", error: err });
   }
 };
 
-
-// Update order state
-const updateOrderState = async (req, res, next) => {
-  const id = req.params.id;
-  const { OrderState } = req.body;
-
+// CREATE new order
+const createOrder = async (req, res) => {
   try {
-    let managerOrder = await OrderManager.findByIdAndUpdate(
-      id,
-      { OrderState },
+    const newOrder = new OrderManager(req.body);
+    await newOrder.save();
+    res.status(201).json(newOrder);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error creating order", error: err });
+  }
+};
+
+// UPDATE order
+const updateOrder = async (req, res) => {
+  try {
+    const updatedOrder = await OrderManager.findByIdAndUpdate(
+      req.params.id,
+      req.body,
       { new: true }
     );
-
-    if (!managerOrder) {
-      return res.status(404).json({ message: "Unable to update manager order" });
-    }
-
-    // Auto fill from order
-    const orderData = await Order.findOne({
-      OrderNumber: managerOrder.OrderNumber,
-    });
-
-    return res
-      .status(200)
-      .json({ managerOrder: { ...managerOrder.toObject(), OrderDetails: orderData || null } });
-  } 
-  catch (err) {
+    if (!updatedOrder) return res.status(404).json({ message: "Order not found" });
+    res.status(200).json(updatedOrder);
+  } catch (err) {
     console.error(err);
-    return res
-      .status(500)
-      .json({ message: "Error updating manager order", error: err });
+    res.status(500).json({ message: "Error updating order", error: err });
   }
 };
 
-// Display all pending orders
-const getPendingOrders = async (req, res, next) => {
+// DELETE order
+const deleteOrder = async (req, res) => {
   try {
-    let pendingOrders = await OrderManager.find({ OrderState: "Pending" });
-
-    if (!pendingOrders || pendingOrders.length === 0) {
-      return res.status(404).json({ message: "No pending orders found" });
-    }
-
-    // Auto fill from order
-    const filledOrders = await Promise.all(
-      pendingOrders.map(async (mgr) => {
-        const orderData = await Order.findOne({ OrderNumber: mgr.OrderNumber });
-        return {
-          ...mgr.toObject(),
-          OrderDetails: orderData || null,
-        };
-      })
-    );
-
-    return res.status(200).json({ pendingOrders: filledOrders });
-  } 
-  catch (err) {
+    const deletedOrder = await OrderManager.findByIdAndDelete(req.params.id);
+    if (!deletedOrder) return res.status(404).json({ message: "Order not found" });
+    res.status(200).json({ message: "Order deleted", deletedOrder });
+  } catch (err) {
     console.error(err);
-    return res
-      .status(500)
-      .json({ message: "Error fetching pending orders", error: err });
+    res.status(500).json({ message: "Error deleting order", error: err });
   }
 };
 
-exports.getAllManagerOrders = getAllManagerOrders;
-exports.getManagerOrderById = getManagerOrderById;
-exports.updateOrderState = updateOrderState;
-exports.getPendingOrders = getPendingOrders;
+module.exports = {
+  getAllManagerOrders,
+  getManagerOrderById,
+  createOrder,
+  updateOrder,
+  deleteOrder,
+};

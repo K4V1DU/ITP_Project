@@ -1,40 +1,34 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const OrderManageSchema = new Schema({
-
-    OrderNumber:{
-        type: String
+const OrderManageSchema = new Schema(
+  {
+    OrderNumber: {
+      type: String,
+      required: true,
+      unique: true,
     },
-
-    UserId:{
-        type: String,
-        required: true
+    Product: {
+      ProductId: { type: String },
+      Quantity: { type: String },
     },
-
-    Product:{
-        ProductId:{
-            type: String
-        },
-        Quantity:{
-            type: String
-        }
+    TotalPrice: {
+      type: Number,
+      required: true,
+      default: 0,
     },
-
-    TotalPrice:{
-        type: Number
+    PaymentMethod: {
+      type: String,
+      enum: ["Cash", "Card", "Online"],
+      default: "Cash",
     },
-    
-    PaymentMethod:{
-        type: String
+    OrderState: {
+      type: String,
+      enum: ["Pending", "Accept", "Reject"],
+      default: "Pending",
     },
+  },
+  { timestamps: true }
+);
 
-    OrderState:{
-        type: String,
-        enum: ["Pending", "Accept", "Reject"],
-        default: "Pending"
-    },
-
-}, {timestamps: true});
-
-module.exports = mongoose.model("OrderManage",OrderManageSchema)
+module.exports = mongoose.model("OrderManage", OrderManageSchema);

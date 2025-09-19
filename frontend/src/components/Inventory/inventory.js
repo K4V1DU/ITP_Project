@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-//import { ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 
 const URL = "http://localhost:5000/Inventory";
 

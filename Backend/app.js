@@ -8,6 +8,7 @@ const UsersRouter = require("./Routes/UsersRoute");
 const Coupons = require("./Routes/CouponsRoute");
 const orderRoutes = require("./Routes/OrdersRoute");
 const orderManagerRoutes = require("./Routes/orderManageRoute");
+const PaymentsRoute = require("./Routes/PaymentsRoute");
 
 
 const app = express(); 
@@ -27,7 +28,7 @@ app.use("/Users", UsersRouter);
 app.use("/Coupons",Coupons);
 app.use("/orders", orderRoutes);
 app.use("/orderManage", orderManagerRoutes);
-
+app.use("/payments", PaymentsRoute);
 
 
 

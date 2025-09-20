@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "../NavBar/NavBar";
+import { useLocation } from "react-router-dom";
 //import "./CouponsDashboard.css";
 
 const API_URL = "http://localhost:5000/Coupons";
@@ -26,6 +27,14 @@ function CouponsDashboard() {
     ExpiryDate: "",
     Active: true,
   });
+
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state?.coupon) {
+      setEditingCoupon(location.state.coupon);
+      setFormData({ ...location.state.coupon });
+    }
+  }, [location.state]);
 
   const fetchCoupons = async () => {
     try {

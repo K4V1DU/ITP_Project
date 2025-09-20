@@ -74,6 +74,17 @@ function CouponsDashboard() {
 
     if (type === "number" && value < 0) return;
 
+    if (name === "ExpiryDate") {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        toast.error("Expiry date cannot be a past date", { position: "top-right", autoClose: 1000 });
+        return; // block updating state
+      }
+    }
+
     //update form data
     setFormData({
       ...formData,
@@ -103,20 +114,6 @@ function CouponsDashboard() {
       case "MinAmount":
         if (value && value < 0) {
           //toast.error("Minimum applicable price is 5000", { position: "top-right", autoClose: 1000 });
-        }
-        break;
-
-      case "ExpiryDate":
-        const selectedDate = new Date(value);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 60);
-
-        if (selectedDate < today) {
-          toast.error("Expiry date cannot be a past date", { position: "top-right", autoClose: 1000 });
-        } else if (selectedDate > maxDate) {
-          toast.error("Enter a date within 60 days", { position: "top-right", autoClose: 1000 });
         }
         break;
 
@@ -155,6 +152,15 @@ function CouponsDashboard() {
 
     if (!formData.ExpiryDate) {
       toast.error("Expiry Date is required", { position: "top-right" });
+      return false;
+    }
+
+
+    const selectedDate = new Date(formData.ExpiryDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate < today) {
+      toast.error("Expiry date cannot be a past date", { position: "top-right" });
       return false;
     }
 

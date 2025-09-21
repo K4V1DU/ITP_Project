@@ -27,10 +27,10 @@ function App() {
       <Route path="/users" element={<DisplayUsers />} />
       <Route path="/add-user" element={<AddUsers />} />
       <Route path="/update-user/:id" element={<UpdateUsers />} />
-      <Route path="/Promotions" element={<ProtionAndCoupon />} />
+      <Route path="/Manage-Coupon" element={<ProtionAndCoupon />} />
       <Route path="/Login" element={<Login />} />
       <Route path="/checkout" element={<Checkout />} />
-      <Route path="/History" element={<ProtionReport />} />
+      <Route path="/Dashboard" element={<ProtionReport />} />
       <Route path="/Inventory" element={<Inventory />} />
       <Route path="/Notifications" element={<ManageOrders />} />
       <Route path="/Orders" element={<Orders />} />

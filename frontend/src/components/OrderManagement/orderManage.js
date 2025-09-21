@@ -225,7 +225,7 @@ function OrdersDashboard() {
         </select>
         <select style={styles.select} value={paymentMethodFilter} onChange={(e) => setPaymentMethodFilter(e.target.value)}>
           <option value="all">All Payment Method</option>
-          <option value="COD">COD</option>
+          <option value="Bank Deposit">Bank Deposit</option>
           <option value="Cash on Delivery">Cash on Delivery</option>
         </select>
         <select style={styles.select} value={paymentStatusFilter} onChange={(e) => setPaymentStatusFilter(e.target.value)}>

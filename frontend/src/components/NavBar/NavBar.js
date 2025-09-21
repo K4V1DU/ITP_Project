@@ -18,11 +18,13 @@ function Navbar() {
 
   let links = [];
   if (role === "Marketing Manager") {
-    links = ["Promotions", "Notifications", "History"];
+    links = ["Dashboard", "Manage Coupon", "Notifications", "History"];
   } else if (role === "Admin") {
-    links = ["Admin Panel", "Manage Users", "Notifications", "Inventory"];
+    links = ["Admin Panel", "Manage Users","orderManage", "Dashboard", "Inventory"];
   }else if (role === "Supply Manager") {
     links = ["Inventory", "page1", "page2", "page3"];
+  }else if (role === "Order Manager") {
+    links = ["orderManage", "Manage", "Notifications"];
   }else {
     links = ["Home","Cart","Orders","Notifications","Contact"];
   }

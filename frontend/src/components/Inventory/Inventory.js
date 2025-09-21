@@ -28,8 +28,10 @@ function Inventory() {
   useEffect(() => {
     const fetchHandler = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/Inventory/${id}`);
-        const Item = res.data.Item;
+        const res = await axios.get(`http://localhost:5000/Inventory`);
+        console.log("API Response:", res.data);
+        const Item = res.data;
+        setInventory(res.data);
 
         setInputs({
           ProductID: Item.ProductID,
@@ -122,6 +124,7 @@ function Inventory() {
                             onChange={handleChange}
                             required
                           />
+                          {item.ProductID}
                         </td>
                         <td>
                           <input
@@ -131,6 +134,7 @@ function Inventory() {
                             onChange={handleChange}
                             required
                           />
+                          {item.Name}
                         </td>
                         <td>
                           <input
@@ -142,6 +146,7 @@ function Inventory() {
                             step="1"
                             required
                           />
+                          {item.Price}
                         </td>
                         <td>
                           <input
@@ -152,6 +157,7 @@ function Inventory() {
                             min="0"
                             required
                           />
+                          {item.Quantity}
                         </td>
                         <td>
                           <input
@@ -161,6 +167,7 @@ function Inventory() {
                             onChange={handleChange}
                             required
                           />
+                          {item.Category}
                         </td>
                         <td>
                           <input
@@ -169,6 +176,7 @@ function Inventory() {
                             value={inputs.Flavour}
                             onChange={handleChange}
                           />
+                          {item.Flavour}
                         </td>
                         <td>
                           <input
@@ -179,6 +187,7 @@ function Inventory() {
                             min="0"
                             required
                           />
+                          {item.Capacity}
                         </td>
                         <td>
                           <textarea
@@ -187,6 +196,7 @@ function Inventory() {
                             onChange={handleChange}
                             required
                           />
+                          {item.Description}
                         </td>
                         <td>
                           <img src={item.URL} alt={item.Name} width="50" />

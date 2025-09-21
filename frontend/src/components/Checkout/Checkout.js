@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import "./Checkout.css"; // your page styles first
-import "react-toastify/dist/ReactToastify.css"; // toast styles last
+import "./Checkout.css";
+import "react-toastify/dist/ReactToastify.css";
 import Navbar from "../NavBar/NavBar";
 
 function Checkout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { items, subtotal, discount, totalCost, appliedCoupon, userId } =
     location.state || {};
 
@@ -20,13 +21,12 @@ function Checkout() {
   minDateObj.setDate(minDateObj.getDate() + 2);
   const minDate = minDateObj.toISOString().split("T")[0];
 
-  // Fetch user data and fill address & phone
   useEffect(() => {
     if (userId) {
       axios
         .get(`http://localhost:5000/Users/${userId}`)
         .then((res) => {
-          const user = res.data.user; // <-- access 'user' property from backend
+          const user = res.data.user;
           if (user.Address) setShippingAddress(user.Address);
           if (user.Mobile) setContactNumber(user.Mobile);
         })
@@ -44,7 +44,6 @@ function Checkout() {
     }
 
     try {
-      // Check stock for each item
       const stockCheckPromises = items.map(async (item) => {
         const res = await axios.get(
           `http://localhost:5000/inventory/${item.ProductID}`
@@ -56,7 +55,6 @@ function Checkout() {
       });
 
       const itemsWithStock = await Promise.all(stockCheckPromises);
-
       const outOfStock = itemsWithStock.filter(
         (item) => item.Quantity > item.Stock
       );
@@ -69,19 +67,15 @@ function Checkout() {
 
       let scheduledDateToUse = null;
       let estimatedDelivery = "";
-
       if (scheduleDate) {
-        // User picked a schedule date
         scheduledDateToUse = scheduleDate;
         estimatedDelivery = scheduleDate;
       } else {
-        // User did not pick a date: schedule null, estimated = today + 2 days
         const todayPlus2 = new Date();
         todayPlus2.setDate(todayPlus2.getDate() + 2);
         estimatedDelivery = todayPlus2.toISOString().split("T")[0];
       }
 
-      // Prepare order payload
       const orderPayload = {
         OrderNumber: `ORD${Date.now()}`,
         UserID: userId,
@@ -103,10 +97,13 @@ function Checkout() {
         EstimatedDelivery: estimatedDelivery,
       };
 
-      // Place order
-      await axios.post("http://localhost:5000/orders", orderPayload);
+      const orderRes = await axios.post(
+        "http://localhost:5000/orders",
+        orderPayload
+      );
 
-      // Update inventory quantities
+      const createdOrderNumber = orderRes.data.order.OrderNumber;
+
       const updateInventoryPromises = items.map((item) =>
         axios.put(`http://localhost:5000/inventory/update/${item.ProductID}`, {
           quantity: item.Quantity,
@@ -114,10 +111,14 @@ function Checkout() {
       );
       await Promise.all(updateInventoryPromises);
 
-      // Delete all cart items for the user
       await axios.delete(`http://localhost:5000/Cart/user/${userId}`);
 
-      toast.success("Order placed successfully! Cart cleared.");
+      toast.success("Order placed successfully! Redirecting...", { autoClose: 2000 });
+
+      setTimeout(() => {
+        navigate(`/OrderDetails/${createdOrderNumber}`);
+      }, 2000);
+
     } catch (err) {
       console.error(err);
       toast.error("Failed to place order");
@@ -183,21 +184,22 @@ function Checkout() {
 
         <button onClick={handlePlaceOrder}>Place Order</button>
 
-      <ToastContainer
-  position="top-right"
-  autoClose={3000}
-  hideProgressBar={false}
-  newestOnTop={false}
-  closeOnClick={false}       
-  closeButton={false}       
-  pauseOnFocusLoss
-  draggable
-  pauseOnHover
-  style={{ background: "white" }}
-/>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          closeButton={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          style={{ background: "white" }}
+        />
       </div>
     </div>
   );
 }
 
 export default Checkout;
+

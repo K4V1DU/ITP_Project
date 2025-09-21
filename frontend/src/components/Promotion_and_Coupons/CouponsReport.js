@@ -16,6 +16,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:5000/Coupons";
 const COLORS = ["#28a745", "#dc3545", "#ffc107"];
@@ -29,6 +30,10 @@ function CouponsReport() {
     usedUp: 0,
     totalDiscountGiven: 0,
   });
+
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("");
+  const navigate = useNavigate();
 
   const fetchCoupons = async () => {
     try {
@@ -85,12 +90,32 @@ function CouponsReport() {
     limit: c.UsageLimit,
   }));
 
+  const handleRowClick = (id) => {
+    setExpandedRow(expandedRow === id ? null : id); 
+  };
+
+  const handleEdit = (coupon) => {
+    navigate("/Manage-Coupon", { state: { coupon } });
+  };
+
+  const handleDelete = async (coupon) => {
+    if (window.confirm(`Do you want to delete coupon: ${coupon.Code}?`)) {
+      try {
+        await axios.delete(`${API_URL}/${coupon._id}`);
+        toast.success("Deleted coupon successfully", { position: "top-right" });
+        fetchCoupons();
+      } catch (err) {
+        console.error(err);
+        toast.error("Error deleting coupon", { position: "top-right" });
+      }
+    }
+  };
+
   return (
     <div>
       <Navbar />
       <div className="report-container">
         <style>{`
-          /* General Layout */
           .report-container {
             padding: 2rem;
             font-family: 'Roboto', sans-serif;
@@ -141,10 +166,21 @@ function CouponsReport() {
             color: #343a40;
           }
 
-          .card-active { border-left: 5px solid #28a745; }
-          .card-expired { border-left: 5px solid #dc3545; }
-          .card-used { border-left: 5px solid #ffc107; }
-          .card-total-discount { border-left: 5px solid #17a2b8; }
+          .card-active { 
+            border-left: 5px solid #28a745; 
+          }
+
+          .card-expired { 
+            border-left: 5px solid #dc3545; 
+          }
+
+          .card-used { 
+            border-left: 5px solid #ffc107; 
+          }
+
+          .card-total-discount {
+           border-left: 5px solid #17a2b8; 
+          }
 
           /* Charts */
           .charts-container {
@@ -223,9 +259,67 @@ function CouponsReport() {
             color: #fff;
           }
 
-          .active { background-color: #28a745; }
-          .expired { background-color: #dc3545; }
-          .used-up { background-color: #ffc107; color: #212529; }
+          .active { 
+            background-color: #28a745; 
+          }
+
+          .expired { 
+            background-color: #dc3545; 
+          }
+
+          .used-up { 
+            background-color: #ffc107; 
+            color: #212529; 
+          }
+
+          .row-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+          }
+
+          .row-actions button {
+            padding: 0.35rem 0.8rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+          }
+
+          .row-actions .edit-btn { 
+            background: #44bd32; 
+            color: #fff; 
+            padding: 0.6rem 1rem; 
+            border-radius: 8px;
+            cursor: pointer; 
+            border: none;
+            font-weight: 500; 
+            margin-right: 0.5rem; 
+            transition: background-color 0.2s;
+          }
+
+          .row-actions .delete-btn { 
+            background-color: #dc3545; 
+            color: #fff; 
+            padding: 0.6rem 1rem; 
+            border-radius: 8px;
+            cursor: pointer; 
+            border: none;
+            font-weight: 500; 
+            margin-right: 0.5rem; 
+            transition: background-color 0.2s;
+          }
+
+          /* Search Section */
+          .search-section select {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            font-size: 1rem;
+            cursor: pointer;
+          }
 
           /* Responsive */
           @media (max-width: 768px) {
@@ -242,18 +336,22 @@ function CouponsReport() {
             <h3>Total Coupons</h3>
             <p>{stats.total}</p>
           </div>
+
           <div className="card card-active">
             <h3>Active</h3>
             <p>{stats.active}</p>
           </div>
+
           <div className="card card-expired">
             <h3>Expired</h3>
             <p>{stats.expired}</p>
           </div>
+
           <div className="card card-used">
             <h3>Used Up</h3>
             <p>{stats.usedUp}</p>
           </div>
+
           <div className="card card-total-discount">
             <h3>Total Discount Given</h3>
             <p>Rs {stats.totalDiscountGiven.toFixed(2)}</p>
@@ -300,7 +398,24 @@ function CouponsReport() {
           </div>
         </div>
 
+
         <div className="table-title">Coupon Details Table</div>
+
+        <div>{/* Search Section */}
+        <div className="search-section">
+          <label htmlFor="statusFilter" style={{ marginRight: "0.5rem", fontWeight: "500" }}>Filter by Status:</label>
+          <select
+            id="statusFilter"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">All</option>
+            <option value="Active">Active</option>
+            <option value="Expired">Expired</option>
+            <option value="Used Up">Used Up</option>
+          </select>
+        </div></div><br></br>
+        
         <div className="table-container">
           <table>
             <thead>
@@ -317,31 +432,58 @@ function CouponsReport() {
               </tr>
             </thead>
             <tbody>
-              {coupons.map((c) => {
-                const expiryDate = new Date(c.ExpiryDate);
-                const now = new Date();
-                const usageReached = c.UsageCount >= c.UsageLimit;
-                const status = expiryDate < now ? "Expired" : usageReached ? "Used Up" : "Active";
-                const totalDiscount = (c.DiscountValue / 100) * (c.MinAmount || 0) * c.UsageCount;
+              {coupons
+                .filter((c) => {
+                  const expiryDate = new Date(c.ExpiryDate);
+                  const usageReached = c.UsageCount >= c.UsageLimit;
+                  const status = expiryDate < new Date() ? "Expired" : usageReached ? "Used Up" : "Active";
+                  return statusFilter === "" || status === statusFilter;
+                })
+                .map((c) => {
+                  const expiryDate = new Date(c.ExpiryDate);
+                  const now = new Date();
+                  const usageReached = c.UsageCount >= c.UsageLimit;
+                  const status = expiryDate < now ? "Expired" : usageReached ? "Used Up" : "Active";
+                  const totalDiscount = (c.DiscountValue / 100) * (c.MinAmount || 0) * c.UsageCount;
+                  const isExpanded = expandedRow === c._id;
 
-                return (
-                  <tr key={c._id}>
-                    <td>{c.Code}</td>
-                    <td>{c.discountType}</td>
-                    <td>{c.DiscountValue}%</td>
-                    <td>Rs {c.MinAmount}</td>
-                    <td>{c.UsageCount}</td>
-                    <td>{c.UsageLimit}</td>
-                    <td>{formatDate(c.ExpiryDate)}</td>
-                    <td>
-                      <span className={`badge ${status.toLowerCase().replace(" ", "-")}`}>
-                        {status}
-                      </span>
-                    </td>
-                    <td>Rs {totalDiscount.toFixed(2)}</td>
-                  </tr>
-                );
-              })}
+                  return (
+                    <React.Fragment key={c._id}>
+                      <tr
+                        onClick={() => handleRowClick(c._id)}
+                        style={{
+                          cursor: "pointer",
+                          backgroundColor: isExpanded ? "#e8f0fe" : "inherit",
+                          transition: "background-color 0.3s",
+                        }}
+                      >
+                        <td>{c.Code}</td>
+                        <td>{c.discountType}</td>
+                        <td>{c.DiscountValue}%</td>
+                        <td>Rs {c.MinAmount}</td>
+                        <td>{c.UsageCount}</td>
+                        <td>{c.UsageLimit}</td>
+                        <td>{formatDate(c.ExpiryDate)}</td>
+                        <td>
+                          <span className={`badge ${status.toLowerCase().replace(" ", "-")}`}>
+                            {status}
+                          </span>
+                        </td>
+                        <td>Rs {totalDiscount.toFixed(2)}</td>
+                      </tr>
+                      {isExpanded && (
+                        <tr>
+                          <td colSpan="9">
+                            <div className="row-actions">
+                              <button className="edit-btn" onClick={() => handleEdit(c)}>Edit</button>
+                              <button className="delete-btn" onClick={() => handleDelete(c)}>Delete</button>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
             </tbody>
           </table>
         </div>

@@ -2,10 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 //insert routes
 const inventoryRouter = require("./Routes/InventoryRoute");
+const NotificationRoute = require("./Routes/NotificationRoute");
 const CartRouter = require("./Routes/CartRoute");
 const UsersRouter = require("./Routes/UsersRoute");
 const Coupons = require("./Routes/CouponsRoute");
 const orderRoutes = require("./Routes/OrdersRoute");
+const orderManagerRoutes = require("./Routes/orderManageRoute");
+const PaymentsRoute = require("./Routes/PaymentsRoute");
 
 
 const app = express(); 
@@ -19,10 +22,13 @@ app.use(cors());
 
 
 app.use("/inventory", inventoryRouter);
+app.use("/Notifications",NotificationRoute);
 app.use("/Cart", CartRouter);
 app.use("/Users", UsersRouter);
 app.use("/Coupons",Coupons);
 app.use("/orders", orderRoutes);
+app.use("/orderManage", orderManagerRoutes);
+app.use("/payments", PaymentsRoute);
 
 
 

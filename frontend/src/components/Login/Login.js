@@ -31,7 +31,13 @@ function Login() {
         } else if (role === "Customer") {
           history("/home");
         } else if (role === "Marketing Manager") {
-          history("/Promotions");
+          history("/Dashboard");
+
+        } else if (role === "Supply Manager") {
+          history("/Inventory"); 
+          
+        } else if (role === "Order Manager") {
+          history("/orderManage");
         } else {
           history("/login");
         }

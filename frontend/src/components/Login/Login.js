@@ -28,13 +28,10 @@ function Login() {
 
         if (role === "Admin") {
           history("/users");
-
         } else if (role === "Customer") {
           history("/home");
-
         } else if (role === "Marketing Manager") {
           history("/Promotions");
-
         } else {
           history("/login");
         }
@@ -47,35 +44,159 @@ function Login() {
   };
 
   return (
-    <div>
-      <h1>User Login</h1>
-      <form onSubmit={handleSubmit}>
-        <label>User Name</label>
-        <br />
-        <input
-          type="text"
-          value={user.username}
-          onChange={handleInputChange}
-          name="username"
-          required
-        />
-        <br />
-        <br />
+    <div className="login-page">
+      <style>{`
+        .login-page {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          background: url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=2800&auto=format&fit=crop&ixlib=rb-4.0.3') no-repeat center center/cover;
+          font-family: 'Epilogue', sans-serif;
+          position: relative;
+        }
+        .overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(30, 58, 138, 0.5);
+        }
+        .login-card {
+          position: relative;
+          width: 100%;
+          max-width: 380px;
+          background: #111827; /* solid dark */
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 1rem;
+          padding: 2rem;
+          text-align: center;
+          z-index: 1;
+          color: white;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+          animation: fadeIn 0.8s ease-in-out;
+        }
+        .logo-container {
+          width: 110px;
+          height: 110px;
+          margin: 0 auto 0.8rem auto;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 0 20px rgba(59, 130, 246, 0.7);
+        }
+        .logo-container img {
+          width: 90px;
+          height: 90px;
+          object-fit: contain;
+        }
+        .app-title {
+          font-size: 1.6rem;
+          font-weight: 700;
+          margin-bottom: 1.5rem;
+          color: #fff;
+        }
+        .login-card h1 {
+          font-size: 2rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+        }
+        .login-card label {
+          display: block;
+          text-align: left;
+          margin: 10px 0 5px;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #f1f5f9;
+        }
+        .login-card input {
+          width: 100%;
+          padding: 12px;
+          margin-bottom: 1rem;
+          border: none;
+          border-radius: 0.75rem;
+          background: rgba(255, 255, 255, 0.15);
+          color: #fff;
+          font-size: 0.95rem;
+        }
+        .login-card input::placeholder {
+          color: rgba(255, 255, 255, 0.7);
+        }
+        .login-card input:focus {
+          outline: none;
+          border: 2px solid #3b82f6;
+          background: rgba(255, 255, 255, 0.2);
+        }
+        .login-card button {
+          width: 100%;
+          padding: 12px;
+          background: #3b82f6;
+          border: none;
+          border-radius: 0.75rem;
+          color: #fff;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: transform 0.2s ease, background 0.3s ease;
+        }
+        .login-card button:hover {
+          background: #2563eb;
+          transform: scale(1.05);
+        }
+        .login-card p {
+          margin-top: 1rem;
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.8);
+        }
+        .login-card p a {
+          color: #fff;
+          font-weight: 600;
+          text-decoration: underline;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-15px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-        <label>Password</label>
-        <br />
-        <input
-          type="password"
-          value={user.password}
-          onChange={handleInputChange}
-          name="password"
-          required
-        />
-        <br />
-        <br />
+      <div className="overlay"></div>
+      <div className="login-card">
+        {/* Logo */}
+        <div className="logo-container">
+          <img src="/images/navlogo.png" alt="App Logo" />
+        </div>  
 
-        <button type="submit">Login</button>
-      </form>
+        {/* App Title */}
+        <div className="app-title">Cool Cart</div>
+
+        <h1>Welcome Back</h1>
+        <form onSubmit={handleSubmit}>
+          <label>User Name</label>
+          <input
+            type="text"
+            placeholder="Enter your username"
+            value={user.username}
+            onChange={handleInputChange}
+            name="username"
+            required
+          />
+
+          <label>Password</label>
+          <input
+            type="password"
+            placeholder="Enter your password"
+            value={user.password}
+            onChange={handleInputChange}
+            name="password"
+            required
+          />
+
+          <button type="submit">Login</button>
+        </form>
+        <p>
+          Don’t have an account? <a href="#">Sign Up</a>
+        </p>
+      </div>
     </div>
   );
 }

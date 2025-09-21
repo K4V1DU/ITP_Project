@@ -8,7 +8,7 @@ const UsersRouter = require("./Routes/UsersRoute");
 const Coupons = require("./Routes/CouponsRoute");
 const orderRoutes = require("./Routes/OrdersRoute");
 const PaymentsRoute = require("./Routes/PaymentsRoute");
-
+const DeliveryRoutes = require("./Routes/DeliveryAssignmentRoute");
 
 const app = express(); 
 const cors = require("cors");
@@ -27,7 +27,7 @@ app.use("/Users", UsersRouter);
 app.use("/Coupons",Coupons);
 app.use("/orders", orderRoutes);
 app.use("/payments", PaymentsRoute);
-
+app.use("/delivery", DeliveryRoutes);
 
 
  mongoose.connect("mongodb+srv://K4V1DU:ekwpjA9nDZid3iqR@cluster0.23nczaf.mongodb.net/Coolcart")

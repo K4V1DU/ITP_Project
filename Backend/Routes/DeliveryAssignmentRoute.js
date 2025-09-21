@@ -1,11 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const { assignAgent, getDeliveryAgentByOrder } = require("../Controllers/DeliveryAssignmentController");
+const { 
+  assignAgent, 
+  getDeliveryAgentByOrder, 
+  getAllOrdersByAgentID,
+  updateDeliveryStatus,
+  updatePaymentStatus // new
+} = require("../Controllers/DeliveryAssignmentController");
 
-// Insert new delivery assignment
+// Existing routes
 router.post("/assign", assignAgent);
+router.get("/order/:orderId", getDeliveryAgentByOrder);
+router.get("/agent/:agentId", getAllOrdersByAgentID);
+router.put("/update-status/:orderId", updateDeliveryStatus);
 
-// Get delivery agent by order ID
-router.get("/:orderId", getDeliveryAgentByOrder);
+// New route to update payment status
+router.put("/update-payment/:orderId", updatePaymentStatus);
 
 module.exports = router;

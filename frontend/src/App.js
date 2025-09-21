@@ -15,6 +15,7 @@ import Inventory from "./components/Inventory/inventory.js";
 import ManageOrders from "./components/OrderManagement/orderManage.js";
 import Orders  from "./components/Orders/Orders.js";
 import OrderDetails from "./components/OrderDetails/OrderDetails.js";
+import DeliveryDashboard from "./components/DeliveryManagement/DeliveryDashboard.js";
 
 
 
@@ -38,7 +39,7 @@ function App() {
       <Route path="/orderManage" element={<ManageOrders />} />
       <Route path="/Orders" element={<Orders />} />
       <Route path="/OrderDetails/:orderNumber" element={<OrderDetails />} />
-
+      <Route path="/DeliveryDashboard" element={<DeliveryDashboard />} />
 
     </Routes>
   );

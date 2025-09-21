@@ -32,7 +32,7 @@ function App() {
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/Dashboard" element={<ProtionReport />} />
       <Route path="/Inventory" element={<Inventory />} />
-      <Route path="/Notifications" element={<ManageOrders />} />
+      <Route path="/orderManage" element={<ManageOrders />} />
       <Route path="/Orders" element={<Orders />} />
       <Route path="/OrderDetails/:orderNumber" element={<OrderDetails />} />
 

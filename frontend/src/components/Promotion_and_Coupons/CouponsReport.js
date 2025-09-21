@@ -95,7 +95,7 @@ function CouponsReport() {
   };
 
   const handleEdit = (coupon) => {
-    navigate("/promotions", { state: { coupon } });
+    navigate("/Manage-Coupon", { state: { coupon } });
   };
 
   const handleDelete = async (coupon) => {

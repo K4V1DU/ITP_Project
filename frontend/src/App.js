@@ -15,6 +15,8 @@ import Inventory from "./components/Inventory/inventory.js";
 import ManageOrders from "./components/OrderManagement/orderManage.js";
 import Orders  from "./components/Orders/Orders.js";
 import OrderDetails from "./components/OrderDetails/OrderDetails.js";
+import OrderManageDetails  from "./components/OrderManagement/OrderManageDetails.js";
+import OrdersDashboard from "./components/OrderManagement/orderManage.js";
 
 
 
@@ -38,6 +40,8 @@ function App() {
       <Route path="/orderManage" element={<ManageOrders />} />
       <Route path="/Orders" element={<Orders />} />
       <Route path="/OrderDetails/:orderNumber" element={<OrderDetails />} />
+      <Route path="/orders-dashboard" element={<OrdersDashboard />} />
+      <Route path="/order-details/:id" element={<OrderManageDetails />} />
 
 
     </Routes>

@@ -33,7 +33,7 @@ function Login() {
           history("/home");
 
         } else if (role === "Marketing Manager") {
-          history("/Promotions");
+          history("/Dashboard");
 
         } else if (role === "Supply Manager") {
           history("/Inventory");  

@@ -18,7 +18,7 @@ function Navbar() {
 
   let links = [];
   if (role === "Marketing Manager") {
-    links = ["Promotions", "Notifications", "History"];
+    links = ["Dashboard", "Manage Coupon", "Notifications", "History"];
   } else if (role === "Admin") {
     links = ["Admin Panel", "Manage Users", "Notifications", "Inventory"];
   }else if (role === "Supply Manager") {

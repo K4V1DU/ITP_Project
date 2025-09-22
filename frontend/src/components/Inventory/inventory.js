@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../NavBar/NavBar";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router";
+import { Form, useNavigate } from "react-router";
 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -104,11 +104,11 @@ function Inventory() {
                       <th>Product ID</th>
                       <th>Name</th>
                       <th>Price</th>
+                      <th>Description</th>
                       <th>Quantity</th>
                       <th>Category</th>
                       <th>Flavour</th>
                       <th>Capacity</th>
-                      <th>Description</th>
                       <th>URL</th>
                       <th>Action</th>
                     </tr>
@@ -116,88 +116,14 @@ function Inventory() {
                   <tbody>
                     {Inventory.map((item) => (
                       <tr key={item.ProductID}>
-                        <td>
-                          <input
-                            type="text"
-                            name="ProductID"
-                            value={inputs.ProductID}
-                            onChange={handleChange}
-                            required
-                          />
-                          {item.ProductID}
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            name="Name"
-                            value={inputs.Name}
-                            onChange={handleChange}
-                            required
-                          />
-                          {item.Name}
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            name="Price"
-                            value={inputs.Price}
-                            onChange={handleChange}
-                            min="0"
-                            step="1"
-                            required
-                          />
-                          {item.Price}
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            name="Quantity"
-                            value={inputs.Quantity}
-                            onChange={handleChange}
-                            min="0"
-                            required
-                          />
-                          {item.Quantity}
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            name="Category"
-                            value={inputs.Category}
-                            onChange={handleChange}
-                            required
-                          />
-                          {item.Category}
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            name="Flavour"
-                            value={inputs.Flavour}
-                            onChange={handleChange}
-                          />
-                          {item.Flavour}
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            name="Capacity"
-                            value={inputs.Capacity}
-                            onChange={handleChange}
-                            min="0"
-                            required
-                          />
-                          {item.Capacity}
-                        </td>
-                        <td>
-                          <textarea
-                            name="Description"
-                            value={inputs.Description}
-                            onChange={handleChange}
-                            required
-                          />
-                          {item.Description}
-                        </td>
+                        <td>{item.ProductID}</td>
+                        <td>{item.Name}</td>
+                        <td>{item.Price}</td>
+                        <td>{item.Description}</td>
+                        <td>{item.Quantity}</td>
+                        <td>{item.Category}</td>
+                        <td>{item.Flavour}</td>
+                        <td>{item.Capacity}</td>
                         <td>
                           <img src={item.URL} alt={item.Name} width="50" />
                         </td>
@@ -225,6 +151,12 @@ function Inventory() {
         ) : (
           <p>Loading ....</p>
         )}
+        {/*  Add Product Button */}
+        <div style={{ marginTop: "20px" }}>
+          <button onClick={() => history("/addproduct")}>
+            Add New Product
+          </button>
+        </div>
       </div>
     </div>
   );

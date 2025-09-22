@@ -6,7 +6,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
 const ORDER_API = "http://localhost:5000/OrderManage";
-const DELIVERY_API = "http://localhost:5000/delivery";
 
 function OrderManageDetails() {
   const { id } = useParams();
@@ -31,11 +30,12 @@ function OrderManageDetails() {
     }
   };
 
-  // Fetch delivery agents
+  // Fetch delivery agents by Role: "Delivery Staff"
   const fetchDeliveryAgents = async () => {
     try {
-      const res = await axios.get(`${DELIVERY_API}/agents`);
-      setDeliveryAgents(res.data);
+      const res = await axios.get("http://localhost:5000/users");
+      const agents = res.data.users.filter(u => u.Role === "Delivery Staff");
+      setDeliveryAgents(agents);
     } catch (err) {
       toast.error("Failed to load delivery agents");
     }
@@ -47,7 +47,6 @@ function OrderManageDetails() {
     // eslint-disable-next-line
   }, []);
 
-  // Update order status
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value;
     setStatus(newStatus);
@@ -59,12 +58,11 @@ function OrderManageDetails() {
     }
   };
 
-  // Assign delivery agent
   const handleAssignAgent = async (e) => {
     const agentId = e.target.value;
     setAssignedAgent(agentId);
     try {
-      await axios.post(`${DELIVERY_API}/assign`, {
+      await axios.post(`http://localhost:5000/delivery/assign`, {
         OrderID: order.OrderNumber,
         DeliveryAgentID: agentId,
       });
@@ -74,7 +72,6 @@ function OrderManageDetails() {
     }
   };
 
-  // Delete order
   const handleDelete = async () => {
     if (!window.confirm("Are you sure?")) return;
     try {
@@ -86,7 +83,6 @@ function OrderManageDetails() {
     }
   };
 
-  // Internal CSS
   const styles = {
     container: { padding: "2rem" },
     wrapper: { maxWidth: "900px", margin: "0 auto", backgroundColor: "#f7f7f7", padding: "1.5rem", borderRadius: "10px" },
@@ -157,7 +153,7 @@ function OrderManageDetails() {
               <select value={assignedAgent} onChange={handleAssignAgent} style={styles.statusSelect}>
                 <option value="">Select Agent</option>
                 {deliveryAgents.map(agent => (
-                  <option key={agent._id} value={agent._id}>{agent.name}</option>
+                  <option key={agent._id} value={agent._id}>{agent.FirstName} {agent.LastName}</option>
                 ))}
               </select>
             )}

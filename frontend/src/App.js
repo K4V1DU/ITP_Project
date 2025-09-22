@@ -17,6 +17,7 @@ import Orders  from "./components/Orders/Orders.js";
 import OrderDetails from "./components/OrderDetails/OrderDetails.js";
 import OrderManageDetails  from "./components/OrderManagement/OrderManageDetails.js";
 import OrdersDashboard from "./components/OrderManagement/orderManage.js";
+import CouponShare from "./components/Promotion_and_Coupons/ShareCoupons.js";
 
 
 
@@ -42,6 +43,7 @@ function App() {
       <Route path="/OrderDetails/:orderNumber" element={<OrderDetails />} />
       <Route path="/orders-dashboard" element={<OrdersDashboard />} />
       <Route path="/order-details/:id" element={<OrderManageDetails />} />
+      <Route path="/Dispatch" element={<CouponShare />} />
 
 
     </Routes>

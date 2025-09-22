@@ -17,7 +17,7 @@ function OrderManageDetails() {
   const [deliveryAgents, setDeliveryAgents] = useState([]);
   const [assignedAgent, setAssignedAgent] = useState("");
 
-  // Fetch order details
+
   const fetchOrder = async () => {
     try {
       const res = await axios.get(`${ORDER_API}/${id}`);
@@ -30,13 +30,14 @@ function OrderManageDetails() {
     }
   };
 
-  // Fetch delivery agents by Role: "Delivery Staff"
+
   const fetchDeliveryAgents = async () => {
     try {
       const res = await axios.get("http://localhost:5000/users");
       const agents = res.data.users.filter(u => u.Role === "Delivery Staff");
       setDeliveryAgents(agents);
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("Failed to load delivery agents");
     }
   };
@@ -53,7 +54,8 @@ function OrderManageDetails() {
     try {
       await axios.put(`${ORDER_API}/${id}`, { Status: newStatus });
       toast.success("Order status updated");
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("Failed to update status");
     }
   };
@@ -67,7 +69,8 @@ function OrderManageDetails() {
         DeliveryAgentID: agentId,
       });
       toast.success("Delivery agent assigned");
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("Failed to assign delivery agent");
     }
   };
@@ -78,7 +81,8 @@ function OrderManageDetails() {
       await axios.delete(`${ORDER_API}/${id}`);
       toast.success("Order deleted");
       navigate("/orderManage");
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("Failed to delete order");
     }
   };

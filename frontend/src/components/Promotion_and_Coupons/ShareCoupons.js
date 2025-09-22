@@ -23,14 +23,14 @@ function ShareCoupons() {
         const allUsers = usersRes.data.users || [];
         const customerList = allUsers.filter((u) => u.Role === "Customer");
 
-        // Only active coupons, exclude promotions
         const activeCoupons = (Array.isArray(couponsRes.data) ? couponsRes.data : couponsRes.data.Coupon)
             .filter((c) => c.Active && c.discountType === "Coupon");
 
 
         setCustomers(customerList);
         setCoupons(activeCoupons);
-      } catch (err) {
+      } 
+      catch (err) {
         console.error(err);
         toast.error("Error loading data");
       }
@@ -55,6 +55,7 @@ function ShareCoupons() {
         userIds: selectedUsers,
         couponId: selectedCoupon,
       });
+
       toast.success("Coupon shared successfully!");
       setSelectedUsers([]);
       setSelectedCoupon("");
@@ -109,7 +110,7 @@ function ShareCoupons() {
         <ToastContainer />
       </div>
 
-      {/* Internal CSS */}
+      {/* CSS */}
       <style>{`
         .container {
           max-width: 800px;

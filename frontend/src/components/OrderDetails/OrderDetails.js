@@ -43,9 +43,9 @@ function OrderDetails() {
         // 3. Fetch assigned delivery agent
         try {
           const deliveryRes = await axios.get(
-            `http://localhost:5000/delivery/${orderData.OrderNumber}`
+            `http://localhost:5000/delivery/order/${orderData.OrderNumber}`
           );
-          const { DeliveryAgentID } = deliveryRes.data; // Use correct key
+          const { DeliveryAgentID } = deliveryRes.data; 
           if (DeliveryAgentID) {
             const agentRes = await axios.get(
               `http://localhost:5000/users/${DeliveryAgentID}`

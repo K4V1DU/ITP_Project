@@ -16,9 +16,9 @@ function Inventory() {
   const [inputs, setInputs] = useState({
     ProductID: "",
     Name: "",
-    Price: 0,
+    Price: "",
     Description: "",
-    Quantity: 0,
+    Quantity: "",
     Category: "",
     Flavour: "",
     Capacity: "",
@@ -54,14 +54,7 @@ function Inventory() {
     fetchHandler();
   }, [id]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setInputs((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
+  
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/Inventory/${id}`);

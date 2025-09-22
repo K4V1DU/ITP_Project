@@ -11,6 +11,7 @@ import UpdateUsers from "./components/AdminDashboard/UpdateUsers.js"
 import Checkout from "./components/Checkout/Checkout.js";
 import ProtionReport from "./components/Promotion_and_Coupons/CouponsReport.js";
 import Inventory from "./components/Inventory/Inventory.js";
+import AddProducts from './components/AddProducts/AddProducts.js';
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/History" element={<ProtionReport />} />
       <Route path="/Inventory" element={<Inventory />} />
+      <Route path="/addproduct" element={<AddProducts />} />
 
     </Routes>
   );

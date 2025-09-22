@@ -38,7 +38,11 @@ function Login() {
           
         } else if (role === "Order Manager") {
           history("/orderManage");
-        } else {
+
+        }else if (role === "Delivery Staff") {
+          history("/DeliveryDashboard");  
+        } 
+        else {
           history("/login");
         }
       } else {

@@ -41,24 +41,24 @@ function OrderDetails() {
         }
 
         // 3. Fetch assigned delivery agent
-      try {
-  const deliveryRes = await axios.get(
-    `http://localhost:5000/delivery/${orderData.OrderNumber}`
-  );
-  const { DeliveryAgentID } = deliveryRes.data; // Use correct key
-  if (DeliveryAgentID) {
-    const agentRes = await axios.get(
-      `http://localhost:5000/users/${DeliveryAgentID}`
-    );
-    const { FirstName, LastName, Mobile } = agentRes.data.user;
-    setAgent({ FullName: `${FirstName} ${LastName}`, Mobile });
-  } else {
-    setAgent(null);
-  }
-} catch (err) {
-  console.error("Error fetching agent:", err);
-  setAgent(null);
-}
+        try {
+          const deliveryRes = await axios.get(
+            `http://localhost:5000/delivery/${orderData.OrderNumber}`
+          );
+          const { DeliveryAgentID } = deliveryRes.data; // Use correct key
+          if (DeliveryAgentID) {
+            const agentRes = await axios.get(
+              `http://localhost:5000/users/${DeliveryAgentID}`
+            );
+            const { FirstName, LastName, Mobile } = agentRes.data.user;
+            setAgent({ FullName: `${FirstName} ${LastName}`, Mobile });
+          } else {
+            setAgent(null);
+          }
+        } catch (err) {
+          console.error("Error fetching agent:", err);
+          setAgent(null);
+        }
 
         // 4. Fetch existing receipt
         try {
@@ -120,7 +120,9 @@ function OrderDetails() {
       toast.success(res.data.message);
 
       setExistingReceipt({
-        url: `http://localhost:5000${res.data.receiptURL}?t=${new Date().getTime()}`,
+        url: `http://localhost:5000${
+          res.data.receiptURL
+        }?t=${new Date().getTime()}`,
         name: res.data.receiptName || receipt.name,
       });
 
@@ -168,7 +170,12 @@ function OrderDetails() {
           <div className="order-status">
             <div>
               <strong>Order Status:</strong>{" "}
-              <span className={`status ${order.Status.toLowerCase()}`}>
+              <span
+                className={`status ${order.Status.toLowerCase().replace(
+                  /\s+/g,
+                  "-"
+                )}`}
+              >
                 {order.Status}
               </span>
             </div>
@@ -209,8 +216,8 @@ function OrderDetails() {
               <h2>Delivery Agent</h2>
               {agent ? (
                 <>
-                  <p>Name: {agent.FullName}</p>
-                  <p>Number: {agent.Mobile}</p>
+                  <p>{agent.FullName}</p>
+                  <p>{agent.Mobile}</p>
                 </>
               ) : (
                 <p style={{ color: "red" }}>No Delivery agent assigned yet</p>
@@ -336,4 +343,3 @@ function OrderDetails() {
 }
 
 export default OrderDetails;
-

@@ -25,6 +25,8 @@ function Navbar() {
     links = ["Inventory", "page1", "page2", "page3"];
   }else if (role === "Order Manager") {
     links = ["orderManage", "Manage", "Notifications"];
+  }else if (role === "Delivery Staff") {
+    links = ["DeliveryDashboard", "Notifications"];
   }else {
     links = ["Home","Cart","Orders","Notifications","Contact"];
   }

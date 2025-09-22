@@ -1,18 +1,18 @@
 const DeliveryAssignment = require("../Model/DeliveryAssignmentModel");
 const Order = require("../Model/OrdersModel");
 
-// Assign a delivery agent to an order (no user check)
+//Assign a delivery to agent
 const assignAgent = async (req, res) => {
   try {
     const { OrderID, DeliveryAgentID } = req.body;
 
-    // Check if order exists
+    //Check
     const order = await Order.findOne({ OrderNumber: OrderID });
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Create new assignment
+    //Create assignment
     const assignment = new DeliveryAssignment({
       OrderID,
       DeliveryAgentID,
@@ -30,7 +30,7 @@ const assignAgent = async (req, res) => {
 
 
 
-// Get delivery agent by order ID
+//Get agent by order ID
 const getDeliveryAgentByOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -46,7 +46,8 @@ const getDeliveryAgentByOrder = async (req, res) => {
       DeliveryAgentID: assignment.DeliveryAgentID,
       Status: assignment.Status
     });
-  } catch (error) {
+  } 
+  catch (error) {
     res.status(500).json({ message: "Error fetching delivery agent", error: error.message });
   }
 };
@@ -54,12 +55,12 @@ const getDeliveryAgentByOrder = async (req, res) => {
 
 
 
-// Get all orders assigned to a specific delivery agent
+//Get all orders and delivery agent
 const getAllOrdersByAgentID = async (req, res) => {
   try {
     const { agentId } = req.params;
 
-    // Find all assignments for this agent
+    //all assignments
     const assignments = await DeliveryAssignment.find({
       DeliveryAgentID: agentId,
     });
@@ -68,7 +69,6 @@ const getAllOrdersByAgentID = async (req, res) => {
       return res.status(200).json({ message: "No orders assigned yet." });
     }
 
-    // If you want to also pull full order details
     const orderNumbers = assignments.map((a) => a.OrderID);
     const orders = await Order.find({ OrderNumber: { $in: orderNumbers } });
 
@@ -96,7 +96,6 @@ const updateDeliveryStatus = async (req, res) => {
   }
 
   try {
-    // 1️⃣ Update DeliveryAssignment table (always same as dropdown)
     const assignment = await DeliveryAssignment.findOneAndUpdate(
       { OrderID: orderId },
       { Status: status },
@@ -107,10 +106,9 @@ const updateDeliveryStatus = async (req, res) => {
       return res.status(404).json({ message: "Assignment not found" });
     }
 
-    // 2️⃣ Determine Orders table status
     const orderStatus = status === "Assigned" ? "Ready" : status;
 
-    // Update Orders table
+    //Update Order table
     const order = await Order.findOneAndUpdate(
       { OrderNumber: orderId },
       { Status: orderStatus },
@@ -126,7 +124,8 @@ const updateDeliveryStatus = async (req, res) => {
       assignment,
       order,
     });
-  } catch (err) {
+  } 
+  catch (err) {
     console.error("Error updating status:", err);
     return res.status(500).json({ message: "Server error" });
   }
@@ -142,7 +141,6 @@ const updatePaymentStatus = async (req, res) => {
   }
 
   try {
-    // Update Orders table only (no need to change DeliveryAssignment)
     const order = await Order.findOneAndUpdate(
       { OrderNumber: orderId },
       { PaymentStatus: paymentStatus },
@@ -157,7 +155,8 @@ const updatePaymentStatus = async (req, res) => {
       message: "Payment status updated successfully",
       order,
     });
-  } catch (err) {
+  } 
+  catch (err) {
     console.error("Error updating payment status:", err);
     return res.status(500).json({ message: "Server error" });
   }
@@ -166,10 +165,8 @@ const updatePaymentStatus = async (req, res) => {
 
 
 
-module.exports = {
-  assignAgent,
-  getDeliveryAgentByOrder,
-  getAllOrdersByAgentID,
-  updateDeliveryStatus,
-  updatePaymentStatus,
-};
+exports.assignAgent = assignAgent;
+exports.getDeliveryAgentByOrder = getDeliveryAgentByOrder;  
+exports.getAllOrdersByAgentID = getAllOrdersByAgentID; 
+exports.updateDeliveryStatus = updateDeliveryStatus; 
+exports.updatePaymentStatus = updatePaymentStatus; 

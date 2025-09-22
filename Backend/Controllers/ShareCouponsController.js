@@ -3,12 +3,12 @@ const Users = require("../Model/UsersModel");
 const Coupons = require("../Model/CouponsModel");
 const SharedCoupons = require("../Model/SharedCouponsModel");
 
-// Gmail transporter
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "coolcarticecream@gmail.com",   // your Gmail
-    pass: "hpwc kbns iazj cjcv",         // app password from Gmail
+    user: "coolcarticecream@gmail.com", //gmail
+    pass: "hpwc kbns iazj cjcv", //password
   },
 });
 
@@ -24,17 +24,18 @@ const shareCoupon = async (req, res) => {
     }
 
     for (const customer of customers) {
-      // avoid duplicate log
+
+      //avoid duplicate log
       const alreadyShared = await SharedCoupons.findOne({ userId: customer._id, couponId });
       if (!alreadyShared) {
         await SharedCoupons.create({ userId: customer._id, couponId });
       }
 
-      // send email
+      //send
       const mailOptions = {
         from: "coolcarticecream@gmail.com",
         to: customer.Email,
-        subject: "🎁 You received a CoolCart Ice Cream coupon!",
+        subject: "🎁 You received a CoolCart Ice Cream coupon..!",
         html: `
           <h3>Hello ${customer.FirstName},</h3>
           <p>You have received a special coupon code: <b>${coupon.Code}</b></p>
@@ -50,10 +51,12 @@ const shareCoupon = async (req, res) => {
     }
 
     return res.status(200).json({ message: "Coupons shared & logged successfully" });
-  } catch (err) {
+  } 
+  catch (err) {
     console.error("Error sharing coupon:", err);
     return res.status(500).json({ message: "Error sharing coupon", error: err });
   }
 };
 
-module.exports = { shareCoupon };
+
+exports.shareCoupon = shareCoupon; 

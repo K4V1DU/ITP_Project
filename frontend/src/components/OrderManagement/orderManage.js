@@ -20,7 +20,8 @@ function OrdersDashboard() {
     try {
       const res = await axios.get(API_URL);
       setOrders(res.data);
-    } catch (err) {
+    } 
+    catch (err) {
       console.error(err);
       toast.error("Error fetching orders");
     }
@@ -30,7 +31,7 @@ function OrdersDashboard() {
     fetchOrders();
   }, []);
 
-  // Filter orders
+ 
   const filteredOrders = orders.filter((o) => {
     const orderNumber = o.OrderNumber?.toLowerCase() || "";
     const userID = o.UserID?.toLowerCase() || "";
@@ -47,7 +48,7 @@ function OrdersDashboard() {
     );
   });
 
-  // Internal CSS
+
   const styles = {
     container: { padding: "2rem" },
     input: { width: "100%", padding: "0.7rem", marginBottom: "1rem", borderRadius: "8px", border: "1px solid #dcdde1" },
@@ -64,7 +65,7 @@ function OrdersDashboard() {
       <div style={styles.container}>
         <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>Order Management</h1>
 
-        {/* Filters */}
+        
         <input style={styles.input} placeholder="Search by Order Number..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         <input style={styles.input} placeholder="Search by User ID..." value={userSearchTerm} onChange={(e) => setUserSearchTerm(e.target.value)} />
         <select style={styles.select} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
@@ -85,7 +86,7 @@ function OrdersDashboard() {
           <option value="Completed">Completed</option>
         </select>
 
-        {/* Orders Table */}
+        
         <table style={styles.table}>
           <thead>
             <tr>

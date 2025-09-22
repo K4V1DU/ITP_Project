@@ -10,6 +10,7 @@ const orderRoutes = require("./Routes/OrdersRoute");
 const orderManagerRoutes = require("./Routes/orderManageRoute");
 const PaymentsRoute = require("./Routes/PaymentsRoute");
 const DeliveryRoutes = require("./Routes/DeliveryAssignmentRoute");
+const shareCouponsRoute = require("./Routes/shareCouponsRoute");
 
 const app = express(); 
 const cors = require("cors");
@@ -30,6 +31,7 @@ app.use("/orders", orderRoutes);
 app.use("/orderManage", orderManagerRoutes);
 app.use("/payments", PaymentsRoute);
 app.use("/delivery", DeliveryRoutes);
+app.use("/sharecoupons", shareCouponsRoute);
 
 
  mongoose.connect("mongodb+srv://K4V1DU:ekwpjA9nDZid3iqR@cluster0.23nczaf.mongodb.net/Coolcart")

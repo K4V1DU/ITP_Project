@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import "./DeliveryDashboard.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function DeliveryDashboard() {
   const [assignments, setAssignments] = useState([]);
@@ -9,8 +11,8 @@ function DeliveryDashboard() {
   const [users, setUsers] = useState({});
   const [agent, setAgent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [statusChanges, setStatusChanges] = useState({}); // temp changes for dropdown
-  const [paymentChanges, setPaymentChanges] = useState({}); // temp changes for dropdown
+  const [statusChanges, setStatusChanges] = useState({});
+  const [paymentChanges, setPaymentChanges] = useState({});
   const [filterStatus, setFilterStatus] = useState("All");
 
   const agentId = localStorage.getItem("userId");
@@ -41,6 +43,7 @@ function DeliveryDashboard() {
         setAgent(agentRes.data.user);
       } catch (err) {
         console.error("Error fetching data:", err);
+        toast.error("Failed to load data.");
       } finally {
         setLoading(false);
       }
@@ -63,51 +66,53 @@ function DeliveryDashboard() {
       const deliveryStatus = statusChanges[orderId];
       const paymentStatus = paymentChanges[orderId];
 
-      // find the saved assignment & order
       const assignment = assignments.find((a) => a.OrderID === orderId);
       const order = orders.find((o) => o.OrderNumber === orderId);
 
       if (!assignment || !order) {
-        alert("Order or assignment not found.");
+        toast.error("Order or assignment not found.");
         return;
       }
 
-      // Determine final values after applying pending changes (if any)
       const finalDeliveryStatus = deliveryStatus || assignment.Status;
       const finalPaymentStatus = paymentStatus || order.PaymentStatus;
 
-      // 🚨 Block invalid combination
+      //  Block invalid combo
       if (
         finalDeliveryStatus === "Delivered" &&
         finalPaymentStatus !== "Completed"
       ) {
-        alert(
-          "Order cannot be marked as Delivered unless payment status is Completed."
+        toast.error(
+          "Cannot mark Delivered unless payment status is Completed."
         );
         return;
       }
 
-      // 🚨 Ask confirmation when marking Delivered
+      // Confirm Delivered
       if (finalDeliveryStatus === "Delivered") {
-        const confirmed = window.confirm(
-          `Are you sure you want to mark Order ${orderId} as Delivered?`
-        );
-        if (!confirmed) {
-          return; // stop update
+        if (
+          !window.confirm(
+            `Confirm: Mark Order ${orderId} as Delivered?`
+          )
+        ) {
+          toast.info("Action cancelled.");
+          return;
         }
       }
 
-      // 🚨 Ask confirmation when marking Cancelled
+      //  Confirm Cancelled
       if (finalDeliveryStatus === "Cancelled") {
-        const confirmed = window.confirm(
-          `Are you sure you want to Cancel Order ${orderId}? This action cannot be undone.`
-        );
-        if (!confirmed) {
-          return; // stop update
+        if (
+          !window.confirm(
+            `Confirm: Cancel Order ${orderId}? This cannot be undone.`
+          )
+        ) {
+          toast.info("Action cancelled.");
+          return;
         }
       }
 
-      // If validation passes, send updates
+      // Send updates
       if (deliveryStatus) {
         await axios.put(
           `http://localhost:5000/delivery/update-status/${orderId}`,
@@ -122,16 +127,16 @@ function DeliveryDashboard() {
         );
       }
 
-      alert(`Order ${orderId} updated successfully`);
+      toast.success(`Order ${orderId} updated successfully!`);
 
-      // Refresh assignments + orders
+      // Refresh
       const res = await axios.get(
         `http://localhost:5000/delivery/agent/${agentId}`
       );
       setAssignments(res.data.assignments || []);
       setOrders(res.data.orders || []);
 
-      // Clear temp changes for this order
+      // Clear temp changes
       setStatusChanges((prev) => {
         const updated = { ...prev };
         delete updated[orderId];
@@ -144,19 +149,17 @@ function DeliveryDashboard() {
       });
     } catch (err) {
       console.error("Error updating order:", err);
-      alert("Failed to update order");
+      toast.error("Failed to update order.");
     }
   };
 
   const today = new Date().toLocaleDateString();
 
-  // Filter assignments based on selected status
   const filteredAssignments = assignments.filter((assignment) => {
     if (filterStatus === "All") return true;
     return assignment.Status === filterStatus;
   });
 
-  // Top stats for agent (use actual saved statuses)
   const assignedCount = assignments.filter(
     (a) => a.Status === "Assigned"
   ).length;
@@ -173,6 +176,9 @@ function DeliveryDashboard() {
   return (
     <div className="delivery-dashboard">
       <Navbar />
+
+      {/* Toasts */}
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
 
       {/* ------------------- DASHBOARD HEADER ------------------- */}
       <div className="dashboard-header">
@@ -225,7 +231,6 @@ function DeliveryDashboard() {
           );
           const user = order ? users[order.UserID] : null;
 
-          // preview values (temporary or saved)
           const currentStatus =
             statusChanges[assignment.OrderID] || assignment.Status;
           const currentPayment =
@@ -233,14 +238,11 @@ function DeliveryDashboard() {
             order?.PaymentStatus ||
             "Pending";
 
-          // used to control enabling/disabling options
-          // if status preview is Delivered, force payment to stay Completed
-          const finalStatusPreview = currentStatus; // preview of final status
-          const finalPaymentPreview = currentPayment; // preview of final payment
+          const finalStatusPreview = currentStatus;
+          const finalPaymentPreview = currentPayment;
 
           return (
             <div key={assignment._id} className="assignment-card">
-              {/* Top Status Display (always actual saved status) */}
               <h3>Order ID: {assignment.OrderID}</h3>
               <p>
                 <strong>Status:</strong>{" "}
@@ -308,7 +310,6 @@ function DeliveryDashboard() {
                     <strong>Payment Status:</strong> {order.PaymentStatus}
                   </p>
 
-                  {/* ------------------- DROPDOWNS & UPDATE BUTTON ------------------- */}
                   {assignment.Status !== "Delivered" &&
                     assignment.Status !== "Cancelled" && (
                       <div className="update-section">
@@ -325,7 +326,6 @@ function DeliveryDashboard() {
                           <option value="Out for Delivery">
                             Out for Delivery
                           </option>
-                          {/* Disable Delivered if payment preview isn't Completed */}
                           <option
                             value="Delivered"
                             disabled={finalPaymentPreview !== "Completed"}
@@ -335,7 +335,6 @@ function DeliveryDashboard() {
                           <option value="Cancelled">Cancelled</option>
                         </select>
 
-                        {/* Show payment status dropdown only if PaymentMethod !== "Bank Deposit" */}
                         {order?.PaymentMethod !== "Bank Deposit" && (
                           <select
                             value={currentPayment}
@@ -346,7 +345,6 @@ function DeliveryDashboard() {
                               }))
                             }
                           >
-                            {/* If the preview status is Delivered, prevent changing away from Completed */}
                             <option
                               value="Pending"
                               disabled={finalStatusPreview === "Delivered"}

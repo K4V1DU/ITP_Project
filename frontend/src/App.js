@@ -15,6 +15,11 @@ import Inventory from "./components/Inventory/inventory.js";
 import ManageOrders from "./components/OrderManagement/orderManage.js";
 import Orders  from "./components/Orders/Orders.js";
 import OrderDetails from "./components/OrderDetails/OrderDetails.js";
+import Register from "./components/Login/Register.js";
+import ForgotPassword from "./components/Login/FogotPassword.js";
+import ResetPassword from "./components/Login/ResetPassword.js";
+import VerifyOtp from "./components/Login/VerifyOtp.js";
+import AdminPannel from "./components/AdminDashboard/DashboardOverview.js";
 
 
 
@@ -26,7 +31,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/Order/:id" element={<Order />} />
-      <Route path="/users" element={<DisplayUsers />} />
+      <Route path="/Manage-Users" element={<DisplayUsers />} />
       <Route path="/add-user" element={<AddUsers />} />
       <Route path="/update-user/:id" element={<UpdateUsers />} />
       <Route path="/Manage-Coupon" element={<ProtionAndCoupon />} />
@@ -38,6 +43,11 @@ function App() {
       <Route path="/orderManage" element={<ManageOrders />} />
       <Route path="/Orders" element={<Orders />} />
       <Route path="/OrderDetails/:orderNumber" element={<OrderDetails />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/verify-otp" element={<VerifyOtp />} />
+      <Route path="/Admin-Panel" element={<AdminPannel />} />
 
 
     </Routes>

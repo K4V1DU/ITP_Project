@@ -1,5 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
+
+
 //insert routes
 const inventoryRouter = require("./Routes/InventoryRoute");
 const NotificationRoute = require("./Routes/NotificationRoute");
@@ -9,7 +11,8 @@ const Coupons = require("./Routes/CouponsRoute");
 const orderRoutes = require("./Routes/OrdersRoute");
 const orderManagerRoutes = require("./Routes/orderManageRoute");
 const PaymentsRoute = require("./Routes/PaymentsRoute");
-
+const PasswordResetRoute = require("./Routes/PasswordResetRoute");
+const RegisterRoute = require("./Routes/RegisterRoute");
 
 const app = express(); 
 const cors = require("cors");
@@ -29,7 +32,8 @@ app.use("/Coupons",Coupons);
 app.use("/orders", orderRoutes);
 app.use("/orderManage", orderManagerRoutes);
 app.use("/payments", PaymentsRoute);
-
+app.use("/PasswordResetRoute", PasswordResetRoute);
+app.use("/Users", RegisterRoute);
 
 
  mongoose.connect("mongodb+srv://K4V1DU:ekwpjA9nDZid3iqR@cluster0.23nczaf.mongodb.net/Coolcart")

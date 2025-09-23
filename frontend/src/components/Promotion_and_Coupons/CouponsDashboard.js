@@ -438,9 +438,16 @@ function CouponsDashboard() {
           color: #fff; 
         }
 
+        .actions {
+          display: flex;
+          justify-content: center; /* center buttons horizontally */
+          gap: 0.5rem; /* space between buttons */
+          flex-wrap: wrap; /* wrap on small screens */
+        }
+
         .actions button { 
-          margin: 0.2rem 0.2rem; 
           font-size: 0.85rem; 
+          margin: 0; /* margin handled by gap */
         }
 
         /* Edit Section buttons */

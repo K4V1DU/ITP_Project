@@ -15,6 +15,8 @@ const PasswordResetRoute = require("./Routes/PasswordResetRoute");
 const RegisterRoute = require("./Routes/RegisterRoute");
 const DeliveryRoutes = require("./Routes/DeliveryAssignmentRoute");
 const shareCouponsRoute = require("./Routes/shareCouponsRoute");
+const ProfileRoute = require("./Routes/ProfileRoute");
+const adminRoutes  = require("./Routes/AdminRoute");
 const adminCartsRoutes = require("./Routes/AdminCartsRoute");
 
 
@@ -39,6 +41,8 @@ app.use("/PasswordResetRoute", PasswordResetRoute);
 app.use("/Users", RegisterRoute);
 app.use("/delivery", DeliveryRoutes);
 app.use("/sharecoupons", shareCouponsRoute);
+app.use("/profile", ProfileRoute);
+app.use("/admin", adminRoutes);
 app.use("/Admin/Carts", adminCartsRoutes);
 
 

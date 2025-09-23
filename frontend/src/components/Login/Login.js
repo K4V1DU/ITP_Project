@@ -35,7 +35,7 @@ function Login() {
         } else if (role === "Supply Manager") {
           history("/Inventory");
         } else if (role === "Order Manager") {
-          history("/orderManage");
+          history("/order-Manage");
 
         }else if (role === "Delivery Staff") {
           history("/DeliveryDashboard");  
@@ -59,20 +59,20 @@ function Login() {
           align-items: center;
           justify-content: center;
           min-height: 100vh;
-          background: url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=2800&auto=format&fit=crop&ixlib=rb-4.0.3') no-repeat center center/cover;
+          background: url('/images/bg1.png') no-repeat center center/cover;
           font-family: 'Epilogue', sans-serif;
           position: relative;
         }
         .overlay {
           position: absolute;
           inset: 0;
-          background: rgba(30, 58, 138, 0.5);
+          background: rgba(0, 0, 0, 0.21);
         }
         .login-card {
           position: relative;
           width: 100%;
           max-width: 380px;
-          background: #111827; /* solid dark */
+          background: #111827cb; /* solid dark */
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 1rem;
           padding: 2rem;
@@ -86,7 +86,7 @@ function Login() {
           width: 110px;
           height: 110px;
           margin: 0 auto 0.8rem auto;
-          border-radius: 50%;
+          border-radius: 100%;
           background: rgba(255, 255, 255, 0.1);
           display: flex;
           align-items: center;
@@ -94,9 +94,10 @@ function Login() {
           box-shadow: 0 0 20px rgba(59, 130, 246, 0.7);
         }
         .logo-container img {
-          width: 90px;
-          height: 90px;
+          
+          height: 110px;
           object-fit: contain;
+          border-radius: 100%;
         }
         .app-title {
           font-size: 1.6rem;
@@ -171,7 +172,7 @@ function Login() {
       <div className="login-card">
         {/* Logo */}
         <div className="logo-container">
-          <img src="/images/navlogo.png" alt="App Logo" />
+          <img src="/images/logo99.png" alt="App Logo" />
         </div>  
 
         {/* App Title */}

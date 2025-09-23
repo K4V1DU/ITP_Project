@@ -8,7 +8,10 @@ const products = require("../Model/InventoryModel");
 const InventoryController = require("../Controllers/InventoryController");
 
 router.get("/",InventoryController.getAllProducts);
-router.post("/",InventoryController.addProducts);
+router.post("/", (req, res, next) => {
+  console.log("POST body:", req.body);  
+  next();
+}, InventoryController.addProducts);
 router.get("/:id",InventoryController.getById);
 router.put("/:id",InventoryController.updateProduct);
 router.delete("/:id",InventoryController.deleteProduct);

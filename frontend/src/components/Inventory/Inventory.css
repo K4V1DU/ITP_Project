@@ -1,0 +1,98 @@
+/* ------------------ INVENTORY PAGE ------------------ */
+.inventory-item {
+  margin: 20px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  border: 2px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  overflow-x: auto;
+}
+
+.inventory-item table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border-left: none;
+  border-right: none;
+}
+
+.inventory-item th {
+  background: #ffffff;         
+  color: #000000;              
+  text-align: left;
+  padding: 14px 12px;
+  font-weight: 600;
+  font-size: 15px;
+  border-bottom: 2px solid #ddd; 
+  border-left: none;
+  border-right: none;
+}
+
+.inventory-item td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  border-left: none;
+  border-right: none;
+  color: #333;
+  vertical-align: middle;
+}
+
+.inventory-item tr:hover td {
+  background: #f9f9f9;
+}
+
+/* Image cells */
+.inventory-item td img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+/* Action buttons */
+.inventory-item button {
+  margin: 2px;
+  padding: 6px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inventory-item button[type="edit"] {
+  background: #009407;
+  color: #fff;
+}
+
+.inventory-item button[type="edit"]:hover {
+  background: #009407;
+}
+
+.inventory-item button[type="delete"] {
+  background: #ff0019;
+  color: #fff;
+}
+
+.inventory-item button[type="delete"]:hover {
+  background: #ff0019;
+}
+
+button[type="addnewpro"] {
+  padding: 10px 20px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button[type="addnewpro"]:hover {
+  background: #333;
+}

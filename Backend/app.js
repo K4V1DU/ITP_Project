@@ -15,18 +15,19 @@ const PasswordResetRoute = require("./Routes/PasswordResetRoute");
 const RegisterRoute = require("./Routes/RegisterRoute");
 const DeliveryRoutes = require("./Routes/DeliveryAssignmentRoute");
 const shareCouponsRoute = require("./Routes/shareCouponsRoute");
+const adminCartsRoutes = require("./Routes/AdminCartsRoute");
+
+
 
 const app = express(); 
 const cors = require("cors");
-
-
 
 //Middleware
 app.use(express.json());
 app.use(cors());
 
 
-app.use("/inventory", inventoryRouter);
+app.use("/Inventory", inventoryRouter);
 app.use("/Notifications",NotificationRoute);
 app.use("/Cart", CartRouter);
 app.use("/Users", UsersRouter);
@@ -38,6 +39,9 @@ app.use("/PasswordResetRoute", PasswordResetRoute);
 app.use("/Users", RegisterRoute);
 app.use("/delivery", DeliveryRoutes);
 app.use("/sharecoupons", shareCouponsRoute);
+app.use("/Admin/Carts", adminCartsRoutes);
+
+
 
 
 

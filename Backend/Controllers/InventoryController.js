@@ -1,5 +1,3 @@
-
-
 const Inventory = require("../Model/InventoryModel");
 
 

@@ -1,14 +1,15 @@
-import "./AddProducts";
-import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import "../AddProducts/AddProducts.css";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 
-function AddProducts() {
+function EditProduct() {
   const history = useNavigate();
+  const { id } = useParams();
 
   const [inputs, setInputs] = useState({
     ProductID: "",
@@ -21,6 +22,21 @@ function AddProducts() {
     Capacity: "",
     URL: "",
   });
+
+  // Fetch product details
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/Inventory/${id}`);
+        console.log("Fetched product:", res.data);
+        setInputs(res.data.product || {}); // use singular key
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        toast.error("Failed to load product", { position: "top-center" });
+      }
+    };
+    fetchProduct();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +57,7 @@ function AddProducts() {
       }
     }
 
-    // Product Name validation
+    // Name validation
     if (name === "Name") {
       if (!/^[a-zA-Z\s.,'-]*$/.test(value)) {
         toast.error(
@@ -54,7 +70,7 @@ function AddProducts() {
 
     // Description validation
     if (name === "Description") {
-      if (!/^[a-zA-Z\s.,'-]*$%&/.test(value)) {
+      if (!/^[a-zA-Z\s.,'-]*$/.test(value)) {
         toast.error(
           "Description can only contain letters and basic punctuation",
           { position: "top-center" }
@@ -89,9 +105,10 @@ function AddProducts() {
     }));
   };
 
+  // Send update request
   const sendRequest = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/Inventory", {
+      const res = await axios.put(`http://localhost:5000/Inventory/${id}`, {
         ProductID: String(inputs.ProductID),
         Name: String(inputs.Name),
         Price: Number(inputs.Price),
@@ -102,17 +119,17 @@ function AddProducts() {
         Capacity: String(inputs.Capacity),
         URL: String(inputs.URL),
       });
-      console.log("Product added:", res.data);
+      console.log("Product updated:", res.data);
       return res.data;
     } catch (err) {
-      console.error("Error adding product:", err.response?.data || err);
+      console.error("Error updating product:", err.response?.data || err);
+      toast.error("Update failed", { position: "top-center" });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // validation
     if (!inputs.Category) {
       toast.error("Please select a category", { position: "top-center" });
       return;
@@ -126,7 +143,7 @@ function AddProducts() {
       return;
     }
 
-    sendRequest().then(() => history("/Inventory")); // redirect after submit
+    sendRequest().then(() => history("/Inventory"));
   };
 
   return (
@@ -134,9 +151,7 @@ function AddProducts() {
       <Navbar />
       <ToastContainer />
       <form onSubmit={handleSubmit} className="productForm">
-        <h2 style={{ textAlign: "center", margin: "20px 0" }}>
-          Add New Product
-        </h2>
+        <h2 style={{ textAlign: "center", margin: "20px 0" }}>Edit Product</h2>
 
         <h5>Product ID : </h5>
         <input
@@ -145,6 +160,7 @@ function AddProducts() {
           value={inputs.ProductID}
           onChange={handleChange}
           placeholder="Product ID"
+          disabled
           required
         />
 
@@ -155,6 +171,7 @@ function AddProducts() {
           value={inputs.Name}
           onChange={handleChange}
           placeholder="Product Name"
+          disabled
           required
         />
 
@@ -196,13 +213,14 @@ function AddProducts() {
           name="Category"
           value={inputs.Category}
           onChange={handleChange}
+          disabled
           required
         >
           <option value="">-- Select Category --</option>
-          <option value="Cup">Cup</option>
-          <option value="Stick">Stick</option>
-          <option value="Cone">Cone</option>
-          <option value="Family pack">Family pack</option>
+          <option value="Cups">Cups</option>
+          <option value="Tubs">Tubs</option>
+          <option value="Cones">Cones</option>
+          <option value="Bar">Bar</option>
         </select>
 
         <h5>Flavour : </h5>
@@ -210,6 +228,7 @@ function AddProducts() {
           name="Flavour"
           value={inputs.Flavour}
           onChange={handleChange}
+          disabled
           required
         >
           <option value="">-- Select Flavour --</option>
@@ -217,7 +236,6 @@ function AddProducts() {
           <option value="Chocolate">Chocolate</option>
           <option value="Strawberry">Strawberry</option>
           <option value="Mango">Mango</option>
-          
         </select>
 
         <h5>Capacity : </h5>
@@ -226,7 +244,7 @@ function AddProducts() {
           name="Capacity"
           value={inputs.Capacity}
           onChange={handleChange}
-          placeholder="Capacity"
+          disabled
           required
         />
 
@@ -241,7 +259,7 @@ function AddProducts() {
 
         <br />
         <br />
-        <button type="submit">Add Product</button>
+        <button type="submit">Update Product</button>
         <button type="button" onClick={() => history("/Inventory")}>
           Cancel
         </button>
@@ -250,4 +268,4 @@ function AddProducts() {
   );
 }
 
-export default AddProducts;
+export default EditProduct;

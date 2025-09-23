@@ -1,0 +1,90 @@
+/* ------------------ ADD PRODUCTS PAGE ------------------ */
+.productForm {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid #ddd;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.productForm h2 {
+  text-align: center;
+  color: #000;
+  font-size: 1.8rem;
+}
+
+.productForm h5 {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.productForm input,
+.productForm textarea,
+.productForm select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.productForm input:focus,
+.productForm textarea:focus,
+.productForm select:focus {
+  border-color: #000;
+}
+
+.productForm textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.productForm button {
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Add Product button - green */
+.productForm button[type="submit"] {
+  background: #009407;
+  color: #fff;
+}
+
+.productForm button[type="submit"]:hover {
+  background: #007a05;
+}
+
+/* Cancel button - black */
+.productForm button[type="button"] {
+  background: #000;
+  color: #fff;
+  margin-top: 10px;
+}
+
+.productForm button[type="button"]:hover {
+  background: #333;
+}
+
+/* Responsive for small screens */
+@media (max-width: 768px) {
+  .productForm {
+    margin: 20px;
+    padding: 20px;
+  }
+}

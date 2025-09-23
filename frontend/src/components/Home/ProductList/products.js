@@ -17,7 +17,7 @@ const handleOrder = () => {navigate(`/order/${_id}`);};
 
       <div className="productDetails">
         <div className="bold">Description:</div>
-        <div>{Description}</div>
+        <div className="productDescription">{Description}</div>
 
         <div className="bold">Price:</div>
         <div>Rs : {Price.toFixed(2)}/=</div>

@@ -140,7 +140,7 @@ function OrderManageDetails() {
     try {
       await axios.delete(`${ORDER_API}/${id}`);
       toast.success("Order deleted");
-      navigate("/orderManage");
+      navigate("/order-Manage");
     } catch (err) {
       toast.error("Failed to delete order");
     }
@@ -363,7 +363,7 @@ function OrderManageDetails() {
             </button>
             <button
               style={styles.backBtn}
-              onClick={() => navigate("/orderManage")}
+              onClick={() => navigate("/order-Manage")}
               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             >

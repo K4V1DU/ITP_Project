@@ -59,20 +59,20 @@ function Login() {
           align-items: center;
           justify-content: center;
           min-height: 100vh;
-          background: url('https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=2800&auto=format&fit=crop&ixlib=rb-4.0.3') no-repeat center center/cover;
+          background: url('/images/bg1.png') no-repeat center center/cover;
           font-family: 'Epilogue', sans-serif;
           position: relative;
         }
         .overlay {
           position: absolute;
           inset: 0;
-          background: rgba(30, 58, 138, 0.5);
+          background: rgba(0, 0, 0, 0.21);
         }
         .login-card {
           position: relative;
           width: 100%;
           max-width: 380px;
-          background: #111827; /* solid dark */
+          background: #111827cb; /* solid dark */
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 1rem;
           padding: 2rem;

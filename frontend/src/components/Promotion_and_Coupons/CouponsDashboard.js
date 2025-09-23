@@ -14,6 +14,7 @@ function CouponsDashboard() {
   const [usedUpCoupons, setUsedUpCoupons] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState(""); // NEW STATE FOR TYPE FILTER
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [activeTab, setActiveTab] = useState("active");
 
@@ -249,23 +250,17 @@ function CouponsDashboard() {
     }
   };
 
-  const filteredCoupons = coupons.filter(
-    (c) =>
-      c.Code.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === "" || (statusFilter === "active" ? c.Active : !c.Active))
-  );
+  const filterByType = (list) =>
+    list.filter(
+      (c) =>
+        (c.Code.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (statusFilter === "" || (statusFilter === "active" ? c.Active : !c.Active)) &&
+        (typeFilter === "" || c.discountType === typeFilter)
+    );
 
-  const filteredExpired = expiredCoupons.filter(
-    (c) =>
-      c.Code.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === "" || (statusFilter === "active" ? c.Active : !c.Active))
-  );
-
-  const filteredUsedUp = usedUpCoupons.filter(
-    (c) =>
-      c.Code.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === "" || (statusFilter === "active" ? c.Active : !c.Active))
-  );
+  const filteredCoupons = filterByType(coupons);
+  const filteredExpired = filterByType(expiredCoupons);
+  const filteredUsedUp = filterByType(usedUpCoupons);
 
   const formatDiscount = (coupon) => `${coupon.DiscountValue}%`;
 
@@ -623,6 +618,17 @@ function CouponsDashboard() {
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
+          </select>
+
+          {/* NEW TYPE FILTER */}
+          <select
+            className="filter-input"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+          >
+            <option value="">All Types</option>
+            <option value="Coupon">Coupon</option>
+            <option value="Promotion">Promotion</option>
           </select>
         </div>
 

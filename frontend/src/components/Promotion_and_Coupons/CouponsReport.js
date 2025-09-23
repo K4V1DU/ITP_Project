@@ -33,6 +33,8 @@ function CouponsReport() {
 
   const [expandedRow, setExpandedRow] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   const fetchCoupons = async () => {
@@ -91,7 +93,7 @@ function CouponsReport() {
   }));
 
   const handleRowClick = (id) => {
-    setExpandedRow(expandedRow === id ? null : id); 
+    setExpandedRow(expandedRow === id ? null : id);
   };
 
   const handleEdit = (coupon) => {
@@ -104,8 +106,7 @@ function CouponsReport() {
         await axios.delete(`${API_URL}/${coupon._id}`);
         toast.success("Deleted coupon successfully", { position: "top-right" });
         fetchCoupons();
-      } 
-      catch (err) {
+      } catch (err) {
         console.error(err);
         toast.error("Error deleting coupon", { position: "top-right" });
       }
@@ -314,7 +315,8 @@ function CouponsReport() {
           }
 
           /* Search Section */
-          .search-section select {
+          .search-section select,
+          .search-section input {
             padding: 0.5rem 1rem;
             border-radius: 8px;
             border: 1px solid #ced4da;
@@ -399,24 +401,52 @@ function CouponsReport() {
           </div>
         </div>
 
-
         <div className="table-title">Coupon Details Table</div>
 
-        <div>
-        <div className="search-section">
-          <label htmlFor="statusFilter" style={{ marginRight: "0.5rem", fontWeight: "500" }}>Filter by Status:</label>
-          <select
-            id="statusFilter"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="Active">Active</option>
-            <option value="Expired">Expired</option>
-            <option value="Used Up">Used Up</option>
-          </select>
-        </div></div><br></br>
         
+        <div className="search-section" style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+          
+          <div>
+            <label htmlFor="statusFilter" style={{ marginRight: "0.5rem", fontWeight: "500" }}>Status:</label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">All</option>
+              <option value="Active">Active</option>
+              <option value="Expired">Expired</option>
+              <option value="Used Up">Used Up</option>
+            </select>
+          </div>
+
+          
+          <div>
+            <label htmlFor="typeFilter" style={{ marginRight: "0.5rem", fontWeight: "500" }}>Type:</label>
+            <select
+              id="typeFilter"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+            >
+              <option value="">All</option>
+              <option value="Coupon">Coupon</option>
+              <option value="Promotion">Promotion</option>
+            </select>
+          </div>
+
+          
+          <div>
+            <label htmlFor="searchTerm" style={{ marginRight: "0.5rem", fontWeight: "500" }}>Code:</label>
+            <input
+              id="searchTerm"
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by code..."
+            />
+          </div>
+        </div>
+
         <div className="table-container">
           <table>
             <thead>
@@ -438,7 +468,12 @@ function CouponsReport() {
                   const expiryDate = new Date(c.ExpiryDate);
                   const usageReached = c.UsageCount >= c.UsageLimit;
                   const status = expiryDate < new Date() ? "Expired" : usageReached ? "Used Up" : "Active";
-                  return statusFilter === "" || status === statusFilter;
+
+                  return (
+                    (statusFilter === "" || status === statusFilter) &&
+                    (typeFilter === "" || c.discountType === typeFilter) &&
+                    (searchTerm === "" || c.Code.toLowerCase().includes(searchTerm.toLowerCase()))
+                  );
                 })
                 .map((c) => {
                   const expiryDate = new Date(c.ExpiryDate);

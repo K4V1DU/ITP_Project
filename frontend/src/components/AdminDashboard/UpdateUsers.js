@@ -62,7 +62,7 @@ function UpdateUsers() {
     try {
       await axios.put(`http://localhost:5000/Users/${id}`, user);
       Swal.fire("Success", "User updated successfully!", "success");
-      navigate("/users");
+      navigate("/Manage-Users");
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Failed to update user", "error");

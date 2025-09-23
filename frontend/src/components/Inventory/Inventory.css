@@ -152,3 +152,37 @@ table img {
   width: 100px;
   height: auto;
 }
+
+/* Select element style */
+.productForm select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  font-size: 16px;
+  color: #333;
+  appearance: none; /* removes default arrow in some browsers */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* Hover effect */
+.productForm select:hover {
+  border-color: #888;
+}
+
+/* Focus effect */
+.productForm select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* Default option gray color */
+.productForm select option:first-child {
+  color: #999;
+}
+

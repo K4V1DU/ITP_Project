@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "../NavBar/NavBar";
+import { useLocation } from "react-router-dom";
 //import "./CouponsDashboard.css";
 
 const API_URL = "http://localhost:5000/Coupons";
@@ -13,6 +14,7 @@ function CouponsDashboard() {
   const [usedUpCoupons, setUsedUpCoupons] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState(""); // NEW STATE FOR TYPE FILTER
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [activeTab, setActiveTab] = useState("active");
 
@@ -26,6 +28,14 @@ function CouponsDashboard() {
     ExpiryDate: "",
     Active: true,
   });
+
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state?.coupon) {
+      setEditingCoupon(location.state.coupon);
+      setFormData({ ...location.state.coupon });
+    }
+  }, [location.state]);
 
   const fetchCoupons = async () => {
     try {
@@ -68,11 +78,23 @@ function CouponsDashboard() {
     fetchCoupons();
   }, []);
 
-  // LIVE VALIDATION
+
+  //VALIDATION
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
     if (type === "number" && value < 0) return;
+
+    if (name === "ExpiryDate") {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        toast.error("Expiry date cannot be a past date", { position: "top-right", autoClose: 1000 });
+        return; // block updating state
+      }
+    }
 
     //update form data
     setFormData({
@@ -103,20 +125,6 @@ function CouponsDashboard() {
       case "MinAmount":
         if (value && value < 0) {
           //toast.error("Minimum applicable price is 5000", { position: "top-right", autoClose: 1000 });
-        }
-        break;
-
-      case "ExpiryDate":
-        const selectedDate = new Date(value);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 60);
-
-        if (selectedDate < today) {
-          toast.error("Expiry date cannot be a past date", { position: "top-right", autoClose: 1000 });
-        } else if (selectedDate > maxDate) {
-          toast.error("Enter a date within 60 days", { position: "top-right", autoClose: 1000 });
         }
         break;
 
@@ -155,6 +163,15 @@ function CouponsDashboard() {
 
     if (!formData.ExpiryDate) {
       toast.error("Expiry Date is required", { position: "top-right" });
+      return false;
+    }
+
+
+    const selectedDate = new Date(formData.ExpiryDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate < today) {
+      toast.error("Expiry date cannot be a past date", { position: "top-right" });
       return false;
     }
 
@@ -233,23 +250,17 @@ function CouponsDashboard() {
     }
   };
 
-  const filteredCoupons = coupons.filter(
-    (c) =>
-      c.Code.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === "" || (statusFilter === "active" ? c.Active : !c.Active))
-  );
+  const filterByType = (list) =>
+    list.filter(
+      (c) =>
+        (c.Code.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (statusFilter === "" || (statusFilter === "active" ? c.Active : !c.Active)) &&
+        (typeFilter === "" || c.discountType === typeFilter)
+    );
 
-  const filteredExpired = expiredCoupons.filter(
-    (c) =>
-      c.Code.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === "" || (statusFilter === "active" ? c.Active : !c.Active))
-  );
-
-  const filteredUsedUp = usedUpCoupons.filter(
-    (c) =>
-      c.Code.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === "" || (statusFilter === "active" ? c.Active : !c.Active))
-  );
+  const filteredCoupons = filterByType(coupons);
+  const filteredExpired = filterByType(expiredCoupons);
+  const filteredUsedUp = filterByType(usedUpCoupons);
 
   const formatDiscount = (coupon) => `${coupon.DiscountValue}%`;
 
@@ -510,7 +521,6 @@ function CouponsDashboard() {
       <div className="dashboard-container">
         <h1 className="dashboard-title">Promotion & Coupon Management</h1>
 
-        {/* Add / Edit Form */}
         <form className="form-container" onSubmit={handleSubmit}>
           <h2>{editingCoupon ? `Edit Coupon: ${editingCoupon.Code}` : "Add New Coupon"}</h2>
 
@@ -609,9 +619,20 @@ function CouponsDashboard() {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
+
+          {/* NEW TYPE FILTER */}
+          <select
+            className="filter-input"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+          >
+            <option value="">All Types</option>
+            <option value="Coupon">Coupon</option>
+            <option value="Promotion">Promotion</option>
+          </select>
         </div>
 
-        {/* Tabs */}
+
         <div className="tab-navigation">
           <button
             className={`tab-btn ${activeTab === "active" ? "tab-active" : ""}`}
@@ -635,7 +656,7 @@ function CouponsDashboard() {
           </button>
         </div>
 
-        {/* Tables */}
+        
         {activeTab === "active" && (
           <div className="table-container">
             <table>

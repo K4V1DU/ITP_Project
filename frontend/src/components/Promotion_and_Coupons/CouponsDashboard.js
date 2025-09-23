@@ -77,7 +77,8 @@ function CouponsDashboard() {
     fetchCoupons();
   }, []);
 
-  // LIVE VALIDATION
+
+  //VALIDATION
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -525,7 +526,6 @@ function CouponsDashboard() {
       <div className="dashboard-container">
         <h1 className="dashboard-title">Promotion & Coupon Management</h1>
 
-        {/* Add / Edit Form */}
         <form className="form-container" onSubmit={handleSubmit}>
           <h2>{editingCoupon ? `Edit Coupon: ${editingCoupon.Code}` : "Add New Coupon"}</h2>
 
@@ -626,7 +626,7 @@ function CouponsDashboard() {
           </select>
         </div>
 
-        {/* Tabs */}
+
         <div className="tab-navigation">
           <button
             className={`tab-btn ${activeTab === "active" ? "tab-active" : ""}`}
@@ -650,7 +650,7 @@ function CouponsDashboard() {
           </button>
         </div>
 
-        {/* Tables */}
+        
         {activeTab === "active" && (
           <div className="table-container">
             <table>

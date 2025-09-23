@@ -1,4 +1,6 @@
 const Order = require("../Model/OrdersModel");
+const nodemailer = require("nodemailer");
+const User = require("../Model/UsersModel"); 
 
 const createOrder = async (req, res) => {
   try {
@@ -32,6 +34,35 @@ const createOrder = async (req, res) => {
 
     await newOrder.save();
 
+    // Fetch customer email
+    const user = await User.findById(UserID);
+    const customerEmail = user?.Email; 
+
+    if (customerEmail) {
+      
+      const subject = `Order Confirmation - ${OrderNumber}`;
+      const html = `
+        <h2>Thank you for your order!</h2>
+        <p>Order Number: <strong>${OrderNumber}</strong></p>
+        <p>Total: Rs ${Total}</p>
+        <p>Estimated Delivery: ${EstimatedDelivery || "N/A"}</p>
+        <p>Payment Method: ${PaymentMethod}</p>
+        <h3>Order Details:</h3>
+        <ul>
+          ${Items.map(
+            (item) =>
+              `<li>${item.Name} x ${item.Quantity} = Rs ${item.Total.toFixed(
+                2
+              )}</li>`
+          ).join("")}
+        </ul>
+        <p>Shipping Address: ${ShippingAddress}</p>
+        <p>Contact Number: ${ContactNumber}</p>
+      `;
+
+      await sendEmail(customerEmail, subject, "", html);
+    }
+
     res
       .status(201)
       .json({ message: "Order created successfully", order: newOrder });
@@ -40,6 +71,7 @@ const createOrder = async (req, res) => {
     res.status(500).json({ error: "Failed to create order" });
   }
 };
+
 
 // GET /orders
 const getAllOrders = async (req, res) => {
@@ -86,6 +118,35 @@ const getOrderByNumber = async (req, res) => {
   }
 };
 
+
+
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "coolcarticecream@gmail.com", 
+    pass: "hmjr bjdz wdhk qgfu",       
+  },
+});
+
+const sendEmail = async (to, subject, text, html) => {
+  try {
+    await transporter.sendMail({
+      from: '"Cool Cart Ice Cream" <coolcarticecream@gmail.com>',
+      to,        
+      subject,   
+      text,      
+      html,      
+    });
+    console.log(`Email sent to ${to}`);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};
+
+
+
+exports.sendEmail = sendEmail;
 exports.getAllOrders = getAllOrders;
 exports.createOrder = createOrder;
 exports.getUserOrders = getUserOrders;

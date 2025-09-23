@@ -10,6 +10,7 @@ function OrderDetails() {
   const { orderNumber } = useParams();
   const [order, setOrder] = useState(null);
   const [user, setUser] = useState(null);
+  const [agent, setAgent] = useState(null); // Added state for delivery agent
   const [loading, setLoading] = useState(true);
   const [receipt, setReceipt] = useState(null);
   const [existingReceipt, setExistingReceipt] = useState(null);
@@ -19,12 +20,14 @@ function OrderDetails() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // 1. Fetch order details
         const orderRes = await axios.get(
           `http://localhost:5000/orders/number/${orderNumber}`
         );
         const orderData = orderRes.data.order;
         setOrder(orderData);
 
+        // 2. Fetch customer info
         if (orderData.UserID) {
           try {
             const userRes = await axios.get(
@@ -37,6 +40,27 @@ function OrderDetails() {
           }
         }
 
+        // 3. Fetch assigned delivery agent
+        try {
+          const deliveryRes = await axios.get(
+            `http://localhost:5000/delivery/order/${orderData.OrderNumber}`
+          );
+          const { DeliveryAgentID } = deliveryRes.data; 
+          if (DeliveryAgentID) {
+            const agentRes = await axios.get(
+              `http://localhost:5000/users/${DeliveryAgentID}`
+            );
+            const { FirstName, LastName, Mobile } = agentRes.data.user;
+            setAgent({ FullName: `${FirstName} ${LastName}`, Mobile });
+          } else {
+            setAgent(null);
+          }
+        } catch (err) {
+          console.error("Error fetching agent:", err);
+          setAgent(null);
+        }
+
+        // 4. Fetch existing receipt
         try {
           const receiptRes = await axios.get(
             `http://localhost:5000/payments/order/${orderData.OrderNumber}`
@@ -96,7 +120,9 @@ function OrderDetails() {
       toast.success(res.data.message);
 
       setExistingReceipt({
-        url: `http://localhost:5000${res.data.receiptURL}?t=${new Date().getTime()}`,
+        url: `http://localhost:5000${
+          res.data.receiptURL
+        }?t=${new Date().getTime()}`,
         name: res.data.receiptName || receipt.name,
       });
 
@@ -144,7 +170,12 @@ function OrderDetails() {
           <div className="order-status">
             <div>
               <strong>Order Status:</strong>{" "}
-              <span className={`status ${order.Status.toLowerCase()}`}>
+              <span
+                className={`status ${order.Status.toLowerCase().replace(
+                  /\s+/g,
+                  "-"
+                )}`}
+              >
                 {order.Status}
               </span>
             </div>
@@ -183,8 +214,14 @@ function OrderDetails() {
           <div className="right-column">
             <section className="order-summary">
               <h2>Delivery Agent</h2>
-              <p>Ajith Muthukumarana</p>
-              <p>071 5437895</p>
+              {agent ? (
+                <>
+                  <p>{agent.FullName}</p>
+                  <p>{agent.Mobile}</p>
+                </>
+              ) : (
+                <p style={{ color: "red" }}>No Delivery agent assigned yet</p>
+              )}
 
               <h2>Payment Summary</h2>
               <p>Subtotal: Rs {order.Subtotal.toFixed(2)}</p>
@@ -202,7 +239,7 @@ function OrderDetails() {
                   <h3>Bank Receipt</h3>
 
                   {existingReceipt &&
-                    order.PaymentStatus?.toLowerCase() === "pending" && (
+                    ["pending", "declined"].includes(order.PaymentStatus?.toLowerCase()) && (
                       <button
                         className="delete-receipt-btn"
                         onClick={handleDeleteReceipt}
@@ -224,7 +261,7 @@ function OrderDetails() {
                     </div>
                   )}
 
-                  {order.PaymentStatus?.toLowerCase() === "pending" && (
+                  {["pending", "declined"].includes(order.PaymentStatus?.toLowerCase()) && (
                     <div
                       className={`bank-upload ${dragActive ? "active" : ""}`}
                       onDragEnter={handleDrag}

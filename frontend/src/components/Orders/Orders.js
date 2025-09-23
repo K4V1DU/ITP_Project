@@ -16,17 +16,15 @@ function Orders() {
   // Map filter to actual statuses
   const statusMap = {
     all: null,
-    ongoing: ["pending", "preparing", "shipped"],
-    completed: ["completed"],
+    ongoing: ["pending", "ready", "out-for-delivery"],
+    completed: ["delivered"],
     cancelled: ["cancelled"],
   };
 
   // Fetch orders
   const fetchOrders = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/orders/user/${userId}`
-      );
+      const res = await axios.get(`http://localhost:5000/orders/user/${userId}`);
       setOrders(res.data.orders || []);
     } catch (err) {
       console.error("Error fetching orders:", err);
@@ -46,7 +44,7 @@ function Orders() {
     filter === "all"
       ? orders
       : orders.filter((order) =>
-          statusMap[filter].includes(order.Status.toLowerCase())
+          statusMap[filter].includes(order.Status.toLowerCase().replace(/ /g, "-"))
         );
 
   // Navigate to order details
@@ -103,15 +101,14 @@ function Orders() {
                   <td>{order.OrderNumber}</td>
                   <td>
                     {Array.isArray(order.Items)
-                      ? order.Items.reduce(
-                          (sum, item) => sum + item.Quantity,
-                          0
-                        )
+                      ? order.Items.reduce((sum, item) => sum + item.Quantity, 0)
                       : 0}
                   </td>
                   <td>Rs {order.Total.toFixed(2)}</td>
                   <td>
-                    <span className={`status ${order.Status.toLowerCase()}`}>
+                    <span
+                      className={`status ${order.Status.toLowerCase().replace(/ /g, "-")}`}
+                    >
                       {order.Status}
                     </span>
                   </td>

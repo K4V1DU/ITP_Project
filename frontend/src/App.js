@@ -20,6 +20,11 @@ import ForgotPassword from "./components/Login/FogotPassword.js";
 import ResetPassword from "./components/Login/ResetPassword.js";
 import VerifyOtp from "./components/Login/VerifyOtp.js";
 import AdminPannel from "./components/AdminDashboard/DashboardOverview.js";
+import OrderManageDetails  from "./components/OrderManagement/OrderManageDetails.js";
+import OrdersDashboard from "./components/OrderManagement/orderManage.js";
+import CouponShare from "./components/Promotion_and_Coupons/ShareCoupons.js";
+import DeliveryDashboard from "./components/DeliveryManagement/DeliveryDashboard.js";
+
 
 
 
@@ -48,6 +53,10 @@ function App() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/verify-otp" element={<VerifyOtp />} />
       <Route path="/Admin-Panel" element={<AdminPannel />} />
+      <Route path="/orders-dashboard" element={<OrdersDashboard />} />
+      <Route path="/order-details/:id" element={<OrderManageDetails />} />
+      <Route path="/Dispatch" element={<CouponShare />} />
+      <Route path="/DeliveryDashboard" element={<DeliveryDashboard />} />
 
 
     </Routes>

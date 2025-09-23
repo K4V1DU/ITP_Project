@@ -168,11 +168,7 @@ function Cart() {
   let discount = 0;
 
   if (appliedCoupon) {
-    if (appliedCoupon.type === "percentage") {
       discount = subtotal * (appliedCoupon.discountValue / 100);
-    } else {
-      discount = appliedCoupon.discountValue;
-    }
   }
 
   const totalCost = subtotal - discount;
@@ -306,8 +302,8 @@ function Cart() {
 
               {appliedCoupon && (
                 <div className="coupon-tag">
-                  {appliedCoupon.code} ({appliedCoupon.discountValue}
-                  {appliedCoupon.type === "percentage" ? "%" : "Rs"})
+                  {appliedCoupon.code} - {appliedCoupon.discountValue}%
+                 
                   <button onClick={() => setAppliedCoupon(null)}>✖</button>
                 </div>
               )}

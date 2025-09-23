@@ -104,7 +104,8 @@ function CouponsReport() {
         await axios.delete(`${API_URL}/${coupon._id}`);
         toast.success("Deleted coupon successfully", { position: "top-right" });
         fetchCoupons();
-      } catch (err) {
+      } 
+      catch (err) {
         console.error(err);
         toast.error("Error deleting coupon", { position: "top-right" });
       }
@@ -401,7 +402,7 @@ function CouponsReport() {
 
         <div className="table-title">Coupon Details Table</div>
 
-        <div>{/* Search Section */}
+        <div>
         <div className="search-section">
           <label htmlFor="statusFilter" style={{ marginRight: "0.5rem", fontWeight: "500" }}>Filter by Status:</label>
           <select

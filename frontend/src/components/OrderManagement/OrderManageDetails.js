@@ -25,9 +25,11 @@ function OrderManageDetails() {
       const res = await axios.get("http://localhost:5000/users");
       const agents = res.data.users.filter((u) => u.Role === "Delivery Staff");
       setDeliveryAgents(agents);
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("Failed to load delivery agents");
-    } finally {
+    } 
+    finally {
       setLoading(false);
     }
   };
@@ -39,22 +41,24 @@ function OrderManageDetails() {
       setOrder(res.data);
       setStatus(res.data.Status);
 
-      // Fetch assigned delivery agent
+      //Fetch assigned delivery agent
       try {
         const assignRes = await axios.get(
-          `http://localhost:5000/delivery/${res.data.OrderNumber}`
+          `http://localhost:5000/delivery/order/${res.data.OrderNumber}`
         );
         const agentID = assignRes.data.DeliveryAgentID;
         setAssignedAgent(agentID);
         setIsAssigned(true);
 
-        // Find agent name if delivery agents loaded
+        //Find agent name 
         const agent = deliveryAgents.find((a) => a._id === agentID);
         if (agent) setAssignedAgentName(`${agent.FirstName} ${agent.LastName}`);
-      } catch (err) {
-        setIsAssigned(false); // no agent assigned yet
+      } 
+      catch (err) {
+        setIsAssigned(false);
       }
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("Failed to load order");
     }
   };
@@ -64,13 +68,11 @@ function OrderManageDetails() {
     // eslint-disable-next-line
   }, []);
 
-  // Fetch order after delivery agents are loaded to correctly show assigned agent name
   useEffect(() => {
     if (deliveryAgents.length > 0) fetchOrder();
     // eslint-disable-next-line
   }, [deliveryAgents]);
 
-  // Update assignedAgentName whenever assignedAgent changes
   useEffect(() => {
     if (assignedAgent && deliveryAgents.length > 0) {
       const agent = deliveryAgents.find((a) => a._id === assignedAgent);
@@ -84,7 +86,8 @@ function OrderManageDetails() {
     try {
       await axios.put(`${ORDER_API}/${id}`, { Status: newStatus });
       toast.success("Order status updated");
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("Failed to update status");
     }
   };
@@ -110,8 +113,8 @@ function OrderManageDetails() {
       setAssignedAgentName(agent ? `${agent.FirstName} ${agent.LastName}` : "");
       setIsAssigned(true);
       toast.success("Delivery agent assigned");
-    } catch (err) {
-      // If already assigned, fetch the assigned agent
+    } 
+    catch (err) {
       try {
         const assignRes = await axios.get(
           `http://localhost:5000/delivery/${order.OrderNumber}`
@@ -125,7 +128,8 @@ function OrderManageDetails() {
         toast.info(
           `Order already assigned to ${assignedAgentName} (${assignRes.data.DeliveryAgentID})`
         );
-      } catch (fetchErr) {
+      } 
+      catch (fetchErr) {
         toast.error("Failed to fetch already assigned agent");
       }
     }
@@ -143,65 +147,85 @@ function OrderManageDetails() {
   };
 
   const styles = {
-    container: { padding: "2rem" },
+    container: { padding: "2rem", backgroundColor: "#f0f2f5", minHeight: "100vh" },
     wrapper: {
-      maxWidth: "900px",
+      maxWidth: "950px",
       margin: "0 auto",
-      backgroundColor: "#f7f7f7",
-      padding: "1.5rem",
-      borderRadius: "10px",
+      backgroundColor: "#fff",
+      padding: "2rem",
+      borderRadius: "12px",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
     },
     section: {
-      marginBottom: "1.5rem",
-      padding: "1rem",
-      backgroundColor: "#fff",
-      borderRadius: "8px",
+      marginBottom: "1.8rem",
+      padding: "1.2rem",
+      backgroundColor: "#fafafa",
+      borderRadius: "10px",
+      border: "1px solid #e6e6e6",
     },
     sectionTitle: {
-      fontSize: "1.2rem",
-      fontWeight: "600",
-      marginBottom: "0.5rem",
-      color: "#2f3640",
+      fontSize: "1.25rem",
+      fontWeight: "700",
+      marginBottom: "0.75rem",
+      color: "#2d3436",
+      borderBottom: "2px solid #dfe6e9",
+      paddingBottom: "0.4rem",
     },
     itemCard: {
       marginBottom: "1rem",
-      padding: "0.8rem",
-      backgroundColor: "#f1f2f6",
-      borderRadius: "6px",
+      padding: "1rem",
+      backgroundColor: "#ffffff",
+      border: "1px solid #dfe6e9",
+      borderRadius: "8px",
+      boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
     },
     statusSelect: {
-      padding: "0.5rem 1rem",
-      borderRadius: "6px",
-      border: "1px solid #dcdde1",
+      padding: "0.6rem 1rem",
+      borderRadius: "8px",
+      border: "1px solid #b2bec3",
       fontSize: "1rem",
-      marginBottom: "0.5rem",
+      marginBottom: "0.8rem",
+      outline: "none",
+      backgroundColor: "#fff",
+      transition: "0.3s",
     },
-    actionButtons: { marginTop: "2rem" },
+    actionButtons: {
+      marginTop: "2rem",
+      display: "flex",
+      gap: "1rem",
+      justifyContent: "flex-end",
+    },
     deleteBtn: {
-      padding: "0.7rem 1rem",
+      padding: "0.8rem 1.3rem",
       backgroundColor: "#e84118",
       color: "#fff",
       border: "none",
-      borderRadius: "6px",
+      borderRadius: "8px",
       cursor: "pointer",
+      fontWeight: "600",
+      transition: "0.3s",
     },
     backBtn: {
-      padding: "0.7rem 1rem",
-      marginLeft: "1rem",
+      padding: "0.8rem 1.3rem",
       backgroundColor: "#273c75",
       color: "#fff",
       border: "none",
-      borderRadius: "6px",
+      borderRadius: "8px",
       cursor: "pointer",
+      fontWeight: "600",
+      transition: "0.3s",
     },
     assignBtn: (assigned) => ({
-      padding: "0.5rem 1rem",
-      borderRadius: "6px",
-      backgroundColor: assigned ? "#e84118" : "#4cd137",
+      padding: "0.6rem 1.2rem",
+      borderRadius: "8px",
+      backgroundColor: assigned ? "#7f8c8d" : "#27ae60",
       color: "#fff",
       border: "none",
       cursor: assigned ? "not-allowed" : "pointer",
-      marginTop: "0.5rem",
+      marginTop: "0.8rem",
+      marginLeft: "0.5rem", // added gap between select and button
+      fontWeight: "600",
+      transition: "0.3s",
     }),
   };
 
@@ -300,7 +324,7 @@ function OrderManageDetails() {
             {deliveryAgents.length === 0 ? (
               <p>No delivery agents available.</p>
             ) : (
-              <>
+              <div style={{}}>
                 <select
                   value={assignedAgent || ""}
                   onChange={(e) => setAssignedAgent(e.target.value)}
@@ -314,24 +338,34 @@ function OrderManageDetails() {
                     </option>
                   ))}
                 </select>
+
                 <button
                   onClick={handleAssignAgentClick}
                   style={styles.assignBtn(isAssigned)}
                   disabled={isAssigned || status === "Cancelled"}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                 >
                   {isAssigned ? "Already Assigned" : "Assign Agent"}
                 </button>
-              </>
+              </div>
             )}
           </div>
 
           <div style={styles.actionButtons}>
-            <button style={styles.deleteBtn} onClick={handleDelete}>
+            <button
+              style={styles.deleteBtn}
+              onClick={handleDelete}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            >
               Delete Order
             </button>
             <button
               style={styles.backBtn}
               onClick={() => navigate("/orderManage")}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             >
               Back to Orders
             </button>

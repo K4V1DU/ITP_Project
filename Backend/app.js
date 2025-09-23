@@ -15,11 +15,12 @@ const PasswordResetRoute = require("./Routes/PasswordResetRoute");
 const RegisterRoute = require("./Routes/RegisterRoute");
 const DeliveryRoutes = require("./Routes/DeliveryAssignmentRoute");
 const shareCouponsRoute = require("./Routes/shareCouponsRoute");
+const adminCartsRoutes = require("./Routes/AdminCartsRoute");
+
+
 
 const app = express(); 
 const cors = require("cors");
-
-
 
 //Middleware
 app.use(express.json());
@@ -38,6 +39,9 @@ app.use("/PasswordResetRoute", PasswordResetRoute);
 app.use("/Users", RegisterRoute);
 app.use("/delivery", DeliveryRoutes);
 app.use("/sharecoupons", shareCouponsRoute);
+app.use("/Admin/Carts", adminCartsRoutes);
+
+
 
 
 

@@ -28,7 +28,7 @@ function Inventory() {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this item?"
     );
-    if (!confirmDelete) return; // Cancel button එක click කරාම delete stop
+    if (!confirmDelete) return;
 
     try {
       await axios.delete(`http://localhost:5000/inventory/${id}`);
@@ -85,10 +85,11 @@ function Inventory() {
                         <td>
                           <button
                             type="edit"
-                            onClick={() => history(`/editproduct/${item._id}`)}
+                            onClick={() => history(`/EditProduct/${item._id}`)}
                           >
                             Edit
                           </button>
+
                           <button
                             type="delete"
                             onClick={() => handleDelete(item._id)}

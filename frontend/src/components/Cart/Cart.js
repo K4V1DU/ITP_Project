@@ -6,6 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "./Cart.css";
 import { useNavigate } from "react-router-dom";
 
+
+
 function Cart() {
   const [Items, setItems] = useState([]);
   const [coupon, setCoupon] = useState("");
@@ -16,7 +18,7 @@ function Cart() {
 
   const navigate = useNavigate();
 
-  // ✅ Fetch cart items
+  
   const fetchHandler = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/Cart/user/${userId}`);
@@ -46,7 +48,6 @@ function Cart() {
       setItems(itemsWithStock.filter((i) => i !== null));
     } catch (err) {
       console.error("Error fetching cart:", err);
-      toast.error("Failed to fetch cart items.");
     } finally {
       setLoading(false);
     }

@@ -17,15 +17,9 @@ function Navbar() {
   if (role === "Marketing Manager") {
     links = ["Dashboard", "Manage Coupon", "Dispatch", "Notifications"];
   } else if (role === "Admin") {
-    links = [
-      "Admin Panel",
-      "Manage Users",
-      "orderManage",
-      "Dashboard",
-      "Inventory",
-    ];
+    links = ["Admin Panel","Manage Users","orderManage","Dashboard","Inventory","UsersCarts"];
   } else if (role === "Supply Manager") {
-    links = ["Inventory", "page1", "page2", "page3"];
+    links = ["Inventory", "Notifications"];
   } else if (role === "Order Manager") {
     links = ["orderManage", "Manage", "Notifications"];
   } else if (role === "Delivery Staff") {

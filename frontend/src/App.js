@@ -27,7 +27,7 @@ import OrderManageDetails  from "./components/OrderManagement/OrderManageDetails
 import OrdersDashboard from "./components/OrderManagement/orderManage.js";
 import CouponShare from "./components/Promotion_and_Coupons/ShareCoupons.js";
 import DeliveryDashboard from "./components/DeliveryManagement/DeliveryDashboard.js";
-
+import UsersCarts from "./components/AdminDashboard/UsersCarts/usersCarts.js";
 
 
 
@@ -62,6 +62,7 @@ function App() {
       <Route path="/orders-dashboard" element={<OrdersDashboard />} />
       <Route path="/order-details/:id" element={<OrderManageDetails />} />
       <Route path="/Dispatch" element={<CouponShare />} />
+      <Route path="/UsersCarts" element={<UsersCarts />} />
       <Route path="/DeliveryDashboard" element={<DeliveryDashboard />} />
 
 

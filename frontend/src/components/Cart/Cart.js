@@ -3,9 +3,9 @@ import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "./Cart.css";
-import { useNavigate } from "react-router-dom";
 
+import { useNavigate } from "react-router-dom";
+import "./Cart.css";
 
 
 function Cart() {

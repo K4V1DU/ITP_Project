@@ -49,7 +49,7 @@ function AddUsers() {
     try {
       await axios.post("http://localhost:5000/Users", user);
       Swal.fire("Success", "User added successfully!", "success");
-      navigate("/users");
+      navigate("/Manage-Users");
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Failed to add user!", "error");

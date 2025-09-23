@@ -1,10 +1,11 @@
+import "./AddProducts";
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "../Inventory/Inventory.css";
+
 
 function AddProducts() {
   const history = useNavigate();
@@ -53,7 +54,7 @@ function AddProducts() {
 
     // Description validation
     if (name === "Description") {
-      if (!/^[a-zA-Z\s.,'-]*$/.test(value)) {
+      if (!/^[a-zA-Z\s.,'-]*$%&/.test(value)) {
         toast.error(
           "Description can only contain letters and basic punctuation",
           { position: "top-center" }
@@ -198,10 +199,10 @@ function AddProducts() {
           required
         >
           <option value="">-- Select Category --</option>
-          <option value="Cups">Cups</option>
-          <option value="Tubs">Tubs</option>
-          <option value="Cones">Cones </option>
-          <option value="Bar">Bar</option>
+          <option value="Cup">Cup</option>
+          <option value="Stick">Stick</option>
+          <option value="Cone">Cone</option>
+          <option value="Family pack">Family pack</option>
         </select>
 
         <h5>Flavour : </h5>
@@ -216,6 +217,7 @@ function AddProducts() {
           <option value="Chocolate">Chocolate</option>
           <option value="Strawberry">Strawberry</option>
           <option value="Mango">Mango</option>
+          
         </select>
 
         <h5>Capacity : </h5>

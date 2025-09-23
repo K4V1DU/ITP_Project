@@ -85,7 +85,7 @@
 /* -------------------------- ASSIGNMENTS LIST (GRID) -------------------------- */
 .assignments-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 20px;
 }
 
@@ -94,10 +94,11 @@
   background: #fff;
   padding: 15px 20px;
   border-radius: 10px;
-  width: 430px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  border-bottom: 4px solid #007bff; /* default underline */
+  border-bottom: 4px solid #007bff;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .assignment-card:hover {
@@ -130,6 +131,8 @@
   margin-top: 15px;
   border-top: 1px solid #ddd;
   padding-top: 10px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .order-details h4 {
@@ -208,15 +211,29 @@
 }
 
 /* -------------------------- RESPONSIVE -------------------------- */
+@media (max-width: 1024px) {
+  .assignments-list {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .agent-stats {
     flex-direction: column;
   }
-  
+
   .update-section {
     flex-direction: column;
     gap: 5px;
   }
 }
 
-
+@media (max-width: 480px) {
+  .assignments-list {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-header {
+    flex-direction: column;
+    gap: 5px;
+  }
+}

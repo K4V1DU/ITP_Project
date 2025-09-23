@@ -14,24 +14,40 @@ function OrdersDashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
+  const [agentMap, setAgentMap] = useState({});
   const navigate = useNavigate();
 
   const fetchOrders = async () => {
     try {
       const res = await axios.get(API_URL);
       setOrders(res.data);
-    } 
-    catch (err) {
+    } catch (err) {
       console.error(err);
       toast.error("Error fetching orders");
     }
   };
 
   useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/users");
+        const agents = res.data.users.filter((u) => u.Role === "Delivery Staff");
+        const map = {};
+        agents.forEach((a) => {
+          map[a._id] = `${a.FirstName} ${a.LastName}`;
+        });
+        setAgentMap(map);
+      } catch (err) {
+        toast.error("Failed to load delivery agents");
+      }
+    };
+    fetchAgents();
+  }, []);
+
+  useEffect(() => {
     fetchOrders();
   }, []);
 
- 
   const filteredOrders = orders.filter((o) => {
     const orderNumber = o.OrderNumber?.toLowerCase() || "";
     const userID = o.UserID?.toLowerCase() || "";
@@ -47,7 +63,6 @@ function OrdersDashboard() {
       (paymentStatusFilter === "all" || paymentStatus === paymentStatusFilter.toLowerCase())
     );
   });
-
 
   const styles = {
     container: { padding: "2rem" },
@@ -65,9 +80,18 @@ function OrdersDashboard() {
       <div style={styles.container}>
         <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>Order Management</h1>
 
-        
-        <input style={styles.input} placeholder="Search by Order Number..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-        <input style={styles.input} placeholder="Search by User ID..." value={userSearchTerm} onChange={(e) => setUserSearchTerm(e.target.value)} />
+        <input
+          style={styles.input}
+          placeholder="Search by Order Number..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <input
+          style={styles.input}
+          placeholder="Search by User ID..."
+          value={userSearchTerm}
+          onChange={(e) => setUserSearchTerm(e.target.value)}
+        />
         <select style={styles.select} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
@@ -86,7 +110,6 @@ function OrdersDashboard() {
           <option value="Completed">Completed</option>
         </select>
 
-        
         <table style={styles.table}>
           <thead>
             <tr>
@@ -96,28 +119,38 @@ function OrdersDashboard() {
               <th style={styles.th}>Total</th>
               <th style={styles.th}>Status</th>
               <th style={styles.th}>Payment</th>
+              <th style={styles.th}>Assigned Agent</th>
               <th style={styles.th}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.map(o => (
-              <tr key={o._id}>
-                <td style={styles.td}>{o.OrderNumber}</td>
-                <td style={styles.td}>{o.UserID}</td>
-                <td style={styles.td}>{o.Items.length} items</td>
-                <td style={styles.td}>{o.Total}</td>
-                <td style={styles.td}>{o.Status}</td>
-                <td style={styles.td}>{o.PaymentMethod} ({o.PaymentStatus})</td>
-                <td style={styles.td}>
-                  <button
-                    style={{ ...styles.button, backgroundColor: "#40739e", color: "#fff" }}
-                    onClick={() => navigate(`/order-details/${o._id}`)}
-                  >
-                    View More Details
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {filteredOrders.map((o) => {
+              const assignedName = o.DeliveryAgentID 
+                ? agentMap[o.DeliveryAgentID] || "Assigned"
+                : "Not Assigned";
+
+              const rowStyle = { ...styles.td, backgroundColor: o.DeliveryAgentID ? "#dff9fb" : "#f5f6fa" };
+
+              return (
+                <tr key={o._id}>
+                  <td style={rowStyle}>{o.OrderNumber}</td>
+                  <td style={rowStyle}>{o.UserID}</td>
+                  <td style={rowStyle}>{o.Items.length} items</td>
+                  <td style={rowStyle}>{o.Total}</td>
+                  <td style={rowStyle}>{o.Status}</td>
+                  <td style={rowStyle}>{o.PaymentMethod} ({o.PaymentStatus})</td>
+                  <td style={rowStyle}>{assignedName}</td>
+                  <td style={rowStyle}>
+                    <button
+                      style={{ ...styles.button, backgroundColor: "#40739e", color: "#fff" }}
+                      onClick={() => navigate(`/order-details/${o._id}`)}
+                    >
+                      View More Details
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 

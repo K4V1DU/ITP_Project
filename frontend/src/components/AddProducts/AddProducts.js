@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import { ToastContainer } from "react-toastify";
+import '../Inventory/Inventory.css';
 
 function AddProducts() {
   const history = useNavigate();
@@ -143,7 +144,7 @@ function AddProducts() {
         <br></br>
         <br></br>
         <button type="submit">Add Product</button>
-        <button type="button" onClick={() => history("/home")}>
+        <button type="button" onClick={() => history("/Inventory")}>
           Cancel
         </button>
       </form>

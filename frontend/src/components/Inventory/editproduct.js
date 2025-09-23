@@ -4,6 +4,7 @@ import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import './Inventory.css';
 
 function EditProduct() {
   const { id } = useParams();
@@ -21,18 +22,19 @@ function EditProduct() {
   });
 
   // Fetch product by ID
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5000/inventory/${id}`);
-        setInputs(res.data.products); // backend returns {products: {...}}
-      } catch (error) {
-        console.error("Error fetching product:", error);
-        toast.error("Failed to load product!", { position: "top-center" });
-      }
-    };
-    fetchProduct();
-  }, [id]);
+useEffect(() => {
+  const fetchProduct = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/Inventory/${id}`);
+      setInputs(res.data.products); // backend returns {products: {...}}
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      toast.error("Failed to load product!", { position: "top-center" });
+    }
+  };
+  fetchProduct();
+}, [id]);
+
 
   // Handle input change
   const handleChange = (e) => {
@@ -43,18 +45,19 @@ function EditProduct() {
     }));
   };
 
-  // Submit update
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.put(`http://localhost:5000/Inventory/${id}`, inputs);
-      toast.success("Product updated successfully!", { position: "top-center" });
-      history("/inventory");
-    } catch (error) {
-      toast.error("Update failed!", { position: "top-center" });
-      console.error("Error updating product:", error);
-    }
-  };
+ // Submit update
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await axios.put(`http://localhost:5000/Inventory/${id}`, inputs);
+    toast.success("Product updated successfully!", { position: "top-center" });
+    history("/inventory");
+  } catch (error) {
+    toast.error("Update failed!", { position: "top-center" });
+    console.error("Error updating product:", error);
+  }
+};
+
 
   return (
     <div>

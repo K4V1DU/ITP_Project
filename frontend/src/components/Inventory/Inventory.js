@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import "./Inventory.css";
 
 function Inventory() {
   const [Inventory, setInventory] = useState([]);
@@ -24,6 +25,11 @@ function Inventory() {
   }, []);
 
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this item?"
+    );
+    if (!confirmDelete) return; // Cancel button එක click කරාම delete stop
+
     try {
       await axios.delete(`http://localhost:5000/inventory/${id}`);
       setInventory((prev) => prev.filter((p) => p._id !== id));
@@ -33,8 +39,6 @@ function Inventory() {
       console.error("Error deleting item:", error.response || error);
     }
   };
-
-  
 
   return (
     <div>
@@ -80,13 +84,13 @@ function Inventory() {
                         </td>
                         <td>
                           <button
-                            type="button"
+                            type="edit"
                             onClick={() => history(`/editproduct/${item._id}`)}
                           >
                             Edit
                           </button>
                           <button
-                            type="button"
+                            type="delete"
                             onClick={() => handleDelete(item._id)}
                           >
                             Delete
@@ -104,7 +108,7 @@ function Inventory() {
         )}
         {/*  Add Product Button */}
         <div style={{ marginTop: "20px" }}>
-          <button onClick={() => history("/addproduct")}>
+          <button type="addnewpro" onClick={() => history("/addproduct")}>
             Add New Product
           </button>
         </div>

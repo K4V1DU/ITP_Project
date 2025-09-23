@@ -6,9 +6,9 @@ const PaymentSchema = new mongoose.Schema({
     required: true,
   },
   ReceiptFile: {
-    data: { type: Buffer },          // removed required: true
-    contentType: { type: String },   // removed required: true
-    name: { type: String },          // removed required: true
+    data: { type: Buffer },          
+    contentType: { type: String },   
+    name: { type: String },          
   },
   UploadDate: {
     type: Date,

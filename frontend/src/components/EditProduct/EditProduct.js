@@ -1,10 +1,11 @@
+import "../AddProducts/AddProducts.css";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "../Inventory/Inventory.css";
+
 
 function EditProduct() {
   const history = useNavigate();

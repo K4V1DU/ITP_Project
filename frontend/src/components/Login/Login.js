@@ -86,7 +86,7 @@ function Login() {
           width: 110px;
           height: 110px;
           margin: 0 auto 0.8rem auto;
-          border-radius: 50%;
+          border-radius: 100%;
           background: rgba(255, 255, 255, 0.1);
           display: flex;
           align-items: center;
@@ -94,9 +94,10 @@ function Login() {
           box-shadow: 0 0 20px rgba(59, 130, 246, 0.7);
         }
         .logo-container img {
-          width: 90px;
-          height: 90px;
+          
+          height: 110px;
           object-fit: contain;
+          border-radius: 100%;
         }
         .app-title {
           font-size: 1.6rem;
@@ -171,7 +172,7 @@ function Login() {
       <div className="login-card">
         {/* Logo */}
         <div className="logo-container">
-          <img src="/images/navlogo.png" alt="App Logo" />
+          <img src="/images/logo99.png" alt="App Logo" />
         </div>  
 
         {/* App Title */}

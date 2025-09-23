@@ -23,6 +23,7 @@ function Navbar() {
       "orderManage",
       "Dashboard",
       "Inventory",
+      "profile",
     ];
   } else if (role === "Supply Manager") {
     links = ["Inventory", "page1", "page2", "page3"];

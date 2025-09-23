@@ -11,7 +11,6 @@ import UpdateUsers from "./components/AdminDashboard/UpdateUsers.js"
 import Checkout from "./components/Checkout/Checkout.js";
 import DashboardOverview from "./components/AdminDashboard/DashboardOverview.js"
 import ProtionReport from "./components/Promotion_and_Coupons/CouponsReport.js";
-import Inventory from "./components/Inventory/Inventory.js";
 import AddProducts from './components/AddProducts/AddProducts.js';
 import EditProduct from './components/EditProduct/EditProduct.js';
 import Inventory from "./components/Inventory/inventory.js";
@@ -51,7 +50,7 @@ function App() {
       <Route path="/Inventory" element={<Inventory />} />
       <Route path="/addproduct" element={<AddProducts />} />
       <Route path="/EditProduct/:id" element={<EditProduct/>}/>
-      <Route path="/orderManage" element={<ManageOrders />} />
+      <Route path="/Order-Manage" element={<ManageOrders />} />
       <Route path="/Orders" element={<Orders />} />
       <Route path="/OrderDetails/:orderNumber" element={<OrderDetails />} />
       <Route path="/register" element={<Register />} />
@@ -62,8 +61,9 @@ function App() {
       <Route path="/orders-dashboard" element={<OrdersDashboard />} />
       <Route path="/order-details/:id" element={<OrderManageDetails />} />
       <Route path="/Dispatch" element={<CouponShare />} />
-      <Route path="/UsersCarts" element={<UsersCarts />} />
+      <Route path="/Users-Carts" element={<UsersCarts />} />
       <Route path="/DeliveryDashboard" element={<DeliveryDashboard />} />
+       <Route path="/Coupon-Management" element={<ProtionReport />} />
 
 
 

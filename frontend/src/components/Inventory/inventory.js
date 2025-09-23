@@ -1,80 +1,42 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../NavBar/NavBar";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { Form, useNavigate } from "react-router";
-
+import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import "./Inventory.css";
 
 function Inventory() {
   const [Inventory, setInventory] = useState([]);
-  const { id } = useParams();
   const history = useNavigate();
-
-  const [inputs, setInputs] = useState({
-    ProductID: "",
-    Name: "",
-    Price: "",
-    Description: "",
-    Quantity: "",
-    Category: "",
-    Flavour: "",
-    Capacity: "",
-    URL: "",
-  });
 
   useEffect(() => {
     const fetchHandler = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/Inventory`);
+        const res = await axios.get("http://localhost:5000/Inventory/");
         console.log("API Response:", res.data);
-        const Item = res.data;
-        setInventory(res.data);
-
-        setInputs({
-          ProductID: Item.ProductID,
-          Name: Item.Name,
-          Price: Item.Price,
-          Description: Item.Description,
-          Quantity: Item.Quantity,
-          Category: Item.Category,
-          Flavour: Item.Flavour,
-          Capacity: Item.Capacity,
-          URL: Item.URL,
-        });
-
-        setInventory([Item]);
+        setInventory(res.data.products || []);
       } catch (error) {
         console.error("Error fetching inventory:", error);
       }
     };
-
     fetchHandler();
-  }, [id]);
+  }, []);
 
-  
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this item?"
+    );
+    if (!confirmDelete) return; // Cancel button එක click කරාම delete stop
+
     try {
-      await axios.delete(`http://localhost:5000/Inventory/${id}`);
+      await axios.delete(`http://localhost:5000/inventory/${id}`);
+      setInventory((prev) => prev.filter((p) => p._id !== id));
       toast.success("Item deleted successfully!", { position: "top-center" });
-      history("/Inventory");
     } catch (error) {
       toast.error("Delete failed!", { position: "top-center" });
-      console.error("Error deleting item:", error);
-    }
-  };
-
-  const handleUpdate = async (id) => {
-    try {
-      await axios.put(`http://localhost:5000/Inventory/${id}`, inputs);
-
-      toast.success("Item updated successfully!", { position: "top-center" });
-      history("/Inventory");
-    } catch (error) {
-      toast.error("Update failed!", { position: "top-center" });
-      console.error("Error updating item:", error);
+      console.error("Error deleting item:", error.response || error);
     }
   };
 
@@ -108,7 +70,7 @@ function Inventory() {
                   </thead>
                   <tbody>
                     {Inventory.map((item) => (
-                      <tr key={item.ProductID}>
+                      <tr key={item._id}>
                         <td>{item.ProductID}</td>
                         <td>{item.Name}</td>
                         <td>{item.Price}</td>
@@ -122,14 +84,14 @@ function Inventory() {
                         </td>
                         <td>
                           <button
-                            type="button"
-                            onClick={() => handleUpdate(item.ProductID)}
+                            type="edit"
+                            onClick={() => history(`/editproduct/${item._id}`)}
                           >
-                            Update
+                            Edit
                           </button>
                           <button
-                            type="button"
-                            onClick={() => handleDelete(item.ProductID)}
+                            type="delete"
+                            onClick={() => handleDelete(item._id)}
                           >
                             Delete
                           </button>
@@ -146,7 +108,7 @@ function Inventory() {
         )}
         {/*  Add Product Button */}
         <div style={{ marginTop: "20px" }}>
-          <button onClick={() => history("/addproduct")}>
+          <button type="addnewpro" onClick={() => history("/addproduct")}>
             Add New Product
           </button>
         </div>

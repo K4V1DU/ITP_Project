@@ -1,35 +1,48 @@
-
-
 const Inventory = require("../Model/InventoryModel");
-
 
 //Display All
 
-const getAllProducts = async(req, res, next) => {
+const getAllProducts = async (req, res, next) => {
+  let products;
 
-    let products;
-
-    try {
-        products = await Inventory.find();
-
-    } catch (err) {
-        console.log(err);
-    }
-    if(!products){
-        return res.status(404).json({message:"Products Not Found"});
-    }
-    return res.status(200).json({products});
-
-
+  try {
+    products = await Inventory.find();
+  } catch (err) {
+    console.log(err);
+  }
+  if (!products) {
+    return res.status(404).json({ message: "Products Not Found" });
+  }
+  return res.status(200).json({ products });
 };
 
 // Insert
 
 const addProducts = async (req, res, next) => {
-  const { ProductID, Name, Price, Description, Quantity, Category, Flavour, Capacity, URL } = req.body;
+  const {
+    ProductID,
+    Name,
+    Price,
+    Description,
+    Quantity,
+    Category,
+    Flavour,
+    Capacity,
+    URL,
+  } = req.body;
 
   try {
-    const product = new Inventory({ ProductID, Name, Price, Description, Quantity, Category, Flavour, Capacity, URL });
+    const product = new Inventory({
+      ProductID,
+      Name,
+      Price,
+      Description,
+      Quantity,
+      Category,
+      Flavour,
+      Capacity,
+      URL,
+    });
     await product.save();
     return res.status(201).json({ product }); // singular key
   } catch (err) {
@@ -38,45 +51,52 @@ const addProducts = async (req, res, next) => {
   }
 };
 
+// getById
+const getById = async (req, res, next) => {
+  const id = req.params.id;
 
-//getById
-
-
-const getById = async(req, res, next) => {
-
-    const id = req.params.id;
-
-    let products;
-
-    try {
-        products = await Inventory.findById(id);    
-
-    } catch (err) {
-        console.log(err);
+  try {
+    const product = await Inventory.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product Not Found" });
     }
-    if(!products){
-        return res.status(404).json({message:"Product Not Found"});
-    }
-    return res.status(200).json({products});
-
-
+    return res.status(200).json({ product }); // singular key
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server error" });
+  }
 };
 
-
-
 //Update
+const updateProduct = async (req, res, next) => {
+  const id = req.params.id;
+  const {
+    ProductID,
+    Name,
+    Price,
+    Description,
+    Quantity,
+    Category,
+    Flavour,
+    Capacity,
+    URL,
+  } = req.body;
 
-const updateProduct = async(req, res, next) => {
-
-    const id = req.params.id;
-    const {ProductID,Name,Price,Description,Quantity,Category,Flavour,Capacity,URL} = req.body;
-
-
-    try {
+  try {
     const updated = await Inventory.findByIdAndUpdate(
       id,
-      { ProductID, Name, Price, Description, Quantity, Category, Flavour, Capacity, URL },
-      { new: true } // return the updated document
+      {
+        ProductID,
+        Name,
+        Price,
+        Description,
+        Quantity,
+        Category,
+        Flavour,
+        Capacity,
+        URL,
+      },
+      { new: true }
     );
 
     if (!updated) {
@@ -88,32 +108,25 @@ const updateProduct = async(req, res, next) => {
     console.log(err);
     return res.status(500).json({ message: "Server error" });
   }
-
 };
 
 //Delete
+const deleteProduct = async (req, res, next) => {
+  const id = req.params.id;
 
-const deleteProduct = async(req, res, next) => {
+  let products;
 
-    const id = req.params.id;
-
-    let products;
-
-    try {
-        products = await Inventory.findByIdAndDelete(id);
-
-    } catch (err) {
-        console.log(err);
-    }
-    if(!products){
-        return res.status(404).json({message:"Product Not Found"});
-    }
-    return res.status(200).json({products});
-
-
+  try {
+    products = await Inventory.findByIdAndDelete(id);
+  } catch (err) {
+    console.log(err);
+  }
+  if (!products) {
+    return res.status(404).json({ message: "Product Not Found" });
+  }
+  return res.status(200).json({ products });
 };
 
-// PUT /inventory/update/:id
 const updateInventory = async (req, res) => {
   const { id } = req.params;
   const { quantity } = req.body; // quantity to subtract
@@ -135,7 +148,6 @@ const updateInventory = async (req, res) => {
     res.status(500).json({ message: "Error updating inventory" });
   }
 };
-
 
 exports.addProducts = addProducts;
 exports.getAllProducts = getAllProducts;

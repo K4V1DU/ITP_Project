@@ -1,4 +1,4 @@
-/* ========== General Page Styling ========== */
+/* General Page Styling  */
 body {
   font-family: Arial, sans-serif;
   background-color: #f8f9fa;
@@ -6,7 +6,7 @@ body {
   padding: 0;
 }
 
-/* ========== Table Styling ========== */
+/* Table Styling  */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -33,7 +33,7 @@ tr:hover {
   background-color: #f1f1f1;
 }
 
-/* ========== Action Column Buttons Center ========== */
+/*  Action Column Buttons Center  */
 td:last-child {
   text-align: center;
 }
@@ -43,7 +43,7 @@ td:last-child button {
   margin: 4px;
 }
 
-/* ========== Buttons Styling ========== */
+/* Buttons Styling */
 button {
     background-color: #2c3e50;
   min-width: 90px;
@@ -100,7 +100,7 @@ button[type="addnewpro"] {
   background-color: #0056b3;
 }
 
-/* ========== Form Styling (Edit Product) ========== */
+/* Form Styling (Edit Product) */
 .productForm {
   max-width: 600px;
   margin: 30px auto;
@@ -146,7 +146,7 @@ button[type="addnewpro"] {
   background-color: #5a6268;
 }
 
-/* ========== Image in Table ========== */
+/*  Image in Table  */
 table img {
   border-radius: 3px;
   width: 100px;
@@ -162,7 +162,7 @@ table img {
   background-color: #fff;
   font-size: 16px;
   color: #333;
-  appearance: none; /* removes default arrow in some browsers */
+  appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   cursor: pointer;

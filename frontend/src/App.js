@@ -11,15 +11,25 @@ import UpdateUsers from "./components/AdminDashboard/UpdateUsers.js"
 import Checkout from "./components/Checkout/Checkout.js";
 import DashboardOverview from "./components/AdminDashboard/DashboardOverview.js"
 import ProtionReport from "./components/Promotion_and_Coupons/CouponsReport.js";
+import Inventory from "./components/Inventory/Inventory.js";
+import AddProducts from './components/AddProducts/AddProducts.js';
+import EditProduct from './components/EditProduct/EditProduct.js';
 import Inventory from "./components/Inventory/inventory.js";
 import ManageOrders from "./components/OrderManagement/orderManage.js";
 import Orders  from "./components/Orders/Orders.js";
 import OrderDetails from "./components/OrderDetails/OrderDetails.js";
+import Register from "./components/Login/Register.js";
+import ForgotPassword from "./components/Login/FogotPassword.js";
+import ResetPassword from "./components/Login/ResetPassword.js";
+import VerifyOtp from "./components/Login/VerifyOtp.js";
+import AdminPannel from "./components/AdminDashboard/DashboardOverview.js";
 import OrderManageDetails  from "./components/OrderManagement/OrderManageDetails.js";
 import OrdersDashboard from "./components/OrderManagement/orderManage.js";
 import CouponShare from "./components/Promotion_and_Coupons/ShareCoupons.js";
 import DeliveryDashboard from "./components/DeliveryManagement/DeliveryDashboard.js";
 import UsersCarts from "./components/AdminDashboard/UsersCarts/usersCarts.js";
+
+
 
 
 function App() {
@@ -30,7 +40,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/Order/:id" element={<Order />} />
-      <Route path="/users" element={<DisplayUsers />} />
+      <Route path="/Manage-Users" element={<DisplayUsers />} />
       <Route path="/add-user" element={<AddUsers />} />
       <Route path="/update-user/:id" element={<UpdateUsers />} />
       <Route path="/Manage-Coupon" element={<ProtionAndCoupon />} />
@@ -39,9 +49,16 @@ function App() {
       <Route path="/DashboardOverview" element={<DashboardOverview />} />
       <Route path="/Dashboard" element={<ProtionReport />} />
       <Route path="/Inventory" element={<Inventory />} />
+      <Route path="/addproduct" element={<AddProducts />} />
+      <Route path="/EditProduct/:id" element={<EditProduct/>}/>
       <Route path="/orderManage" element={<ManageOrders />} />
       <Route path="/Orders" element={<Orders />} />
       <Route path="/OrderDetails/:orderNumber" element={<OrderDetails />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/verify-otp" element={<VerifyOtp />} />
+      <Route path="/Admin-Panel" element={<AdminPannel />} />
       <Route path="/orders-dashboard" element={<OrdersDashboard />} />
       <Route path="/order-details/:id" element={<OrderManageDetails />} />
       <Route path="/Dispatch" element={<CouponShare />} />

@@ -1,5 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
+
+
 //insert routes
 const inventoryRouter = require("./Routes/InventoryRoute");
 const NotificationRoute = require("./Routes/NotificationRoute");
@@ -9,6 +11,8 @@ const Coupons = require("./Routes/CouponsRoute");
 const orderRoutes = require("./Routes/OrdersRoute");
 const orderManagerRoutes = require("./Routes/orderManageRoute");
 const PaymentsRoute = require("./Routes/PaymentsRoute");
+const PasswordResetRoute = require("./Routes/PasswordResetRoute");
+const RegisterRoute = require("./Routes/RegisterRoute");
 const DeliveryRoutes = require("./Routes/DeliveryAssignmentRoute");
 const shareCouponsRoute = require("./Routes/shareCouponsRoute");
 const adminCartsRoutes = require("./Routes/AdminCartsRoute");
@@ -23,7 +27,7 @@ app.use(express.json());
 app.use(cors());
 
 
-app.use("/inventory", inventoryRouter);
+app.use("/Inventory", inventoryRouter);
 app.use("/Notifications",NotificationRoute);
 app.use("/Cart", CartRouter);
 app.use("/Users", UsersRouter);
@@ -31,9 +35,12 @@ app.use("/Coupons",Coupons);
 app.use("/orders", orderRoutes);
 app.use("/orderManage", orderManagerRoutes);
 app.use("/payments", PaymentsRoute);
+app.use("/PasswordResetRoute", PasswordResetRoute);
+app.use("/Users", RegisterRoute);
 app.use("/delivery", DeliveryRoutes);
 app.use("/sharecoupons", shareCouponsRoute);
 app.use("/Admin/Carts", adminCartsRoutes);
+
 
 
 

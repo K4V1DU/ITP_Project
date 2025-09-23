@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const history = useNavigate();
@@ -27,15 +27,13 @@ function Login() {
         localStorage.setItem("userId", id);
 
         if (role === "Admin") {
-          history("/users");
+          history("/Admin-Panel");
         } else if (role === "Customer") {
           history("/home");
         } else if (role === "Marketing Manager") {
           history("/Dashboard");
-
         } else if (role === "Supply Manager") {
-          history("/Inventory"); 
-          
+          history("/Inventory");
         } else if (role === "Order Manager") {
           history("/orderManage");
 
@@ -203,9 +201,9 @@ function Login() {
 
           <button type="submit">Login</button>
         </form>
-        <p>
-          Don’t have an account? <a href="#">Sign Up</a>
-        </p>
+
+        <p>Don’t have an account? <Link to="/register">Sign Up</Link></p>
+        <p><Link to="/forgot-password">Forgot Password?</Link></p>
       </div>
     </div>
   );

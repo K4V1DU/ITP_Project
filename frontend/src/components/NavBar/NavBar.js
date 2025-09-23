@@ -1,40 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./NavBar.css";
 import axios from "axios";
 
 function Navbar() {
- 
   const [cartTotal, setCartTotal] = useState(0);
-    const [role, setRole] = useState("");
-    const [userId, setUserId] = useState("");
-
+  const [role, setRole] = useState("");
+  const [userId, setUserId] = useState("");
 
   useEffect(() => {
     setRole(localStorage.getItem("role"));
     setUserId(localStorage.getItem("userId"));
-  }, []); 
-
+  }, []);
 
   let links = [];
   if (role === "Marketing Manager") {
     links = ["Dashboard", "Manage Coupon", "Dispatch", "Notifications"];
   } else if (role === "Admin") {
-    links = ["Admin Panel", "Manage Users","orderManage", "Dashboard", "Inventory"];
-  }else if (role === "Supply Manager") {
+    links = [
+      "Admin Panel",
+      "Manage Users",
+      "orderManage",
+      "Dashboard",
+      "Inventory",
+    ];
+  } else if (role === "Supply Manager") {
     links = ["Inventory", "page1", "page2", "page3"];
-  }else if (role === "Order Manager") {
+  } else if (role === "Order Manager") {
     links = ["orderManage", "Manage", "Notifications"];
-  }else if (role === "Delivery Staff") {
+  } else if (role === "Delivery Staff") {
     links = ["DeliveryDashboard", "Notifications"];
-  }else {
-    links = ["Home","Cart","Orders","Notifications","Contact"];
+  } else {
+    links = ["Home", "Cart", "Orders", "Notifications", "Contact"];
   }
 
   useEffect(() => {
     const fetchCartTotal = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/Cart/user/${userId}`);
+        const res = await axios.get(
+          `http://localhost:5000/Cart/user/${userId}`
+        );
         const cartItems = res.data.Items || [];
         const total = cartItems.reduce((sum, item) => sum + item.Total, 0);
         setCartTotal(total);
@@ -56,10 +61,7 @@ function Navbar() {
 
       <div className="Links">
         {links.map((link) => (
-          <Link 
-            key={link} 
-            to={`/${link.toLowerCase().replace(/ /g, '-')}`}  
-          >
+          <Link key={link} to={`/${link.toLowerCase().replace(/ /g, "-")}`}>
             {link}
           </Link>
         ))}
@@ -68,7 +70,6 @@ function Navbar() {
       {role === "Customer" && (
         <div className="wishlist">
           <div className="cart">
-            <img src="/images/logoblack.png" alt="cart" className="cartIcon" />
             <div className="cartAmount">
               <span>Rs: {cartTotal.toFixed(2)}</span>
               <div className="text">My Cart</div>

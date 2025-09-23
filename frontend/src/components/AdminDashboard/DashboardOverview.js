@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import "react-toastify/dist/ReactToastify.css";
+import Navbar from "../NavBar/NavBar";
+
+
 
 function Dashboard() {
   return (
     <div className="dashboard">
+       <Navbar />
       <style>{`
         .dashboard {
           padding: 2rem;

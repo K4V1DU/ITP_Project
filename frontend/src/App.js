@@ -12,7 +12,7 @@ import Checkout from "./components/Checkout/Checkout.js";
 import ProtionReport from "./components/Promotion_and_Coupons/CouponsReport.js";
 import Inventory from "./components/Inventory/Inventory.js";
 import AddProducts from './components/AddProducts/AddProducts.js';
-
+import EditProduct from './components/Inventory/editproduct.js';
 
 function App() {
   return (
@@ -31,7 +31,7 @@ function App() {
       <Route path="/History" element={<ProtionReport />} />
       <Route path="/Inventory" element={<Inventory />} />
       <Route path="/addproduct" element={<AddProducts />} />
-
+      <Route path="editProduct" element={<EditProduct/>}/>
     </Routes>
   );
 }

@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(cors());
 
 
-app.use("/inventory", inventoryRouter);
+app.use("/Inventory", inventoryRouter);
 app.use("/Notifications",NotificationRoute);
 app.use("/Cart", CartRouter);
 app.use("/Users", UsersRouter);

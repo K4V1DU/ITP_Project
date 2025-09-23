@@ -25,24 +25,17 @@ const getAllProducts = async(req, res, next) => {
 
 // Insert
 
-const addProducts = async(req, res, next) =>{
+const addProducts = async (req, res, next) => {
+  const { ProductID, Name, Price, Description, Quantity, Category, Flavour, Capacity, URL } = req.body;
 
-    const {ProductID,Name,Price,Description,Quantity,Category,Flavour,Capacity,URL} = req.body;
-
-    let products;
-
-    try {
-        
-        products = new Inventory({ProductID,Name,Price,Description,Quantity,Category,Flavour,Capacity,URL});
-        await products.save();
-
-    } catch (err) {
-        console.log(err);
-    }
-    if(!products){
-        return res.status(404).json({message:"Insert failed"});
-    }
-    return res.status(200).json({ products });
+  try {
+    const product = new Inventory({ ProductID, Name, Price, Description, Quantity, Category, Flavour, Capacity, URL });
+    await product.save();
+    return res.status(201).json({ product }); // singular key
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Insert failed" });
+  }
 };
 
 
@@ -78,22 +71,23 @@ const updateProduct = async(req, res, next) => {
     const id = req.params.id;
     const {ProductID,Name,Price,Description,Quantity,Category,Flavour,Capacity,URL} = req.body;
 
-    let products;
 
     try {
+    const updated = await Inventory.findByIdAndUpdate(
+      id,
+      { ProductID, Name, Price, Description, Quantity, Category, Flavour, Capacity, URL },
+      { new: true } // return the updated document
+    );
 
-        products = await Inventory.findByIdAndUpdate(id,{ProductID,Name,Price,Description,Quantity,Category,Flavour,Capacity,URL});
-        await products.save();
-
-
-    } catch (err) {
-        console.log(err);
+    if (!updated) {
+      return res.status(404).json({ message: "unable to update" });
     }
-    if(!products){
-        return res.status(404).json({message:"unable to update"});
-    }
-    return res.status(200).json({products});
 
+    return res.status(200).json({ product: updated });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server error" });
+  }
 
 };
 

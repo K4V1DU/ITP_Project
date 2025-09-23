@@ -17,18 +17,19 @@ const DeliveryRoutes = require("./Routes/DeliveryAssignmentRoute");
 const shareCouponsRoute = require("./Routes/shareCouponsRoute");
 const ProfileRoute = require("./Routes/ProfileRoute");
 const adminRoutes  = require("./Routes/AdminRoute");
+const adminCartsRoutes = require("./Routes/AdminCartsRoute");
+
+
 
 const app = express(); 
 const cors = require("cors");
-
-
 
 //Middleware
 app.use(express.json());
 app.use(cors());
 
 
-app.use("/inventory", inventoryRouter);
+app.use("/Inventory", inventoryRouter);
 app.use("/Notifications",NotificationRoute);
 app.use("/Cart", CartRouter);
 app.use("/Users", UsersRouter);
@@ -42,6 +43,8 @@ app.use("/delivery", DeliveryRoutes);
 app.use("/sharecoupons", shareCouponsRoute);
 app.use("/profile", ProfileRoute);
 app.use("/admin", adminRoutes);
+app.use("/Admin/Carts", adminCartsRoutes);
+
 
 
 

@@ -15,24 +15,17 @@ function Navbar() {
 
   let links = [];
   if (role === "Marketing Manager") {
-    links = ["Dashboard", "Manage Coupon", "Dispatch", "Notifications"];
+    links = ["Dashboard", "Manage Coupon", "Dispatch", "profile"];
   } else if (role === "Admin") {
-    links = [
-      "Admin Panel",
-      "Manage Users",
-      "orderManage",
-      "Dashboard",
-      "Inventory",
-      "profile",
-    ];
+    links = ["Admin Panel","Manage Users","Order Manage","Coupon Management","Inventory","Users Carts", "profile"];
   } else if (role === "Supply Manager") {
-    links = ["Inventory", "page1", "page2", "page3"];
+    links = ["Inventory", "profile"];
   } else if (role === "Order Manager") {
-    links = ["orderManage", "Manage", "Notifications"];
+    links = ["Order Manage", "Manage", "profile"];
   } else if (role === "Delivery Staff") {
-    links = ["DeliveryDashboard", "Notifications"];
+    links = ["DeliveryDashboard", "profile"];
   } else {
-    links = ["Home", "Cart", "Orders", "Notifications", "Contact"];
+    links = ["Home", "Cart", "Orders", "Contact", "profile"];
   }
 
   useEffect(() => {

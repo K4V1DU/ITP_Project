@@ -1,0 +1,188 @@
+/* General Page Styling  */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+/* Table Styling  */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+  background-color: #3b5998;
+  color: white;
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+/*  Action Column Buttons Center  */
+td:last-child {
+  text-align: center;
+}
+
+td:last-child button {
+  display: inline-block;
+  margin: 4px;
+}
+
+/* Buttons Styling */
+button {
+    background-color: #2c3e50;
+  min-width: 90px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+/* Edit Button */
+button[type="edit"], .edit {
+  background-color: #28a745;
+}
+button[type="edit"]:hover, .edit:hover {
+  background-color: #218838;
+}
+
+/* Delete Button */
+button[type="delete"], .delete {
+  background-color: #dc3545;
+}
+button[type="delete"]:hover, .delete:hover {
+  background-color: #c82333;
+}
+
+/* Add Product Button */
+.add-btn {
+  margin-top: 20px;
+  min-width: 140px;
+  padding: 10px 18px;
+  background-color: #007bff;
+  font-weight: bold;
+  font-size: 15px;
+}
+.add-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Add  New Product Button */
+button[type="addnewpro"] {
+  margin-top: 20px;
+  min-width: 140px;
+  padding: 10px 18px;
+  background-color: #7404E0;
+  font-weight: bold;
+  font-size: 15px;
+}
+.add-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Form Styling (Edit Product) */
+.productForm {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.productForm h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.productForm h5 {
+  margin: 10px 0 5px;
+  color: #444;
+}
+
+.productForm input,
+.productForm textarea {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.productForm button[type="submit"] {
+  background-color: #28a745;
+  font-weight: bold;
+}
+.productForm button[type="submit"]:hover {
+  background-color: #218838;
+}
+
+.productForm button[type="button"] {
+  background-color: #6c757d;
+  margin-left: 10px;
+}
+.productForm button[type="button"]:hover {
+  background-color: #5a6268;
+}
+
+/*  Image in Table  */
+table img {
+  border-radius: 3px;
+  width: 100px;
+  height: auto;
+}
+
+/* Select element style */
+.productForm select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  font-size: 16px;
+  color: #333;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* Hover effect */
+.productForm select:hover {
+  border-color: #888;
+}
+
+/* Focus effect */
+.productForm select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* Default option gray color */
+.productForm select option:first-child {
+  color: #999;
+}
+

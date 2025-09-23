@@ -239,7 +239,7 @@ function OrderDetails() {
                   <h3>Bank Receipt</h3>
 
                   {existingReceipt &&
-                    order.PaymentStatus?.toLowerCase() === "pending" && (
+                    ["pending", "declined"].includes(order.PaymentStatus?.toLowerCase()) && (
                       <button
                         className="delete-receipt-btn"
                         onClick={handleDeleteReceipt}
@@ -261,7 +261,7 @@ function OrderDetails() {
                     </div>
                   )}
 
-                  {order.PaymentStatus?.toLowerCase() === "pending" && (
+                  {["pending", "declined"].includes(order.PaymentStatus?.toLowerCase()) && (
                     <div
                       className={`bank-upload ${dragActive ? "active" : ""}`}
                       onDragEnter={handleDrag}

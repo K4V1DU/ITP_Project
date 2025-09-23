@@ -11,10 +11,12 @@ function Cart() {
   const [coupon, setCoupon] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [warnings, setWarnings] = useState({});
-  const [loading, setLoading] = useState(true); // ✅ loading state
+  const [loading, setLoading] = useState(true);
   const userId = localStorage.getItem("userId");
 
-  // Fetch cart items
+  const navigate = useNavigate();
+
+  // ✅ Fetch cart items
   const fetchHandler = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/Cart/user/${userId}`);
@@ -22,21 +24,31 @@ function Cart() {
 
       const itemsWithStock = await Promise.all(
         cartItems.map(async (item) => {
-          const stockRes = await axios.get(
-            `http://localhost:5000/inventory/${item.ProductID}`
-          );
-          return {
-            ...item,
-            Stock: stockRes.data.products.Quantity,
-          };
+          try {
+            const stockRes = await axios.get(
+              `http://localhost:5000/inventory/${item.ProductID}`
+            );
+            return {
+              ...item,
+              Stock: stockRes.data.products.Quantity,
+            };
+          } catch (err) {
+            console.warn(`Removing invalid product: ${item.ProductID}`);
+            await axios.delete(`http://localhost:5000/Cart/${item._id}`);
+            toast.warning(
+              `Item "${item.Name}" was removed (not available in stock).`
+            );
+            return null;
+          }
         })
       );
 
-      setItems(itemsWithStock);
+      setItems(itemsWithStock.filter((i) => i !== null));
     } catch (err) {
       console.error("Error fetching cart:", err);
+      toast.error("Failed to fetch cart items.");
     } finally {
-      setLoading(false); // ✅ stop loading no matter what
+      setLoading(false);
     }
   };
 
@@ -45,7 +57,7 @@ function Cart() {
     // eslint-disable-next-line
   }, []);
 
-  // Increment
+  // ✅ Increment quantity
   const incrementQuantity = (id) => {
     const updatedItems = Items.map((item) => {
       if (item._id === id) {
@@ -67,7 +79,7 @@ function Cart() {
     setItems(updatedItems);
   };
 
-  // Decrement
+  // ✅ Decrement quantity
   const decrementQuantity = (id) => {
     const updatedItems = Items.map((item) =>
       item._id === id && item.Quantity > 1
@@ -82,7 +94,7 @@ function Cart() {
     setWarnings((prev) => ({ ...prev, [id]: "" }));
   };
 
-  // Update cart
+  // ✅ Update cart in DB
   const handleUpdateCart = async () => {
     const payload = Items.map((i) => ({
       id: i._id,
@@ -105,27 +117,27 @@ function Cart() {
       });
 
       setItems(updatedItems);
-      toast.success("Cart updated successfully!", { autoClose: 3000 });
+      toast.success("Cart updated successfully!");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update cart", { autoClose: 3000 });
+      toast.error("Failed to update cart");
     }
   };
 
-  // Delete item
+  // ✅ Delete item
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/Cart/${id}`);
       const updatedItems = Items.filter((item) => item._id !== id);
       setItems(updatedItems);
-      toast.success("Item removed from cart!", { autoClose: 3000 });
+      toast.success("Item removed from cart!");
     } catch (err) {
       console.error("Delete error:", err);
-      toast.error("Failed to remove item", { autoClose: 3000 });
+      toast.error("Failed to remove item");
     }
   };
 
-  // Apply coupon
+  // ✅ Apply coupon
   const handleCoupon = async () => {
     if (!coupon) {
       toast.warning("Enter a coupon code");
@@ -147,12 +159,11 @@ function Cart() {
       toast.success(`Coupon applied!`);
       setCoupon("");
     } catch (err) {
-      toast.error(`${err.response?.data?.message || "Invalid coupon"}`, {
-        autoClose: 3000,
-      });
+      toast.error(`${err.response?.data?.message || "Invalid coupon"}`);
     }
   };
 
+  // ✅ Subtotal, discount, total
   const subtotal = Items.reduce((sum, item) => sum + item.Total, 0);
   let discount = 0;
 
@@ -166,8 +177,7 @@ function Cart() {
 
   const totalCost = subtotal - discount;
 
-  const navigate = useNavigate();
-
+  // ✅ Checkout
   const handleCheckout = () => {
     navigate("/checkout", {
       state: {
@@ -185,15 +195,14 @@ function Cart() {
     <div className="cart-page">
       <Navbar />
 
-      
       {loading ? (
-  <div className="loading">
-    <div className="loader"></div>
-    <p>Cart is loading...</p>
-  </div>
-) : Items.length === 0 ? (
-  <div className="empty">Your cart is empty.</div>
-) : (
+        <div className="loading">
+          <div className="loader"></div>
+          <p>Cart is loading...</p>
+        </div>
+      ) : Items.length === 0 ? (
+        <div className="empty">Your cart is empty.</div>
+      ) : (
         <div className="cart-wrapper">
           <div className="cart-left">
             <div className="title-row">
@@ -234,9 +243,7 @@ function Cart() {
                           max={item.Stock}
                           onChange={(e) => {
                             let qty = Number(e.target.value);
-
                             if (qty < 1) qty = 1;
-
                             if (qty > item.Stock) {
                               qty = item.Stock;
                               setWarnings((prev) => ({
@@ -249,7 +256,6 @@ function Cart() {
                                 [item._id]: "",
                               }));
                             }
-
                             const updated = Items.map((i) =>
                               i._id === item._id
                                 ? { ...i, Quantity: qty, Total: qty * i.Price }
@@ -319,10 +325,9 @@ function Cart() {
         </div>
       )}
 
-      <ToastContainer />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }
 
 export default Cart;
-

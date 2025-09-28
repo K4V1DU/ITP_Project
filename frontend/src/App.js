@@ -26,16 +26,16 @@ import OrdersDashboard from "./components/OrderManagement/orderManage.js";
 import CouponShare from "./components/Promotion_and_Coupons/ShareCoupons.js";
 import DeliveryDashboard from "./components/DeliveryManagement/DeliveryDashboard.js";
 
-// 👉 Payment Components
+// 👉 Payment components 
 import UploadReceipt from "./components/Payment/UploadReceipt.jsx";
 import FinancialDashboard from "./components/Payment/FinancialDashboard.jsx";
 import ReceiptView from "./components/Payment/ReceiptView.jsx";
-import EditReceipt from "./components/Payment/EditReceipt.jsx";   // <-- NEW
+import EditReceipt from "./components/Payment/EditReceipt.jsx";   // ✅ Added
 
 function App() {
   return (
     <Routes>
-      {/* Default & Auth */}
+      {/* Auth & User routes */}
       <Route path="/" element={<Login />} />
       <Route path="/Login" element={<Login />} />
       <Route path="/register" element={<Register />} />
@@ -43,7 +43,7 @@ function App() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/verify-otp" element={<VerifyOtp />} />
 
-      {/* Customer Side */}
+      {/* Customer & Orders */}
       <Route path="/home" element={<Home />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
@@ -58,7 +58,7 @@ function App() {
       <Route path="/Admin-Panel" element={<AdminPannel />} />
       <Route path="/DashboardOverview" element={<DashboardOverview />} />
 
-      {/* Coupons */}
+      {/* Coupons & Promotions */}
       <Route path="/Manage-Coupon" element={<ProtionAndCoupon />} />
       <Route path="/Dashboard" element={<ProtionReport />} />
       <Route path="/Dispatch" element={<CouponShare />} />
@@ -72,11 +72,11 @@ function App() {
       {/* Delivery */}
       <Route path="/DeliveryDashboard" element={<DeliveryDashboard />} />
 
-      {/* 🟡 Payment Routes */}
+      {/* 🟡 Payment Module Routes */}
       <Route path="/uploadReceipt" element={<UploadReceipt />} />
       <Route path="/FinancialDashboard" element={<FinancialDashboard />} />
       <Route path="/receipt/:id" element={<ReceiptView />} />
-      <Route path="/edit-receipt/:orderNumber" element={<EditReceipt />} />  {/* NEW */}
+      <Route path="/edit-receipt/:orderNumber" element={<EditReceipt />} />  {/* ✅ NEW ROUTE */}
     </Routes>
   );
 }

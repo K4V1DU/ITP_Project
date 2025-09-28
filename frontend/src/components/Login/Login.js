@@ -40,6 +40,9 @@ function Login() {
         }else if (role === "Delivery Staff") {
           history("/DeliveryDashboard");  
         } 
+        else if (role === "Finance Manager") {
+        history("/FinancialDashboard");
+    }
         else {
           history("/login");
         }

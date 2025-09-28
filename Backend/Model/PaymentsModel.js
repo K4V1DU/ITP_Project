@@ -4,11 +4,12 @@ const PaymentSchema = new mongoose.Schema({
   OrderNumber: {
     type: String,
     required: true,
+    unique: true
   },
   ReceiptFile: {
-    data: { type: Buffer },          // removed required: true
-    contentType: { type: String },   // removed required: true
-    name: { type: String },          // removed required: true
+    data: Buffer,
+    contentType: String,
+    name: String,
   },
   UploadDate: {
     type: Date,
@@ -21,6 +22,7 @@ const PaymentSchema = new mongoose.Schema({
   },
   Notes: {
     type: String,
+    maxlength: 500,
   },
 });
 

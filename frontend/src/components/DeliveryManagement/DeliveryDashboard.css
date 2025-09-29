@@ -1,0 +1,239 @@
+/* -------------------------- GENERAL -------------------------- */
+.delivery-dashboard {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f5f7fa;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.dashboard-header h2 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.dashboard-header p {
+  font-size: 1rem;
+  color: #555;
+}
+
+/* -------------------------- AGENT STATS -------------------------- */
+.agent-stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 150px;
+  background: #fff;
+  padding: 15px 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-bottom: 4px solid #ccc; /* default underline */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.stat-card h3 {
+  margin: 0 0 5px;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Colored underline for stats */
+.stat-card.total-assigned { border-bottom-color: #007bff; }
+.stat-card.delivered { border-bottom-color: #28a745; }
+.stat-card.cancelled { border-bottom-color: #dc3545; }
+.stat-card.out-for-delivery { border-bottom-color: #ffc107; }
+
+/* -------------------------- FILTER -------------------------- */
+.filter-section {
+  margin-bottom: 20px;
+}
+
+.filter-section label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.filter-section select {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+/* -------------------------- ASSIGNMENTS LIST (GRID) -------------------------- */
+.assignments-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* -------------------------- ASSIGNMENT CARD -------------------------- */
+.assignment-card {
+  background: #fff;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-bottom: 4px solid #007bff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.assignment-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.assignment-card h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 3px 8px;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.status-assigned { background-color: #007bff; }
+.status-out { background-color: #ffc107; color: #000; }
+.status-delivered { background-color: #28a745; }
+.status-cancelled { background-color: #dc3545; }
+
+/* -------------------------- ORDER DETAILS -------------------------- */
+.order-details {
+  margin-top: 15px;
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.order-details h4 {
+  margin-bottom: 8px;
+  color: #555;
+  font-size: 1rem;
+}
+
+.order-details ul {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.order-details li {
+  margin-bottom: 4px;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.order-details p {
+  margin: 3px 0;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+/* -------------------------- UPDATE SECTION -------------------------- */
+.update-section {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.update-section select {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
+.update-btn {
+  background-color: #007bff;
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.update-btn:hover {
+  background-color: #0056b3;
+}
+
+/* -------------------------- LOADING -------------------------- */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.loader {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #007bff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* -------------------------- RESPONSIVE -------------------------- */
+@media (max-width: 1024px) {
+  .assignments-list {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .agent-stats {
+    flex-direction: column;
+  }
+
+  .update-section {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .assignments-list {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-header {
+    flex-direction: column;
+    gap: 5px;
+  }
+}

@@ -22,7 +22,7 @@ function AddUsers() {
 
     // Limit mobile input to 10 digits
     if (name === "Mobile") {
-      const onlyNumbers = value.replace(/\D/g, ""); // Remove non-numbers
+      const onlyNumbers = value.replace(/\D/g, ""); 
       if (onlyNumbers.length <= 10) {
         setUser({ ...user, [name]: onlyNumbers });
       }
@@ -49,7 +49,7 @@ function AddUsers() {
     try {
       await axios.post("http://localhost:5000/Users", user);
       Swal.fire("Success", "User added successfully!", "success");
-      navigate("/users");
+      navigate("/Manage-Users");
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Failed to add user!", "error");

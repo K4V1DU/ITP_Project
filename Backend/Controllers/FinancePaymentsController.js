@@ -1,6 +1,7 @@
-const Payment = require("../Model/PaymentsModel"); // ✅ Check path & name
+const Payment = require("../Model/PaymentsModel");   
+const Order = require("../Model/OrdersModel");      
 
-// CREATE Payment
+// ================= CREATE Payment =================
 const createPayment = async (req, res) => {
   try {
     const { OrderNumber, Notes } = req.body;
@@ -28,7 +29,7 @@ const createPayment = async (req, res) => {
   }
 };
 
-// GET All Payments
+// ================= GET All Payments =================
 const getAllPayments = async (req, res) => {
   try {
     const payments = await Payment.find();
@@ -39,7 +40,7 @@ const getAllPayments = async (req, res) => {
   }
 };
 
-// GET Payment by Mongo _id
+// ================= GET Payment by Mongo _id =================
 const getPaymentById = async (req, res) => {
   try {
     const payment = await Payment.findById(req.params.paymentId);
@@ -51,12 +52,11 @@ const getPaymentById = async (req, res) => {
   }
 };
 
-// UPDATE Payment by _id
+// ================= UPDATE Payment by _id =================
 const editPayment = async (req, res) => {
   try {
     const { OrderNumber, Notes, Status } = req.body;
 
-    // Validate status
     if (Status && !["Pending", "Approved", "Rejected"].includes(Status)) {
       return res.status(400).json({ message: "Invalid payment status" });
     }
@@ -68,6 +68,15 @@ const editPayment = async (req, res) => {
     );
 
     if (!updated) return res.status(404).json({ message: "Payment not found" });
+
+    // ✅ Also update related Order
+    if (Status) {
+      await Order.findOneAndUpdate(
+        { OrderNumber: updated.OrderNumber },
+        { PaymentStatus: Status }
+      );
+    }
+
     res.json({ message: "Payment updated", payment: updated });
   } catch (err) {
     console.error("❌ Error updating payment:", err);
@@ -75,7 +84,7 @@ const editPayment = async (req, res) => {
   }
 };
 
-// DELETE Payment
+// ================= DELETE Payment =================
 const deletePayment = async (req, res) => {
   try {
     const deleted = await Payment.findByIdAndDelete(req.params.paymentId);
@@ -87,7 +96,7 @@ const deletePayment = async (req, res) => {
   }
 };
 
-// GET Receipt File by _id
+// ================= GET Receipt File by _id =================
 const getReceiptById = async (req, res) => {
   try {
     const payment = await Payment.findById(req.params.paymentId);
@@ -103,7 +112,7 @@ const getReceiptById = async (req, res) => {
   }
 };
 
-// GET by OrderNumber (for EditReceipt page)
+// ================= GET by OrderNumber =================
 const getPaymentByOrderNumber = async (req, res) => {
   try {
     const { orderNumber } = req.params;
@@ -125,7 +134,7 @@ const getPaymentByOrderNumber = async (req, res) => {
   }
 };
 
-// UPDATE by OrderNumber (for EditReceipt page)
+// ================= UPDATE by OrderNumber =================
 const updatePaymentByOrderNumber = async (req, res) => {
   try {
     const { orderNumber } = req.params;
@@ -154,6 +163,14 @@ const updatePaymentByOrderNumber = async (req, res) => {
       return res.status(404).json({ message: "Payment not found" });
     }
 
+    // ✅ Sync with order too
+    if (status) {
+      await Order.findOneAndUpdate(
+        { OrderNumber: orderNumber },
+        { PaymentStatus: status }
+      );
+    }
+
     res.json({ message: "Receipt updated successfully", payment: updated });
   } catch (err) {
     console.error("❌ Error updating payment by order number:", err);
@@ -161,6 +178,7 @@ const updatePaymentByOrderNumber = async (req, res) => {
   }
 };
 
+// ================= EXPORT =================
 module.exports = {
   createPayment,
   getAllPayments,

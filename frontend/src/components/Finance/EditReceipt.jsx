@@ -9,7 +9,6 @@ import {
   DialogActions, IconButton
 } from "@mui/material";
 
-// Icons
 import IcecreamIcon from "@mui/icons-material/Icecream";
 import HomeIcon from "@mui/icons-material/Home";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -20,14 +19,10 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import SaveIcon from "@mui/icons-material/Save";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import CheckCircleIcon from "@mui/icons-material/Verified";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import BlockIcon from "@mui/icons-material/Block";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
-import { motion } from "framer-motion";
 
-const MotionBox = motion(Box);
-
-// Inline CSS for this screen (no separate file needed)
 const styles = `
 @keyframes rotate { from {transform: rotate(0)} to {transform: rotate(360deg)} }
 .rotating { animation: rotate 1s linear infinite; }
@@ -71,7 +66,7 @@ const iceColors = {
 };
 
 const statusStyles = {
-  Approved: { color: "success", icon: <CheckCircleIcon /> },
+  Approved: { color: "success", icon: <VerifiedIcon /> },
   Pending: { color: "warning", icon: <PendingActionsIcon /> },
   Rejected: { color: "error", icon: <BlockIcon /> }
 };
@@ -94,7 +89,6 @@ export default function EditReceipt() {
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState("Pending");
   const [file, setFile] = useState(null);
-  const [paymentId, setPaymentId] = useState(null);
   const [currentReceiptUrl, setCurrentReceiptUrl] = useState(null);
 
   // UI states
@@ -120,10 +114,8 @@ export default function EditReceipt() {
         setStatus(res.data.Status || "Pending");
         setInitial({ notes: res.data.Notes || "", status: res.data.Status || "Pending" });
         if (res.data?._id) {
-          setPaymentId(res.data._id);
           setCurrentReceiptUrl(`http://localhost:5000/finance/payments/${res.data._id}/receipt`);
         } else {
-          // fallback if backend supports by order number
           setCurrentReceiptUrl(`http://localhost:5000/finance/payments/order/${orderNumber}/receipt`);
         }
       } catch (err) {
@@ -181,7 +173,7 @@ export default function EditReceipt() {
     setUploadProgress(0);
     try {
       const formData = new FormData();
-      // Use capitalized keys to match backend fields used elsewhere
+      // Match backend fields used elsewhere
       formData.append("Notes", notes);
       formData.append("Status", status);
       if (file) formData.append("receipt", file);

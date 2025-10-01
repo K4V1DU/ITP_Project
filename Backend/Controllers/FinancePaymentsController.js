@@ -1,14 +1,24 @@
-const Payment = require("../Model/PaymentsModel");   
-const Order = require("../Model/OrdersModel");      
+
+const Payment = require("../Model/PaymentsModel");
+const Order = require("../Model/OrdersModel");
+
+// Util: ORDER query (OrderNumber is String in schema)
+const toOrderQuery = (orderNumber) => ({ OrderNumber: String(orderNumber).trim() });
+
+// Util: pick only defined
+const pickDefined = (obj) =>
+  Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
 
 // ================= CREATE Payment =================
 const createPayment = async (req, res) => {
   try {
-    const { OrderNumber, Notes } = req.body;
+    const rawOrder = req.body.OrderNumber ?? req.body.orderNumber;
+    const Notes = req.body.Notes ?? req.body.notes ?? "";
 
-    if (!OrderNumber || OrderNumber.trim() === "") {
+    if (!rawOrder || String(rawOrder).trim() === "") {
       return res.status(400).json({ message: "Order Number is required" });
     }
+    const OrderNumber = String(rawOrder).trim();
 
     let receiptFile = null;
     if (req.file) {
@@ -25,14 +35,18 @@ const createPayment = async (req, res) => {
     res.status(201).json({ message: "Payment created successfully", payment: newPayment });
   } catch (err) {
     console.error("❌ Error creating payment:", err);
-    res.status(500).json({ message: "Error creating payment" });
+    res.status(500).json({ message: "Error creating payment", error: err.message });
   }
 };
 
-// ================= GET All Payments =================
+// ================= GET All Payments (FAST) =================
 const getAllPayments = async (req, res) => {
   try {
-    const payments = await Payment.find();
+    const payments = await Payment
+      .find({}, "OrderNumber Notes Status UploadDate createdAt")
+      .sort({ UploadDate: -1 })
+      .lean();
+
     res.json(payments);
   } catch (err) {
     console.error("❌ Error fetching all payments:", err);
@@ -40,10 +54,14 @@ const getAllPayments = async (req, res) => {
   }
 };
 
-// ================= GET Payment by Mongo _id =================
+// ================= GET Payment by Mongo _id (LIGHT) =================
 const getPaymentById = async (req, res) => {
   try {
-    const payment = await Payment.findById(req.params.paymentId);
+    const payment = await Payment
+      .findById(req.params.paymentId)
+      .select("OrderNumber Notes Status UploadDate createdAt")
+      .lean();
+
     if (!payment) return res.status(404).json({ message: "Payment not found" });
     res.json(payment);
   } catch (err) {
@@ -52,35 +70,39 @@ const getPaymentById = async (req, res) => {
   }
 };
 
-// ================= UPDATE Payment by _id =================
+// ================= UPDATE Payment by _id (JSON) =================
 const editPayment = async (req, res) => {
   try {
-    const { OrderNumber, Notes, Status } = req.body;
+    const Status = req.body.Status ?? req.body.status;
+    const Notes = req.body.Notes ?? req.body.notes;
+    const OrderNumber = req.body.OrderNumber ?? req.body.orderNumber;
 
     if (Status && !["Pending", "Approved", "Rejected"].includes(Status)) {
       return res.status(400).json({ message: "Invalid payment status" });
     }
 
+    const payload = pickDefined({
+      OrderNumber: OrderNumber ? String(OrderNumber).trim() : undefined,
+      Notes,
+      Status,
+    });
+
     const updated = await Payment.findByIdAndUpdate(
       req.params.paymentId,
-      { OrderNumber, Notes, Status },
+      { $set: payload },
       { new: true, runValidators: true }
     );
 
     if (!updated) return res.status(404).json({ message: "Payment not found" });
 
-    // ✅ Also update related Order
-    if (Status) {
-      await Order.findOneAndUpdate(
-        { OrderNumber: updated.OrderNumber },
-        { PaymentStatus: Status }
-      );
+    if (payload.Status) {
+      await Order.findOneAndUpdate(toOrderQuery(updated.OrderNumber), { PaymentStatus: payload.Status });
     }
 
     res.json({ message: "Payment updated", payment: updated });
   } catch (err) {
     console.error("❌ Error updating payment:", err);
-    res.status(500).json({ message: "Error updating payment" });
+    res.status(500).json({ message: "Error updating payment", error: err.message });
   }
 };
 
@@ -99,12 +121,15 @@ const deletePayment = async (req, res) => {
 // ================= GET Receipt File by _id =================
 const getReceiptById = async (req, res) => {
   try {
-    const payment = await Payment.findById(req.params.paymentId);
+    const payment = await Payment
+      .findById(req.params.paymentId)
+      .select("+ReceiptFile.data +ReceiptFile.contentType +ReceiptFile.name");
+
     if (!payment || !payment.ReceiptFile || !payment.ReceiptFile.data) {
       return res.status(404).send("Receipt not found");
     }
 
-    res.contentType(payment.ReceiptFile.contentType);
+    res.setHeader("Content-Type", payment.ReceiptFile.contentType || "application/octet-stream");
     res.send(payment.ReceiptFile.data);
   } catch (err) {
     console.error("❌ Error fetching receipt:", err);
@@ -112,38 +137,41 @@ const getReceiptById = async (req, res) => {
   }
 };
 
-// ================= GET by OrderNumber =================
+// ================= GET by OrderNumber (LIGHT) =================
 const getPaymentByOrderNumber = async (req, res) => {
   try {
     const { orderNumber } = req.params;
-    const payment = await Payment.findOne({ OrderNumber: orderNumber });
+
+    const payment = await Payment
+      .findOne(toOrderQuery(orderNumber), "OrderNumber Notes Status UploadDate createdAt")
+      .lean();
 
     if (!payment) {
       return res.status(404).json({ message: "Payment not found" });
     }
 
-    res.json({
-      _id: payment._id,
-      OrderNumber: payment.OrderNumber,
-      Notes: payment.Notes,
-      Status: payment.Status,
-    });
+    res.json(payment);
   } catch (err) {
     console.error("❌ Error fetching payment by order number:", err);
     res.status(500).json({ message: "Error fetching payment" });
   }
 };
 
-// ================= UPDATE by OrderNumber =================
+// ================= UPDATE by OrderNumber (multipart) =================
 const updatePaymentByOrderNumber = async (req, res) => {
   try {
     const { orderNumber } = req.params;
-    const { notes, status } = req.body;
+    const status = req.body.Status ?? req.body.status;
+    const notes = req.body.Notes ?? req.body.notes;
 
-    const updateData = {
+    if (status && !["Pending", "Approved", "Rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid payment status" });
+    }
+
+    const updateData = pickDefined({
       Notes: notes,
       Status: status,
-    };
+    });
 
     if (req.file) {
       updateData.ReceiptFile = {
@@ -151,34 +179,30 @@ const updatePaymentByOrderNumber = async (req, res) => {
         contentType: req.file.mimetype,
         name: req.file.originalname,
       };
+      // optional: updateData.UploadDate = new Date();
     }
 
     const updated = await Payment.findOneAndUpdate(
-      { OrderNumber: orderNumber },
-      updateData,
-      { new: true }
+      toOrderQuery(orderNumber),
+      { $set: updateData },
+      { new: true, runValidators: true }
     );
 
     if (!updated) {
       return res.status(404).json({ message: "Payment not found" });
     }
 
-    // ✅ Sync with order too
     if (status) {
-      await Order.findOneAndUpdate(
-        { OrderNumber: orderNumber },
-        { PaymentStatus: status }
-      );
+      await Order.findOneAndUpdate(toOrderQuery(orderNumber), { PaymentStatus: status });
     }
 
     res.json({ message: "Receipt updated successfully", payment: updated });
   } catch (err) {
     console.error("❌ Error updating payment by order number:", err);
-    res.status(500).json({ message: "Error updating receipt" });
+    res.status(500).json({ message: "Error updating receipt", error: err.message });
   }
 };
 
-// ================= EXPORT =================
 module.exports = {
   createPayment,
   getAllPayments,

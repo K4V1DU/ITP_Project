@@ -11,10 +11,11 @@ const {
   deletePayment,
   getReceiptById,
   getPaymentByOrderNumber,
+  getReceiptByOrderNumber, // added
   updatePaymentByOrderNumber,
 } = require("../controllers/FinancePaymentsController");
 
-// Multer setup
+// Multer setup: memory storage + limits + whitelist
 const allowedMimes = [
   "application/pdf",
   "image/png",
@@ -45,11 +46,12 @@ function multerErrorHandler(err, req, res, next) {
   return res.status(400).json({ message: msg });
 }
 
-// Create Payment (optional file)
+// === Create Payment with optional receipt upload ===
 router.post("/", upload.single("receipt"), multerErrorHandler, createPayment);
 
-// Order-number specific (keep BEFORE :paymentId)
+// === Queries by OrderNumber BEFORE generic :paymentId ===
 router.get("/order/:orderNumber", getPaymentByOrderNumber);
+router.get("/order/:orderNumber/receipt", getReceiptByOrderNumber); // inline receipt by orderNo
 router.put(
   "/order/:orderNumber/edit",
   upload.single("receipt"),
@@ -57,13 +59,13 @@ router.put(
   updatePaymentByOrderNumber
 );
 
-// General CRUD
+// === Receipt fetch by Mongo _id (inline) ===
+router.get("/:paymentId/receipt", getReceiptById);
+
+// === General CRUD ===
 router.get("/", getAllPayments);
 router.get("/:paymentId", getPaymentById);
-router.put("/:paymentId", editPayment); // JSON body (express.json())
+router.put("/:paymentId", editPayment);
 router.delete("/:paymentId", deletePayment);
-
-// Receipt by _id
-router.get("/:paymentId/receipt", getReceiptById);
 
 module.exports = router;

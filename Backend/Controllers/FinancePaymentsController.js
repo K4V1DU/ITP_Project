@@ -1,11 +1,9 @@
-
+// controllers/FinancePaymentsController.js
 const Payment = require("../Model/PaymentsModel");
 const Order = require("../Model/OrdersModel");
 
-// Util: ORDER query (OrderNumber is String in schema)
+// Helpers
 const toOrderQuery = (orderNumber) => ({ OrderNumber: String(orderNumber).trim() });
-
-// Util: pick only defined
 const pickDefined = (obj) =>
   Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
 
@@ -22,6 +20,7 @@ const createPayment = async (req, res) => {
 
     let receiptFile = null;
     if (req.file) {
+      // Using multer.memoryStorage so buffer is available
       receiptFile = {
         data: req.file.buffer,
         contentType: req.file.mimetype,
@@ -118,7 +117,7 @@ const deletePayment = async (req, res) => {
   }
 };
 
-// ================= GET Receipt File by _id =================
+// ================= GET Receipt File by _id (INLINE) =================
 const getReceiptById = async (req, res) => {
   try {
     const payment = await Payment
@@ -129,8 +128,14 @@ const getReceiptById = async (req, res) => {
       return res.status(404).send("Receipt not found");
     }
 
-    res.setHeader("Content-Type", payment.ReceiptFile.contentType || "application/octet-stream");
-    res.send(payment.ReceiptFile.data);
+    const ct = payment.ReceiptFile.contentType || "application/pdf";
+    const fname = payment.ReceiptFile.name || "receipt.pdf";
+
+    res.setHeader("Content-Type", ct);
+    // IMPORTANT: inline to render in iframe
+    res.setHeader("Content-Disposition", `inline; filename="${fname}"`);
+
+    return res.status(200).send(payment.ReceiptFile.data);
   } catch (err) {
     console.error("❌ Error fetching receipt:", err);
     res.status(500).send("Error fetching receipt");
@@ -154,6 +159,27 @@ const getPaymentByOrderNumber = async (req, res) => {
   } catch (err) {
     console.error("❌ Error fetching payment by order number:", err);
     res.status(500).json({ message: "Error fetching payment" });
+  }
+};
+
+// ================= GET Receipt by OrderNumber (INLINE) =================
+const getReceiptByOrderNumber = async (req, res) => {
+  try {
+    const payment = await Payment
+      .findOne(toOrderQuery(req.params.orderNumber))
+      .select("+ReceiptFile.data +ReceiptFile.contentType +ReceiptFile.name");
+
+    if (!payment?.ReceiptFile?.data) return res.status(404).send("Receipt not found");
+
+    const ct = payment.ReceiptFile.contentType || "application/pdf";
+    const fname = payment.ReceiptFile.name || "receipt.pdf";
+
+    res.setHeader("Content-Type", ct);
+    res.setHeader("Content-Disposition", `inline; filename="${fname}"`);
+    res.status(200).send(payment.ReceiptFile.data);
+  } catch (e) {
+    console.error("❌ Error fetching receipt by order:", e);
+    res.status(500).send("Error fetching receipt");
   }
 };
 
@@ -211,5 +237,6 @@ module.exports = {
   deletePayment,
   getReceiptById,
   getPaymentByOrderNumber,
+  getReceiptByOrderNumber,     // exported
   updatePaymentByOrderNumber,
 };

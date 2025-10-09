@@ -11,9 +11,9 @@ const {
   deletePayment,
   getReceiptById,
   getPaymentByOrderNumber,
-  getReceiptByOrderNumber, // added
+  getReceiptByOrderNumber, 
   updatePaymentByOrderNumber,
-} = require("../controllers/FinancePaymentsController");
+} = require("../Controllers/FinancePaymentsController");
 
 // Multer setup: memory storage + limits + whitelist
 const allowedMimes = [

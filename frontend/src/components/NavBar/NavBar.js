@@ -21,7 +21,7 @@ function Navbar() {
   } else if (role === "Supply Manager") {
     links = ["Inventory", "profile"];
   } else if (role === "Order Manager") {
-    links = ["Order Manage", "Manage", "profile"];
+    links = ["Orders Log","Order Manage", "profile"];
   } else if (role === "Delivery Staff") {
     links = ["DeliveryDashboard", "profile"];
   } else {

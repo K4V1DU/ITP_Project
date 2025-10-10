@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import { ToastContainer, toast } from "react-toastify";
@@ -17,6 +17,8 @@ import {
   Legend,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const API_URL = "http://localhost:5000/Coupons";
 const COLORS = ["#28a745", "#dc3545", "#ffc107"];
@@ -36,6 +38,8 @@ function CouponsReport() {
   const [typeFilter, setTypeFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+
+  const reportRef = useRef();
 
   const fetchCoupons = async () => {
     try {
@@ -113,10 +117,58 @@ function CouponsReport() {
     }
   };
 
+  const handleExportPDF = async () => {
+    const input = reportRef.current;
+    const canvas = await html2canvas(input, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+    const width = pdf.internal.pageSize.getWidth();
+    const height = (canvas.height * width) / canvas.width;
+    pdf.addImage(imgData, "PNG", 0, 0, width, height);
+    pdf.save("Coupons_Report.pdf");
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div>
       <Navbar />
-      <div className="report-container">
+      <div className="report-container" ref={reportRef}>
+        <div style={{ textAlign: "right", marginBottom: "1rem" }}>
+          
+          <button
+            onClick={handleExportPDF}
+            style={{
+              background: "#e1b12c",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              padding: "0.5rem 1rem",
+              marginRight: "0.5rem",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Export as PDF
+          </button>
+          <button
+            onClick={handlePrint}
+            style={{
+              background: "#44bd32",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              padding: "0.5rem 1rem",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Print
+          </button>
+        </div>
+
         <style>{`
           .report-container {
             padding: 2rem;

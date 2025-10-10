@@ -68,7 +68,7 @@ function App() {
       <Route path="/DeliveryDashboard" element={<DeliveryDashboard />} />
       <Route path="/Profile" element={<Profile />} />
       <Route path="/Coupon-Management" element={<ProtionReport />} />
-      <Route path="/Manage" element={<OrdersReport />} />
+      <Route path="/Orders-Log" element={<OrdersReport />} />
       
       {/* 🚀 New Finance Dashboard Route */}
       <Route path="/FinanceDashboard" element={<FinanceDashboard />} />

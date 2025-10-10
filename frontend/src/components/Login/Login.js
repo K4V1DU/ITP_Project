@@ -35,7 +35,7 @@ function Login() {
         } else if (role === "Supply Manager") {
           history("/Inventory");
         } else if (role === "Order Manager") {
-          history("/Manage");
+          history("/Orders-Log");
         } else if (role === "Finance Manager") {
           history("/FinanceDashboard");
         } else if (role === "Delivery Staff") {

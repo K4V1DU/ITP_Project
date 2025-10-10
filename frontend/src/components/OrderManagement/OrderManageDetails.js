@@ -136,12 +136,18 @@ function OrderManageDetails() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure?")) return;
+    // Confirmation popup
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${order.OrderNumber} order?`
+    );
+    if (!confirmed) return; // if cancelled
+
     try {
       await axios.delete(`${ORDER_API}/${id}`);
-      toast.success("Order deleted");
+      toast.success("Order deleted successfully");
       navigate("/order-Manage");
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("Failed to delete order");
     }
   };

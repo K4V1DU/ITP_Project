@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/K4V1DU/ITP_Project/issues"
   },
-  "homepage": "https://github.com/K4V1DU/ITP_Project#readme"
+  "homepage": "https://github.com/K4V1DU/ITP_Project#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "framer-motion": "^12.23.22",
+    "mongoose": "^8.18.3",
+    "multer": "^2.0.2"
+  }
 }

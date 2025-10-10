@@ -14,43 +14,39 @@ const uploadReceipt = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // Find existing payment by order number
-    let payment = await Payment.findOne({ OrderNumber: orderNumber });
-    let isUpdate = false;
-
     const receiptData = {
       data: req.file.buffer,
       contentType: req.file.mimetype,
       name: req.file.originalname, // always store original file name
     };
 
-    if (payment) {
-      isUpdate = true;
-      payment.ReceiptFile = receiptData;
-    } else {
-      payment = new Payment({
-        OrderNumber: orderNumber,
-        ReceiptFile: receiptData,
-      });
-    }
+    // Check if record already exists
+    const existingPayment = await Payment.findOne({ OrderNumber: orderNumber });
 
-    await payment.save();
+    // Perform upsert (update if exists, otherwise create)
+    const payment = await Payment.findOneAndUpdate(
+      { OrderNumber: orderNumber },
+      { $set: { ReceiptFile: receiptData } },
+      { new: true, upsert: true }
+    );
 
+    const isUpdate = !!existingPayment; // true if record existed before
     const receiptURL = `/payments/${payment._id}/receipt`;
 
-    res.status(201).json({
+    res.status(isUpdate ? 200 : 201).json({
       message: isUpdate
         ? "Receipt updated successfully"
         : "Receipt uploaded successfully",
       payment,
       receiptURL,
-      receiptName: req.file.originalname, // always return the file name
+      receiptName: req.file.originalname,
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error uploading receipt" });
   }
 };
+
 
 // Serve receipt by payment ID
 const getReceipt = async (req, res) => {

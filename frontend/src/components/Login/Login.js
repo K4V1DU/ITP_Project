@@ -36,10 +36,12 @@ function Login() {
           history("/Inventory");
         } else if (role === "Order Manager") {
           history("/order-Manage");
-
-        }else if (role === "Delivery Staff") {
-          history("/DeliveryDashboard");  
+        } else if (role === "Finance Manager") {
+          history("/FinanceDashboard");
+        } else if (role === "Delivery Staff") {
+          history("/DeliveryDashboard");
         } 
+        
         else {
           history("/login");
         }

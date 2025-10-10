@@ -1,10 +1,10 @@
 # ITP_Project
-<h2>Backend</h2>
+<h2>Backend:</h2>
 <pre>
 npm install nodemailer
 </pre>
 
-<h2>Frontend</h2>
+<h2>Frontend:</h2>
 <pre>
 npm install sweetalert2 react-toastify recharts
 npm install recharts

@@ -7,8 +7,8 @@ const NotificationSchema = new Schema({
         required:true,
     },
     UserID : {
-        type:String, // data Type
-        required:true,//validate
+        type:String, 
+        required:true,
     }, 
     Title: {
         type: String,
@@ -29,6 +29,6 @@ const NotificationSchema = new Schema({
 })
 
 module.exports = mongoose.model(
-    "Notifications",//File name
-    NotificationSchema // function Name
+    "Notifications",
+    NotificationSchema 
 )

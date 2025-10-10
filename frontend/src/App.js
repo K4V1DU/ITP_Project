@@ -29,14 +29,14 @@ import DeliveryDashboard from "./components/DeliveryManagement/DeliveryDashboard
 import Profile from "./components/Profile/Profile.js";
 import UsersCarts from "./components/AdminDashboard/UsersCarts/usersCarts.js";
 
-
-
+// 👇 New Finance Dashboard import
+import FinanceDashboard from "./components/Finance/FinanceDashboard";
+import EditReceipt from "./components/Finance/EditReceipt";
+import ReceiptView from "./components/Finance/ReceiptView";
 
 function App() {
-
   return (
     <Routes>
-
       <Route path="/" element={<Login />} />
       <Route path="/home" element={<Home />} />
       <Route path="/cart" element={<Cart />} />
@@ -68,13 +68,12 @@ function App() {
       <Route path="/Profile" element={<Profile />} />
       <Route path="/Coupon-Management" element={<ProtionReport />} />
 
-
-
-
+      {/* 🚀 New Finance Dashboard Route */}
+      <Route path="/FinanceDashboard" element={<FinanceDashboard />} />
+      <Route path="/edit-receipt/:orderNumber" element={<EditReceipt />} />
+      <Route path="/receipt/:id" element={<ReceiptView />} />
     </Routes>
   );
 }
 
 export default App;
-
-//rfce

@@ -1,4 +1,5 @@
 const OrderManager = require("../Model/OrdersModel");
+const DeliveryAssignment = require("../Model/DeliveryAssignmentModel");
 
 //Get all orders
 const getAllManagerOrders = async (req, res) => {
@@ -60,7 +61,11 @@ const deleteOrder = async (req, res) => {
   try {
     const order = await OrderManager.findByIdAndDelete(req.params.id);
     if (!order) return res.status(404).json({ message: "Order not found" });
-    return res.status(200).json(order);
+
+    // Delete related delivery
+    await DeliveryAssignment.deleteMany({ OrderID: order.OrderNumber });
+
+    return res.status(200).json({ message: "Order and related delivery deleted", order });
   } 
   catch (err) {
     console.error(err);

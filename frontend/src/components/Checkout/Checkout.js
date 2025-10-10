@@ -113,12 +113,13 @@ function Checkout() {
 
       await axios.delete(`http://localhost:5000/Cart/user/${userId}`);
 
-      toast.success("Order placed successfully! Redirecting...", { autoClose: 2000 });
+      toast.success("Order placed successfully! Redirecting...", {
+        autoClose: 2000,
+      });
 
       setTimeout(() => {
         navigate(`/OrderDetails/${createdOrderNumber}`);
       }, 2000);
-
     } catch (err) {
       console.error(err);
       toast.error("Failed to place order");
@@ -132,18 +133,27 @@ function Checkout() {
         <h2>Checkout</h2>
 
         <div className="extra-fields">
-          <label>Shipping Address:</label>
           <input
             type="text"
             value={shippingAddress}
-            onChange={(e) => setShippingAddress(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 100) {
+                setShippingAddress(e.target.value);
+              }
+            }}
+            maxLength="100"
+            placeholder="Enter your address (max 100 characters)"
           />
-
           <label>Contact Number:</label>
           <input
             type="text"
             value={contactNumber}
-            onChange={(e) => setContactNumber(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "");
+              if (value.length <= 10) setContactNumber(value);
+            }}
+            maxLength="10"
+            placeholder="Enter 10-digit number"
           />
 
           <label>Schedule Delivery Date (optional):</label>
@@ -202,4 +212,3 @@ function Checkout() {
 }
 
 export default Checkout;
-

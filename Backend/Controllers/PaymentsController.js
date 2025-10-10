@@ -52,9 +52,9 @@ const uploadReceipt = async (req, res) => {
 const getReceipt = async (req, res) => {
   try {
     const { paymentId } = req.params;
-    const payment = await Payment.findById(paymentId);
+    const payment = await Payment.findById(paymentId).select("+ReceiptFile.data +ReceiptFile.contentType");
 
-    if (!payment || !payment.ReceiptFile) {
+    if (!payment || !payment.ReceiptFile || !payment.ReceiptFile.data) {
       return res.status(404).send("Receipt not found");
     }
 
@@ -66,11 +66,12 @@ const getReceipt = async (req, res) => {
   }
 };
 
+
 // Get receipt info by order number
 const getReceiptByOrderNumber = async (req, res) => {
   try {
     const { orderNumber } = req.params;
-    const payment = await Payment.findOne({ OrderNumber: orderNumber });
+    const payment = await Payment.findOne({ OrderNumber: orderNumber }).select("+ReceiptFile.name");
 
     if (!payment || !payment.ReceiptFile) {
       return res.status(404).json({ message: "No receipt found" });
@@ -78,7 +79,7 @@ const getReceiptByOrderNumber = async (req, res) => {
 
     res.json({
       receiptURL: `/payments/${payment._id}/receipt`,
-      receiptName: payment.ReceiptFile.name, // always return stored name
+      receiptName: payment.ReceiptFile.name,
     });
   } catch (err) {
     console.error(err);

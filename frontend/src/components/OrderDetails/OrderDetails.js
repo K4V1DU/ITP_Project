@@ -5,6 +5,9 @@ import Navbar from "../NavBar/NavBar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./OrderDetails.css";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 
 function OrderDetails() {
   const { orderNumber } = useParams();
@@ -45,7 +48,7 @@ function OrderDetails() {
           const deliveryRes = await axios.get(
             `http://localhost:5000/delivery/order/${orderData.OrderNumber}`
           );
-          const { DeliveryAgentID } = deliveryRes.data; 
+          const { DeliveryAgentID } = deliveryRes.data;
           if (DeliveryAgentID) {
             const agentRes = await axios.get(
               `http://localhost:5000/users/${DeliveryAgentID}`
@@ -159,6 +162,105 @@ function OrderDetails() {
 
   if (!order) return <p>Order not found</p>;
 
+ 
+
+const handleDownloadPDF = () => {
+  if (!order) return;
+  const doc = new jsPDF();
+
+  
+  const logoUrl = "/images/logo99.png";
+  doc.addImage(logoUrl, "PNG", 80, 10, 50, 50);
+
+ 
+  const topY = 65; 
+  const leftX = 14;
+  const rightX = 110;
+
+  
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text("Order Details", leftX, topY);
+
+  doc.setFont("helvetica", "normal");
+  doc.text(`Order #: ${order.OrderNumber}`, leftX, topY + 8);
+  doc.text(`Order Date: ${new Date(order.createdAt).toLocaleDateString()}`, leftX, topY + 16);
+  doc.text(`Payment Method: ${order.PaymentMethod || "N/A"}`, leftX, topY + 24);
+
+  
+  const paymentY = topY + 35;
+  doc.setFont("helvetica", "bold");
+  doc.text("Payment Summary", leftX, paymentY);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Subtotal: Rs ${order.Subtotal.toFixed(2)}`, leftX, paymentY + 8);
+  doc.text(`Discount: Rs ${order.Discount.toFixed(2)}`, leftX, paymentY + 14);
+  doc.text(`Total: Rs ${order.Total.toFixed(2)}`, leftX, paymentY + 20);
+
+  
+  doc.setFont("helvetica", "bold");
+  doc.text("Customer Information", rightX, topY);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Name: ${user?.FullName || "N/A"}`, rightX, topY + 8);
+  doc.text(`Email: ${user?.Email || "N/A"}`, rightX, topY + 16);
+  doc.text(`Contact: ${order.ContactNumber || "N/A"}`, rightX, topY + 24);
+  doc.text(`Shipping Address: ${order.ShippingAddress || "N/A"}`, rightX, topY + 32, { maxWidth: 90 });
+
+  
+  const tableColumn = ["Item", "Quantity", "Price (Rs)", "Total (Rs)"];
+  const tableRows = order.Items.map((item) => [
+    item.Name,
+    item.Quantity,
+    item.Price.toFixed(2),
+    item.Total.toFixed(2),
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: paymentY + 40,
+    theme: "grid",
+    headStyles: {
+      fillColor: [0, 0, 0],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+    },
+    styles: {
+      cellPadding: 2,
+      fontSize: 11,
+      lineWidth: 0.3, 
+      halign: "left",
+      valign: "middle",
+    },
+    columnStyles: {
+      0: { cellWidth: 90 },
+      1: { cellWidth: 30 },
+      2: { cellWidth: 35 },
+      3: { cellWidth: 35 },
+    },
+    drawVerticalLine: () => false,
+    tableWidth: "auto",
+  });
+
+ 
+  const finalY = doc.lastAutoTable.finalY + 15;
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.line(14, finalY, 196, finalY); 
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text("CoolCart Ltd.", 105, finalY + 6, { align: "center" });
+  doc.text("www.coolcart.lk | CoolcartIceCream@Gmail.Com", 105, finalY + 12, { align: "center" });
+  doc.text("Thank you for shopping with us!", 105, finalY + 18, { align: "center" });
+
+  
+  doc.save(`Invoice_${order.OrderNumber}.pdf`);
+};
+
+
+
+
+
   return (
     <div>
       <Navbar />
@@ -167,6 +269,9 @@ function OrderDetails() {
         {/* Header */}
         <div className="order-header">
           <h1>Order #{order.OrderNumber}</h1>
+          <button className="downloadPDF" onClick={handleDownloadPDF}>
+            Download PDF
+          </button>
           <div className="order-status">
             <div>
               <strong>Order Status:</strong>{" "}
@@ -239,7 +344,9 @@ function OrderDetails() {
                   <h3>Bank Receipt</h3>
 
                   {existingReceipt &&
-                    ["pending", "declined"].includes(order.PaymentStatus?.toLowerCase()) && (
+                    ["pending", "declined"].includes(
+                      order.PaymentStatus?.toLowerCase()
+                    ) && (
                       <button
                         className="delete-receipt-btn"
                         onClick={handleDeleteReceipt}
@@ -261,7 +368,9 @@ function OrderDetails() {
                     </div>
                   )}
 
-                  {["pending", "declined"].includes(order.PaymentStatus?.toLowerCase()) && (
+                  {["pending", "declined"].includes(
+                    order.PaymentStatus?.toLowerCase()
+                  ) && (
                     <div
                       className={`bank-upload ${dragActive ? "active" : ""}`}
                       onDragEnter={handleDrag}

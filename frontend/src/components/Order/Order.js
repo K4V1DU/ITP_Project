@@ -107,16 +107,14 @@ const handleSubmit = async (e) => {
 
               <p className="description">{product.Description}</p>
 
-              <p className="price">Rs {product.Price}/=</p>
+              <p className="price">Rs: {product.Price.toFixed(2)}</p>
 
               <p className="total">
-                <strong>Total:</strong> Rs {inputs.Total.toFixed(2)}/=
+                <strong>Total:</strong> Rs {inputs.Total.toFixed(2)}
               </p>
 
 
-              <p className="stock">
-                <strong>Available:{product.Quantity}</strong>
-              </p>
+          
 
 
               <div className="controls">

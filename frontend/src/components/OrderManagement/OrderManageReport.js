@@ -14,7 +14,7 @@ import {
   BarElement,
 } from "chart.js";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+//import html2canvas from "html2canvas";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -71,7 +71,7 @@ function OrdersReport() {
     return () => clearInterval(interval);
   }, []);
 
-  // 🔹 SHOW ONLY ASSIGNED ORDERS
+  // SHOW ASSIGNED ORDERS
   const filteredOrders = orders
     .filter((o) => o.DeliveryAgentID)
     .filter((o) => (statusFilter === "All" ? true : o.Status === statusFilter))
@@ -159,7 +159,7 @@ function OrdersReport() {
     ],
   };
 
-  // NEW: Top Customers Chart
+  // Top Customers Chart
   const customerCounts = orders.reduce((acc, o) => {
     const c = o.CustomerName || "Unknown";
     acc[c] = (acc[c] || 0) + 1;
@@ -177,19 +177,162 @@ function OrdersReport() {
     ],
   };
 
-  // 🔹 Export to PDF
-  const handleExportPDF = async () => {
-    const input = reportRef.current;
-    const canvas = await html2canvas(input, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
+  // PDF
+    const handleExportPDF = async () => {
+    const now = new Date();
+    const formattedDate = now.toLocaleString();
+
+    // Separate assigned and unassigned orders
+    const assignedOrdersData = orders.filter((o) => o.DeliveryAgentID);
+    const unassignedOrdersData = orders.filter((o) => !o.DeliveryAgentID);
+
+    // PDF
     const pdf = new jsPDF("p", "mm", "a4");
-    const width = pdf.internal.pageSize.getWidth();
-    const height = (canvas.height * width) / canvas.width;
-    pdf.addImage(imgData, "PNG", 0, 0, width, height);
-    pdf.save("Assigned_Orders_Report.pdf");
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    let y = 20;
+
+    const logoUrl = "/images/logo99.png";
+    try {
+      const img = new Image();
+      img.src = logoUrl;
+      pdf.addImage(img, "PNG", 15, 10, 25, 25);
+    } catch (err) {
+      console.warn("Logo not found or failed to load.");
+    }
+
+    pdf.setFontSize(18);
+    pdf.setTextColor(33, 37, 41);
+    pdf.text("Orders Management Report", pageWidth / 2, y + 10, { align: "center" });
+    y += 25;
+
+    pdf.setFontSize(12);
+    pdf.setTextColor(40, 40, 40);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Summary", 15, y);
+    y += 8;
+
+    pdf.setFont("helvetica", "normal");
+    const summaryData = [
+      ["Total Orders", totalOrders],
+      ["Pending Orders", pendingOrders],
+      ["Delivered Orders", deliveredOrders],
+      ["Assigned Orders", assignedOrders],
+      ["Unassigned Orders", unassignedOrders],
+      ["Total Revenue", `Rs ${totalRevenue.toFixed(2)}`],
+      ["Total Items Sold", totalItemsSold],
+      ["Top Agent", topAgent],
+      ["Popular Payment Method", topPaymentMethod],
+    ];
+
+    summaryData.forEach(([label, value]) => {
+      pdf.text(`${label}:`, 20, y);
+      pdf.text(String(value), 80, y);
+      y += 7;
+    });
+
+    y += 5;
+    pdf.line(15, y, pageWidth - 15, y);
+    y += 10;
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(11);
+    pdf.text("Assigned Orders", 15, y);
+    y += 8;
+
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "bold");
+    const headers = ["Order #", "Status", "Agent", "Total (Rs)"];
+    const colWidths = [35, 30, 65, 35];
+    let x = 15;
+    headers.forEach((h, i) => {
+      pdf.text(h, x, y);
+      x += colWidths[i];
+    });
+    y += 6;
+
+    pdf.setFont("helvetica", "normal");
+
+    assignedOrdersData.forEach((o) => {
+      if (y > 260) {
+        pdf.addPage();
+        y = 20;
+      }
+
+      const row = [
+        o.OrderNumber,
+        o.Status,
+        agentMap[o.DeliveryAgentID] || "N/A",
+        o.Total?.toFixed(2) || "0.00",
+      ];
+
+      x = 15;
+      row.forEach((text, i) => {
+        pdf.text(String(text), x, y);
+        x += colWidths[i];
+      });
+      y += 6;
+    });
+
+    y += 8;
+    pdf.line(15, y, pageWidth - 15, y);
+    y += 10;
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(11);
+    pdf.text("Unassigned Orders", 15, y);
+    y += 8;
+
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "bold");
+    let x2 = 15;
+    headers.forEach((h, i) => {
+      pdf.text(h, x2, y);
+      x2 += colWidths[i];
+    });
+    y += 6;
+
+    pdf.setFont("helvetica", "normal");
+
+    unassignedOrdersData.forEach((o) => {
+      if (y > 260) {
+        pdf.addPage();
+        y = 20;
+      }
+
+      const row = [
+        o.OrderNumber,
+        o.Status,
+        "Unassigned",
+        o.Total?.toFixed(2) || "0.00",
+      ];
+
+      x2 = 15;
+      row.forEach((text, i) => {
+        pdf.text(String(text), x2, y);
+        x2 += colWidths[i];
+      });
+      y += 6;
+    });
+
+    y += 10;
+    pdf.line(15, y, pageWidth - 15, y);
+    y += 10;
+
+    pdf.setFont("helvetica", "italic");
+    pdf.setFontSize(9);
+    pdf.text(`Report generated on: ${formattedDate}`, 15, y);
+    y += 15;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(11);
+    pdf.text("_________________________", pageWidth - 80, y);
+    pdf.text("Authorized Signature", pageWidth - 75, y + 6);
+
+    pdf.save("Orders_Report.pdf");
   };
 
-  // 🔹 Print Page
+
+  // Print Page
   const handlePrint = () => {
     window.print();
   };
@@ -200,7 +343,7 @@ function OrdersReport() {
       <div className="dashboard-container" ref={reportRef}>
         <h1 className="dashboard-title">Order Management Summary</h1>
 
-        {/* ✅ PDF + Print Buttons */}
+        {/* PDF Buttons */}
         <div style={{ textAlign: "right", marginBottom: "1rem" }}>
           <button
             onClick={handleExportPDF}
@@ -233,7 +376,7 @@ function OrdersReport() {
           </button>
         </div>
 
-        {/* SUMMARY CARDS */}
+        {/* Summary */}
         <div className="summary-cards">
           <div className="card">Total Orders <span>{totalOrders}</span></div>
           <div className="card">Pending Orders <span>{pendingOrders}</span></div>
@@ -379,7 +522,6 @@ function OrdersReport() {
         <ToastContainer />
       </div>
 
-      {/* 🔹 CSS */}
       <style>{`
         .dashboard-container {
           padding: 2rem;

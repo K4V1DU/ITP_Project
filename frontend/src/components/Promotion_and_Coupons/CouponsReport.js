@@ -126,7 +126,7 @@ function CouponsReport() {
     const pageWidth = pdf.internal.pageSize.getWidth();
     let y = 20;
 
-    const logoUrl = "../frontend/public/images/navlogo.png";
+    const logoUrl = "/images/logo99.png";
     try {
       const img = new Image();
       img.src = logoUrl;

@@ -18,7 +18,7 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+//import html2canvas from "html2canvas";
 
 const API_URL = "http://localhost:5000/Coupons";
 const COLORS = ["#28a745", "#dc3545", "#ffc107"];
@@ -117,16 +117,119 @@ function CouponsReport() {
     }
   };
 
-  const handleExportPDF = async () => {
-    const input = reportRef.current;
-    const canvas = await html2canvas(input, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
+    const handleExportPDF = async () => {
+    const now = new Date();
+    const formattedDate = now.toLocaleString();
+
+    // Create PDF
     const pdf = new jsPDF("p", "mm", "a4");
-    const width = pdf.internal.pageSize.getWidth();
-    const height = (canvas.height * width) / canvas.width;
-    pdf.addImage(imgData, "PNG", 0, 0, width, height);
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    let y = 20;
+
+    const logoUrl = "../frontend/public/images/navlogo.png";
+    try {
+      const img = new Image();
+      img.src = logoUrl;
+      pdf.addImage(img, "PNG", 15, 10, 25, 25);
+    } catch (err) {
+      console.warn("Logo not found or failed to load.");
+    }
+
+    pdf.setFontSize(18);
+    pdf.setTextColor(33, 37, 41);
+    pdf.text("Coupons & Promotions Report", pageWidth / 2, y + 10, { align: "center" });
+    y += 25;
+
+    pdf.setFontSize(12);
+    pdf.setTextColor(40, 40, 40);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Summary", 15, y);
+    y += 8;
+
+    pdf.setFont("helvetica", "normal");
+    const summaryData = [
+      ["Total Coupons", stats.total],
+      ["Active", stats.active],
+      ["Expired", stats.expired],
+      ["Used Up", stats.usedUp],
+      ["Total Discount Given", `Rs ${stats.totalDiscountGiven.toFixed(2)}`],
+    ];
+
+    summaryData.forEach(([label, value]) => {
+      pdf.text(`${label}:`, 20, y);
+      pdf.text(String(value), 80, y);
+      y += 7;
+    });
+
+    y += 5;
+    pdf.line(15, y, pageWidth - 15, y);
+    y += 10;
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(11);
+    pdf.text("Coupons & Promotions Details", 15, y);
+    y += 8;
+
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "bold");
+    const headers = ["Code", "Type", "Discount", "Min Amt", "Usage", "Limit", "Expiry", "Status"];
+    const colWidths = [25, 25, 20, 20, 20, 20, 25, 25];
+    let x = 15;
+    headers.forEach((h, i) => {
+      pdf.text(h, x, y);
+      x += colWidths[i];
+    });
+    y += 6;
+
+    pdf.setFont("helvetica", "normal");
+
+    coupons.forEach((c, idx) => {
+      if (y > 260) {
+        pdf.addPage();
+        y = 20;
+      }
+
+      const expiryDate = new Date(c.ExpiryDate);
+      const usageReached = c.UsageCount >= c.UsageLimit;
+      const status = expiryDate < new Date() ? "Expired" : usageReached ? "Used Up" : "Active";
+
+      const row = [
+        c.Code,
+        c.discountType,
+        `${c.DiscountValue}%`,
+        `Rs ${c.MinAmount}`,
+        String(c.UsageCount),
+        String(c.UsageLimit),
+        new Date(c.ExpiryDate).toLocaleDateString(),
+        status,
+      ];
+
+      x = 15;
+      row.forEach((text, i) => {
+        pdf.text(String(text), x, y);
+        x += colWidths[i];
+      });
+
+      y += 6;
+    });
+
+    y += 10;
+    pdf.line(15, y, pageWidth - 15, y);
+    y += 10;
+
+    pdf.setFont("helvetica", "italic");
+    pdf.setFontSize(9);
+    pdf.text(`Report generated on: ${formattedDate}`, 15, y);
+    y += 15;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(11);
+    pdf.text("_________________________", pageWidth - 80, y);
+    pdf.text("Authorized Signature", pageWidth - 75, y + 6);
+
     pdf.save("Coupons_Report.pdf");
   };
+
 
   const handlePrint = () => {
     window.print();

@@ -216,6 +216,8 @@ function OrdersDashboard() {
           <option value="all">All Payment Status</option>
           <option value="Pending">Pending</option>
           <option value="Completed">Completed</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Approved">Approved</option>
           <option value="Declined">Declined</option>
         </select>
 

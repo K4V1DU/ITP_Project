@@ -3,6 +3,9 @@ import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import { toast, ToastContainer } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import "react-toastify/dist/ReactToastify.css";
 
 const ORDER_API = "http://localhost:5000/OrderManage";
@@ -25,11 +28,9 @@ function OrderManageDetails() {
       const res = await axios.get("http://localhost:5000/users");
       const agents = res.data.users.filter((u) => u.Role === "Delivery Staff");
       setDeliveryAgents(agents);
-    } 
-    catch (err) {
+    } catch (err) {
       toast.error("Failed to load delivery agents");
-    } 
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -41,7 +42,6 @@ function OrderManageDetails() {
       setOrder(res.data);
       setStatus(res.data.Status);
 
-      //Fetch assigned delivery agent
       try {
         const assignRes = await axios.get(
           `http://localhost:5000/delivery/order/${res.data.OrderNumber}`
@@ -49,16 +49,12 @@ function OrderManageDetails() {
         const agentID = assignRes.data.DeliveryAgentID;
         setAssignedAgent(agentID);
         setIsAssigned(true);
-
-        //Find agent name 
         const agent = deliveryAgents.find((a) => a._id === agentID);
         if (agent) setAssignedAgentName(`${agent.FirstName} ${agent.LastName}`);
-      } 
-      catch (err) {
+      } catch {
         setIsAssigned(false);
       }
-    } 
-    catch (err) {
+    } catch {
       toast.error("Failed to load order");
     }
   };
@@ -86,8 +82,7 @@ function OrderManageDetails() {
     try {
       await axios.put(`${ORDER_API}/${id}`, { Status: newStatus });
       toast.success("Order status updated");
-    } 
-    catch (err) {
+    } catch {
       toast.error("Failed to update status");
     }
   };
@@ -97,7 +92,6 @@ function OrderManageDetails() {
       toast.error("Please select an agent first");
       return;
     }
-
     if (status === "Cancelled") {
       toast.error("Cannot assign agent to a cancelled order");
       return;
@@ -108,60 +102,144 @@ function OrderManageDetails() {
         OrderID: order.OrderNumber,
         DeliveryAgentID: assignedAgent,
       });
-
       const agent = deliveryAgents.find((a) => a._id === assignedAgent);
       setAssignedAgentName(agent ? `${agent.FirstName} ${agent.LastName}` : "");
       setIsAssigned(true);
       toast.success("Delivery agent assigned");
-    } 
-    catch (err) {
-      try {
-        const assignRes = await axios.get(
-          `http://localhost:5000/delivery/${order.OrderNumber}`
-        );
-        setAssignedAgent(assignRes.data.DeliveryAgentID);
-        const agent = deliveryAgents.find(
-          (a) => a._id === assignRes.data.DeliveryAgentID
-        );
-        setAssignedAgentName(agent ? `${agent.FirstName} ${agent.LastName}` : "");
-        setIsAssigned(true);
-        toast.info(
-          `Order already assigned to ${assignedAgentName} (${assignRes.data.DeliveryAgentID})`
-        );
-      } 
-      catch (fetchErr) {
-        toast.error("Failed to fetch already assigned agent");
-      }
+    } catch (err) {
+      toast.error("Failed to assign agent");
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure?")) return;
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${order.OrderNumber} order?`
+    );
+    if (!confirmed) return;
+
     try {
       await axios.delete(`${ORDER_API}/${id}`);
-      toast.success("Order deleted");
+      toast.success("Order deleted successfully");
       navigate("/order-Manage");
-    } catch (err) {
+    } catch {
       toast.error("Failed to delete order");
     }
   };
 
+  // PDF
+  const handleExportPDF = async () => {
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    let y = 20;
+
+    const logoUrl = "/images/logo99.png";
+    try {
+      const img = new Image();
+      img.src = logoUrl;
+      pdf.addImage(img, "PNG", 15, 10, 25, 25);
+    } catch {}
+
+    pdf.setFontSize(18);
+    pdf.text("Order Details Report", pageWidth / 2, y + 10, { align: "center" });
+    y += 25;
+
+    pdf.setFontSize(11);
+    pdf.text(`Order Number: ${order.OrderNumber}`, 15, y);
+    y += 8;
+    pdf.text(`Generated on: ${new Date().toLocaleString()}`, 15, y);
+    y += 10;
+
+    const addSection = (title) => {
+      pdf.setFontSize(13);
+      pdf.setFont("helvetica", "bold");
+      pdf.text(title, 15, y);
+      y += 6;
+      pdf.setFont("helvetica", "normal");
+    };
+
+    addSection("Customer Information");
+    pdf.text(`User ID: ${order.UserID}`, 20, y);
+    y += 6;
+    pdf.text(`Shipping Address: ${order.ShippingAddress}`, 20, y);
+    y += 6;
+    pdf.text(`Contact Number: ${order.ContactNumber}`, 20, y);
+    y += 10;
+
+    addSection("Items");
+    autoTable(pdf, {
+    head: [["#", "Name", "Product ID", "Price", "Quantity", "Total"]],
+    body: order.Items.map((item, index) => [
+      index + 1,
+      item.Name,
+      item.ProductID,
+      `Rs ${item.Price}`,
+      item.Quantity,
+      `Rs ${item.Total}`,
+    ]),
+      startY: y,
+      theme: "grid",
+      headStyles: { fillColor: [0, 0, 0] },
+      styles: { fontSize: 10 },
+    });
+
+  y = pdf.lastAutoTable.finalY + 10;
+
+
+    addSection("Payment Information");
+    pdf.text(`Payment Method: ${order.PaymentMethod}`, 20, y);
+    y += 6;
+    pdf.text(`Payment Status: ${order.PaymentStatus}`, 20, y);
+    y += 6;
+    pdf.text(`Subtotal: Rs ${order.Subtotal}`, 20, y);
+    y += 6;
+    pdf.text(`Discount: Rs ${order.Discount}`, 20, y);
+    y += 6;
+    pdf.text(`Total: Rs ${order.Total}`, 20, y);
+    y += 10;
+
+    addSection("Order Status");
+    pdf.text(`Current Status: ${status}`, 20, y);
+    y += 10;
+
+    addSection("Delivery Agent");
+    if (isAssigned)
+      pdf.text(
+        `Assigned To: ${assignedAgentName} (${assignedAgent})`,
+        20,
+        y
+      );
+    else pdf.text("Not Assigned", 20, y);
+    y += 15;
+
+    pdf.line(15, y, pageWidth - 15, y);
+    y += 15;
+    pdf.text("_________________________", pageWidth - 80, y);
+    pdf.text("Authorized Signature", pageWidth - 75, y + 6);
+
+    pdf.save(`Order_${order.OrderNumber}_Report.pdf`);
+  };
+
   const styles = {
-    container: { padding: "2rem", backgroundColor: "#f0f2f5", minHeight: "100vh" },
+    container: {
+      padding: "2rem",
+      background: "linear-gradient(135deg, #e0f7fa, #ffffff)",
+      minHeight: "100vh",
+    },
     wrapper: {
       maxWidth: "950px",
       margin: "0 auto",
-      backgroundColor: "#fff",
-      padding: "2rem",
-      borderRadius: "12px",
-      boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+      backgroundColor: "#ffffff",
+      padding: "2.5rem",
+      borderRadius: "15px",
+      boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
     },
     section: {
       marginBottom: "1.8rem",
-      padding: "1.2rem",
+      padding: "1.2rem 1.5rem",
       backgroundColor: "#fafafa",
       borderRadius: "10px",
-      border: "1px solid #e6e6e6",
+      borderLeft: "5px solid #0984e3",
+      transition: "0.3s",
     },
     sectionTitle: {
       fontSize: "1.25rem",
@@ -195,6 +273,16 @@ function OrderManageDetails() {
       gap: "1rem",
       justifyContent: "flex-end",
     },
+    pdfBtn: {
+      padding: "0.8rem 1.3rem",
+      backgroundColor: "#16a085",
+      color: "#fff",
+      border: "none",
+      borderRadius: "8px",
+      cursor: "pointer",
+      fontWeight: "600",
+      transition: "0.3s",
+    },
     deleteBtn: {
       padding: "0.8rem 1.3rem",
       backgroundColor: "#e84118",
@@ -223,7 +311,7 @@ function OrderManageDetails() {
       border: "none",
       cursor: assigned ? "not-allowed" : "pointer",
       marginTop: "0.8rem",
-      marginLeft: "0.5rem", // added gap between select and button
+      marginLeft: "0.5rem",
       fontWeight: "600",
       transition: "0.3s",
     }),
@@ -251,28 +339,22 @@ function OrderManageDetails() {
       <ToastContainer />
       <div style={styles.container}>
         <div style={styles.wrapper}>
-          <h2>Order Details: {order.OrderNumber}</h2>
+          <h2 style={{ textAlign: "center", color: "#0984e3", marginBottom: "1.5rem" }}>
+            Order Details: {order.OrderNumber}
+          </h2>
 
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>Customer Info</h3>
-            <p>
-              <strong>User ID:</strong> {order.UserID}
-            </p>
-            <p>
-              <strong>Shipping Address:</strong> {order.ShippingAddress}
-            </p>
-            <p>
-              <strong>Contact Number:</strong> {order.ContactNumber}
-            </p>
+            <p><strong>User ID:</strong> {order.UserID}</p>
+            <p><strong>Shipping Address:</strong> {order.ShippingAddress}</p>
+            <p><strong>Contact Number:</strong> {order.ContactNumber}</p>
           </div>
 
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>Items</h3>
             {order.Items.map((item, idx) => (
               <div key={idx} style={styles.itemCard}>
-                <p>
-                  <strong>{item.Name}</strong>
-                </p>
+                <p><strong>{item.Name}</strong></p>
                 <p>Product ID: {item.ProductID}</p>
                 <p>Price: Rs {item.Price}</p>
                 <p>Quantity: {item.Quantity}</p>
@@ -283,30 +365,16 @@ function OrderManageDetails() {
 
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>Payment Info</h3>
-            <p>
-              <strong>Payment Method:</strong> {order.PaymentMethod}
-            </p>
-            <p>
-              <strong>Payment Status:</strong> {order.PaymentStatus}
-            </p>
-            <p>
-              <strong>Subtotal:</strong> Rs {order.Subtotal}
-            </p>
-            <p>
-              <strong>Discount:</strong> Rs {order.Discount}
-            </p>
-            <p>
-              <strong>Total:</strong> Rs {order.Total}
-            </p>
+            <p><strong>Payment Method:</strong> {order.PaymentMethod}</p>
+            <p><strong>Payment Status:</strong> {order.PaymentStatus}</p>
+            <p><strong>Subtotal:</strong> Rs {order.Subtotal}</p>
+            <p><strong>Discount:</strong> Rs {order.Discount}</p>
+            <p><strong>Total:</strong> Rs {order.Total}</p>
           </div>
 
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>Order Status</h3>
-            <select
-              value={status}
-              onChange={handleStatusChange}
-              style={styles.statusSelect}
-            >
+            <select value={status} onChange={handleStatusChange} style={styles.statusSelect}>
               <option value="Pending">Pending</option>
               <option value="Ready">Ready</option>
               <option value="Cancelled">Cancelled</option>
@@ -317,14 +385,13 @@ function OrderManageDetails() {
             <h3 style={styles.sectionTitle}>Assign Delivery Agent</h3>
             {isAssigned && (
               <p>
-                <strong>Already Assigned:</strong> {assignedAgentName} (
-                {assignedAgent})
+                <strong>Already Assigned:</strong> {assignedAgentName} ({assignedAgent})
               </p>
             )}
             {deliveryAgents.length === 0 ? (
               <p>No delivery agents available.</p>
             ) : (
-              <div style={{}}>
+              <div>
                 <select
                   value={assignedAgent || ""}
                   onChange={(e) => setAssignedAgent(e.target.value)}
@@ -353,6 +420,14 @@ function OrderManageDetails() {
           </div>
 
           <div style={styles.actionButtons}>
+            <button
+              style={styles.pdfBtn}
+              onClick={handleExportPDF}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            >
+              Export PDF
+            </button>
             <button
               style={styles.deleteBtn}
               onClick={handleDelete}

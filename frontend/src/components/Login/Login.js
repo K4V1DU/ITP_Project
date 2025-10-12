@@ -61,7 +61,7 @@ function Login() {
           align-items: center;
           justify-content: center;
           min-height: 100vh;
-          background: url('/images/bg1.png') no-repeat center center/cover;
+          background: url('/images/bg2.jpg') no-repeat center center/cover;
           font-family: 'Epilogue', sans-serif;
           position: relative;
         }

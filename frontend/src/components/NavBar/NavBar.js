@@ -15,25 +15,23 @@ function Navbar() {
 
   let links = [];
   if (role === "Marketing Manager") {
-    links = ["Dashboard", "Manage Coupon", "Dispatch", "profile"];
+    links = ["Dashboard", "Manage Coupon", "Dispatch"];
   } else if (role === "Admin") {
-    links = ["Admin Panel","Manage Users","Order Manage","Coupon Management","Inventory","Users Carts", "profile"];
+    links = ["Admin Panel","Manage Users","Order Manage","Coupon Management","Inventory","Users Carts"];
   } else if (role === "Supply Manager") {
     links = ["Inventory", "profile"];
   } else if (role === "Order Manager") {
-    links = ["Order Manage", "Manage", "profile"];
+    links = ["Order Manage", "Manage"];
   } else if (role === "Delivery Staff") {
     links = ["DeliveryDashboard", "profile"];
   } else {
-    links = ["Home", "Cart", "Orders", "Contact", "profile"];
+    links = ["Home", "Cart", "Orders", "Contact"];
   }
 
   useEffect(() => {
     const fetchCartTotal = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/Cart/user/${userId}`
-        );
+        const res = await axios.get(`http://localhost:5000/Cart/user/${userId}`);
         const cartItems = res.data.Items || [];
         const total = cartItems.reduce((sum, item) => sum + item.Total, 0);
         setCartTotal(total);
@@ -49,10 +47,14 @@ function Navbar() {
 
   return (
     <nav className="NavBar">
+      {/* Logo */}
       <div className="Logo">
-        <img src="/images/navlogo.png" alt="logo" className="coolCartLogo" />
+        <Link to="/profile">
+          <img src="/images/navlogo.png" alt="logo" className="coolCartLogo" />
+        </Link>
       </div>
 
+      {/* Links */}
       <div className="Links">
         {links.map((link) => (
           <Link key={link} to={`/${link.toLowerCase().replace(/ /g, "-")}`}>
@@ -61,6 +63,18 @@ function Navbar() {
         ))}
       </div>
 
+      {/* Profile image on the right (not changing position) */}
+      <div className="profileImageContainer">
+        <Link to="/profile">
+          <img
+            src="/images/avatar.png"
+            alt="Profile"
+            className="profileImage"
+          />
+        </Link>
+      </div>
+
+      {/* Cart (only for customers) */}
       {role === "Customer" && (
         <div className="wishlist">
           <div className="cart">

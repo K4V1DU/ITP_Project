@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ProductList from "./ProductList/ProductList"; 
 import Navbar from "../NavBar/NavBar";
+import Banners from "./ProductList/slider/banners";
 
 const URL = "http://localhost:5000/inventory";
 
@@ -20,7 +21,7 @@ function Home() {
     
     <div>
       <Navbar/>
-    
+    <Banners />
       {products && <ProductList products={products} />}
 
 

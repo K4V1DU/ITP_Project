@@ -17,10 +17,14 @@
   },
   "homepage": "https://github.com/K4V1DU/ITP_Project#readme",
   "dependencies": {
+    "chart.js": "^4.5.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "framer-motion": "^12.23.22",
+    "framer-motion": "^12.23.24",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "mongoose": "^8.18.3",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "react-chartjs-2": "^5.3.0"
   }
 }

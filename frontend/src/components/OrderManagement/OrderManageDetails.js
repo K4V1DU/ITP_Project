@@ -22,6 +22,22 @@ function OrderManageDetails() {
   const [assignedAgentName, setAssignedAgentName] = useState("");
   const [isAssigned, setIsAssigned] = useState(false);
 
+  // Validation states
+  const [canAssignAgent, setCanAssignAgent] = useState(false);
+
+  // Check validation rules
+  const checkValidation = (orderData) => {
+    if (!orderData) return;
+
+    const isBankDeposit = orderData.PaymentMethod === "Bank Deposit";
+    const isPaymentApproved = orderData.PaymentStatus === "Approved" || orderData.PaymentStatus === "Completed";
+    
+    // Can assign agent only if can update to Ready AND status is Ready
+    const canAssign = (!isBankDeposit || (isBankDeposit && isPaymentApproved)) && orderData.Status === "Ready";
+
+    setCanAssignAgent(canAssign);
+  };
+
   // Fetch delivery agents first
   const fetchDeliveryAgents = async () => {
     try {
@@ -41,6 +57,9 @@ function OrderManageDetails() {
       const res = await axios.get(`${ORDER_API}/${id}`);
       setOrder(res.data);
       setStatus(res.data.Status);
+      
+      // Check validation rules after setting order data
+      checkValidation(res.data);
 
       try {
         const assignRes = await axios.get(
@@ -78,9 +97,26 @@ function OrderManageDetails() {
 
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value;
+    
+    // Validation for Bank Deposit orders
+    if (order.PaymentMethod === "Bank Deposit") {
+      const isPaymentApproved = order.PaymentStatus === "Approved" || order.PaymentStatus === "Completed";
+      
+      if (newStatus === "Ready" && !isPaymentApproved) {
+        toast.error("Cannot set status to Ready. Bank Deposit orders require payment to be Approved or Completed.");
+        return;
+      }
+    }
+
     setStatus(newStatus);
     try {
       await axios.put(`${ORDER_API}/${id}`, { Status: newStatus });
+      
+      // Update local order state and re-check validation
+      const updatedOrder = { ...order, Status: newStatus };
+      setOrder(updatedOrder);
+      checkValidation(updatedOrder);
+      
       toast.success("Order status updated");
     } catch {
       toast.error("Failed to update status");
@@ -94,6 +130,22 @@ function OrderManageDetails() {
     }
     if (status === "Cancelled") {
       toast.error("Cannot assign agent to a cancelled order");
+      return;
+    }
+
+    // Validation for Bank Deposit orders
+    if (order.PaymentMethod === "Bank Deposit") {
+      const isPaymentApproved = order.PaymentStatus === "Approved" || order.PaymentStatus === "Completed";
+      
+      if (!isPaymentApproved) {
+        toast.error("Cannot assign agent. Bank Deposit orders require payment to be Approved or Completed.");
+        return;
+      }
+    }
+
+    // Additional validation - can only assign agent when status is Ready
+    if (status !== "Ready") {
+      toast.error("Can only assign delivery agent when order status is 'Ready'");
       return;
     }
 
@@ -183,7 +235,6 @@ function OrderManageDetails() {
     });
 
   y = pdf.lastAutoTable.finalY + 10;
-
 
     addSection("Payment Information");
     pdf.text(`Payment Method: ${order.PaymentMethod}`, 20, y);
@@ -303,18 +354,27 @@ function OrderManageDetails() {
       fontWeight: "600",
       transition: "0.3s",
     },
-    assignBtn: (assigned) => ({
+    assignBtn: (assigned, canAssign) => ({
       padding: "0.6rem 1.2rem",
       borderRadius: "8px",
-      backgroundColor: assigned ? "#7f8c8d" : "#27ae60",
+      backgroundColor: assigned ? "#7f8c8d" : (canAssign ? "#27ae60" : "#95a5a6"),
       color: "#fff",
       border: "none",
-      cursor: assigned ? "not-allowed" : "pointer",
+      cursor: (assigned || !canAssign) ? "not-allowed" : "pointer",
       marginTop: "0.8rem",
       marginLeft: "0.5rem",
       fontWeight: "600",
       transition: "0.3s",
     }),
+    validationMessage: {
+      padding: "0.8rem",
+      backgroundColor: "#fff3cd",
+      border: "1px solid #ffeaa7",
+      borderRadius: "8px",
+      color: "#856404",
+      marginBottom: "1rem",
+      fontSize: "0.9rem",
+    }
   };
 
   if (loading)
@@ -342,6 +402,17 @@ function OrderManageDetails() {
           <h2 style={{ textAlign: "center", color: "#0984e3", marginBottom: "1.5rem" }}>
             Order Details: {order.OrderNumber}
           </h2>
+
+          {/* Validation Message */}
+          {order.PaymentMethod === "Bank Deposit" && 
+           order.PaymentStatus !== "Approved" && 
+           order.PaymentStatus !== "Completed" && (
+            <div style={styles.validationMessage}>
+              <strong>Validation Notice:</strong> This is a Bank Deposit order. 
+              Status can only be updated to "Ready" and delivery agent can only be assigned 
+              when Payment Status is "Approved" or "Completed". Current Payment Status: <strong>{order.PaymentStatus}</strong>
+            </div>
+          )}
 
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>Customer Info</h3>
@@ -374,11 +445,29 @@ function OrderManageDetails() {
 
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>Order Status</h3>
-            <select value={status} onChange={handleStatusChange} style={styles.statusSelect}>
+            <select 
+              value={status} 
+              onChange={handleStatusChange} 
+              style={styles.statusSelect}
+            >
               <option value="Pending">Pending</option>
-              <option value="Ready">Ready</option>
+              <option 
+                value="Ready" 
+                disabled={order.PaymentMethod === "Bank Deposit" && 
+                         order.PaymentStatus !== "Approved" && 
+                         order.PaymentStatus !== "Completed"}
+              >
+                Ready
+              </option>
               <option value="Cancelled">Cancelled</option>
             </select>
+            {order.PaymentMethod === "Bank Deposit" && 
+             order.PaymentStatus !== "Approved" && 
+             order.PaymentStatus !== "Completed" && (
+              <p style={{ color: "#e74c3c", fontSize: "0.9rem", marginTop: "0.5rem" }}>
+                Cannot set to "Ready": Bank Deposit requires payment to be Approved or Completed
+              </p>
+            )}
           </div>
 
           <div style={styles.section}>
@@ -395,7 +484,7 @@ function OrderManageDetails() {
                 <select
                   value={assignedAgent || ""}
                   onChange={(e) => setAssignedAgent(e.target.value)}
-                  disabled={isAssigned || status === "Cancelled"}
+                  disabled={isAssigned || status === "Cancelled" || !canAssignAgent}
                   style={styles.statusSelect}
                 >
                   <option value="">Select Agent</option>
@@ -408,13 +497,21 @@ function OrderManageDetails() {
 
                 <button
                   onClick={handleAssignAgentClick}
-                  style={styles.assignBtn(isAssigned)}
-                  disabled={isAssigned || status === "Cancelled"}
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                  style={styles.assignBtn(isAssigned, canAssignAgent)}
+                  disabled={isAssigned || status === "Cancelled" || !canAssignAgent}
+                  onMouseEnter={(e) => !isAssigned && canAssignAgent && (e.currentTarget.style.transform = "scale(1.05)")}
                   onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                 >
                   {isAssigned ? "Already Assigned" : "Assign Agent"}
                 </button>
+                
+                {!canAssignAgent && !isAssigned && (
+                  <p style={{ color: "#e74c3c", fontSize: "0.9rem", marginTop: "0.5rem" }}>
+                    {status !== "Ready" 
+                      ? "Can only assign agent when order status is 'Ready'" 
+                      : "Cannot assign agent: Bank Deposit requires payment to be Approved or Completed"}
+                  </p>
+                )}
               </div>
             )}
           </div>

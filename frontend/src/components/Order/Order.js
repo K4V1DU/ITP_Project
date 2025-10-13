@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import Navbar from "../NavBar/NavBar";
-
+import Banners from "../Home/ProductList/slider/banners";
 
 
 
@@ -90,6 +90,7 @@ const handleSubmit = async (e) => {
   return (
     <div>
     <Navbar/>
+    <Banners />
     <div className="order">
       {product ? (
         <form onSubmit={handleSubmit} className="form">

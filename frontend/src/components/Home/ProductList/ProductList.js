@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Products from "./products";
 import "./ProductList.css";
 
+
 function ProductList({ products }) {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedFlavours, setSelectedFlavours] = useState([]);

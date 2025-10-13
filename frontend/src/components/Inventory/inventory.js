@@ -28,10 +28,10 @@ function Inventory() {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this item?"
     );
-    if (!confirmDelete) return; // Cancel button එක click කරාම delete stop
+    if (!confirmDelete) return; 
 
     try {
-      await axios.delete(`http://localhost:5000/inventory/${id}`);
+      await axios.delete(`http://localhost:5000/Inventory/${id}`);
       setInventory((prev) => prev.filter((p) => p._id !== id));
       toast.success("Item deleted successfully!", { position: "top-center" });
     } catch (error) {

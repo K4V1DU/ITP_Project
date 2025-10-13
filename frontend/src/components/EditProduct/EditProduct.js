@@ -59,7 +59,7 @@ function EditProduct() {
 
     // Name validation
     if (name === "Name") {
-      if (!/^[a-zA-Z\s.,'-]*$/.test(value)) {
+      if (/^[a-zA-Z\s.,'-]*$/.test(value)) {
         toast.error(
           "Product Name can only contain letters and basic punctuation",
           { position: "top-center" }
@@ -70,7 +70,7 @@ function EditProduct() {
 
     // Description validation
     if (name === "Description") {
-      if (!/^[a-zA-Z\s.,'-]*$/.test(value)) {
+      if (/^[a-zA-Z\s.,'-]*$/.test(value)) {
         toast.error(
           "Description can only contain letters and basic punctuation",
           { position: "top-center" }

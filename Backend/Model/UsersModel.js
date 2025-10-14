@@ -1,58 +1,54 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const UsersSchema = new Schema({
-
-    FirstName : {
-        type:String,
-        required:true,
+const userSchema = new mongoose.Schema(
+  {
+    FirstName: {
+      type: String,
+      required: true,
+      trim: true,
     },
-
-    LastName : {
-        type:String,
-        required:true,
+    LastName: {
+      type: String,
+      required: true,
+      trim: true,
     },
-
-    UserName : {
-        type:String,
-        required:true,
+    UserName: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
     },
-
-
-    Email : {
-        type:String,
-        required:true,
-    },   
-
-
-    Password : {
-        type:String,
-        required:true,
+    Email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
     },
-
-
-    Role : {
-        type:String,
-        required:true,
+    Mobile: {
+      type: String,
+      required: true,
     },
-
-
-    Mobile : {
-        type:Number,
-        required:true,
+    Address: {
+      type: String,
+      required: true,
     },
-
-
-    Address : {
-        type:String,
-        required:true,
+    Role: {
+      type: String,
+      enum: ["User", "Admin"],
+      default: "User",
     },
+    Password: {
+      type: String,
+      required: true,
+    },
+    profilePicture: {
+      type: String,
+      default: "", // default empty string, will be set when user uploads picture
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-
-
-});
-
-module.exports = mongoose.model(
-    "Users",
-    UsersSchema
-)
+module.exports = mongoose.model("Users", userSchema);

@@ -1,11 +1,24 @@
 const express = require("express");
 const router = express.Router();
-const profileController = require("../controllers/profileController");
+const multer = require("multer");
+const path = require("path");
+const profileController = require("../Controllers/ProfileController");
 
-// GET profile
+// Multer setup
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/profile_pics"); // make sure this folder exists
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
+
+// Routes
 router.get("/:id", profileController.getProfile);
-
-// UPDATE profile
 router.put("/:id", profileController.updateProfile);
+router.put("/upload/:id", upload.single("profilePicture"), profileController.updateProfilePicture);
 
 module.exports = router;

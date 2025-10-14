@@ -132,6 +132,16 @@ function Checkout() {
         <h2>Checkout</h2>
 
         <div className="extra-fields">
+
+        <label>User ID:</label>
+          <input
+            type="text"
+            value={userId}
+            
+          />
+
+
+
           <label>Shipping Address:</label>
           <input
             type="text"

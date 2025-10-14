@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import Navbar from "../NavBar/NavBar";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function DisplayUsers() {
   const [users, setUsers] = useState([]);
   const [filterRole, setFilterRole] = useState("");
-  const [searchUsername, setSearchUsername] = useState(""); // New state for search
+  const [searchUsername, setSearchUsername] = useState("");
   const navigate = useNavigate();
 
   // Fetch all users
@@ -57,9 +59,84 @@ function DisplayUsers() {
         : user.UserName.toLowerCase().includes(searchUsername.toLowerCase())
     );
 
+  // ✅ Generate PDF with logo and company name
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    const date = new Date().toLocaleDateString();
+
+    // Load logo image
+    const img = new Image();
+    img.src = process.env.PUBLIC_URL + "/images/navlogo.png";
+
+    img.onload = () => {
+      // Add logo (x=10, y=10, width=20, height=20)
+      doc.addImage(img, "PNG", 10, 10, 20, 20);
+
+      // Company name centered
+      doc.setFontSize(20);
+      doc.setFont("helvetica", "bold");
+      const companyName = "Cool Cart";
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const textWidth =
+        (doc.getStringUnitWidth(companyName) * doc.internal.getFontSize()) /
+        doc.internal.scaleFactor;
+      const x = (pageWidth - textWidth) / 2;
+      doc.text(companyName, x, 22);
+
+      // Date and report title
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Generated on: ${date}`, 14, 35);
+      const reportTitle =
+        filterRole === "" ? "All Users Report" : `${filterRole} User Report`;
+      doc.text(reportTitle, 14, 42);
+
+      // Table headers
+      const tableColumn = [
+        "First Name",
+        "Last Name",
+        "User Name",
+        "Email",
+        "Role",
+        "Mobile",
+        "Address",
+      ];
+
+      const tableRows = [];
+
+      filteredUsers.forEach((user) => {
+        const userData = [
+          user.FirstName,
+          user.LastName,
+          user.UserName,
+          user.Email,
+          user.Role,
+          user.Mobile,
+          user.Address,
+        ];
+        tableRows.push(userData);
+      });
+
+      // ✅ Table content
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 48,
+      });
+
+      // File name
+      const fileName =
+        filterRole === ""
+          ? "All_Users.pdf"
+          : `${filterRole.replace(/\s+/g, "_")}_Users.pdf`;
+
+      doc.save(fileName);
+    };
+  };
+
   return (
     <div style={{ padding: "20px", background: "white", minHeight: "100vh" }}>
-       <Navbar/>
+      <Navbar />
       <h1>User Management</h1>
 
       <div
@@ -107,15 +184,39 @@ function DisplayUsers() {
           placeholder="Search by User Name"
           value={searchUsername}
           onChange={(e) => setSearchUsername(e.target.value)}
-          style={{ padding: "10px", borderRadius: "5px", fontSize: "16px", flex: 1 }}
+          style={{
+            padding: "10px",
+            borderRadius: "5px",
+            fontSize: "16px",
+            flex: 1,
+          }}
         />
+
+        {/* ✅ Download PDF Button */}
+        <button
+          onClick={generatePDF}
+          style={{
+            backgroundColor: "#d33",
+            color: "white",
+            padding: "10px 15px",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Download PDF
+        </button>
       </div>
 
       <table
         border="1"
         cellPadding="10"
         cellSpacing="0"
-        style={{ width: "100%", textAlign: "center", borderCollapse: "collapse" }}
+        style={{
+          width: "100%",
+          textAlign: "center",
+          borderCollapse: "collapse",
+        }}
       >
         <thead style={{ background: "#f0f0f0" }}>
           <tr>

@@ -22,7 +22,7 @@ function AddUsers() {
 
     // Limit mobile input to 10 digits
     if (name === "Mobile") {
-      const onlyNumbers = value.replace(/\D/g, ""); 
+      const onlyNumbers = value.replace(/\D/g, "");
       if (onlyNumbers.length <= 10) {
         setUser({ ...user, [name]: onlyNumbers });
       }
@@ -69,6 +69,7 @@ function AddUsers() {
     >
       <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Add New User</h1>
       <form onSubmit={handleSubmit}>
+        <label>First Name</label>
         <input
           type="text"
           name="FirstName"
@@ -78,6 +79,8 @@ function AddUsers() {
           onChange={handleChange}
           style={inputStyle}
         />
+
+        <label>Last Name</label>
         <input
           type="text"
           name="LastName"
@@ -87,6 +90,8 @@ function AddUsers() {
           onChange={handleChange}
           style={inputStyle}
         />
+
+        <label>User Name</label>
         <input
           type="text"
           name="UserName"
@@ -96,6 +101,8 @@ function AddUsers() {
           onChange={handleChange}
           style={inputStyle}
         />
+
+        <label>Email</label>
         <input
           type="email"
           name="Email"
@@ -105,6 +112,8 @@ function AddUsers() {
           onChange={handleChange}
           style={inputStyle}
         />
+
+        <label>Password</label>
         <input
           type="password"
           name="Password"
@@ -115,6 +124,7 @@ function AddUsers() {
           style={inputStyle}
         />
 
+        <label>Role</label>
         <select
           name="Role"
           value={user.Role}
@@ -132,6 +142,7 @@ function AddUsers() {
           <option value="Delivery Staff">Delivery Staff</option>
         </select>
 
+        <label>Mobile</label>
         <input
           type="text"
           name="Mobile"
@@ -142,6 +153,7 @@ function AddUsers() {
           style={inputStyle}
         />
 
+        <label>Address</label>
         <input
           type="text"
           name="Address"

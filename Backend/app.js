@@ -18,7 +18,7 @@ const shareCouponsRoute = require("./Routes/shareCouponsRoute");
 const ProfileRoute = require("./Routes/ProfileRoute");
 const adminRoutes  = require("./Routes/AdminRoute");
 const adminCartsRoutes = require("./Routes/AdminCartsRoute");
-
+const profileRoutes = require("./Routes/ProfileRoute");
 
 
 const app = express(); 
@@ -44,6 +44,8 @@ app.use("/sharecoupons", shareCouponsRoute);
 app.use("/profile", ProfileRoute);
 app.use("/admin", adminRoutes);
 app.use("/Admin/Carts", adminCartsRoutes);
+app.use("/api/profile", profileRoutes);
+app.use('/profile_pics', express.static('public/profile_pics'));
 
 
 

@@ -84,6 +84,7 @@ function UpdateUsers() {
     >
       <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Update User</h1>
       <form onSubmit={handleSubmit}>
+        <label>First Name</label>
         <input
           type="text"
           name="FirstName"
@@ -93,6 +94,8 @@ function UpdateUsers() {
           style={inputStyle}
           placeholder="First Name"
         />
+
+        <label>Last Name</label>
         <input
           type="text"
           name="LastName"
@@ -102,6 +105,8 @@ function UpdateUsers() {
           style={inputStyle}
           placeholder="Last Name"
         />
+
+        <label>User Name</label>
         <input
           type="text"
           name="UserName"
@@ -111,6 +116,8 @@ function UpdateUsers() {
           style={inputStyle}
           placeholder="User Name"
         />
+
+        <label>Email</label>
         <input
           type="email"
           name="Email"
@@ -120,6 +127,8 @@ function UpdateUsers() {
           style={inputStyle}
           placeholder="Email"
         />
+
+        <label>Password</label>
         <input
           type="password"
           name="Password"
@@ -129,6 +138,8 @@ function UpdateUsers() {
           style={inputStyle}
           placeholder="Password (min 8 characters)"
         />
+
+        <label>Role</label>
         <select
           name="Role"
           value={user.Role}
@@ -145,6 +156,8 @@ function UpdateUsers() {
           <option value="Supply Manager">Supply Manager</option>
           <option value="Delivery Staff">Delivery Staff</option>
         </select>
+
+        <label>Mobile</label>
         <input
           type="text"
           name="Mobile"
@@ -154,6 +167,8 @@ function UpdateUsers() {
           style={inputStyle}
           placeholder="Mobile Number (10 digits)"
         />
+
+        <label>Address</label>
         <input
           type="text"
           name="Address"

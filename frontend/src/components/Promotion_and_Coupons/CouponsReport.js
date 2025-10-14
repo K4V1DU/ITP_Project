@@ -276,7 +276,7 @@ function CouponsReport() {
           .report-container {
             padding: 2rem;
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #dcdcdcff 0%, #ffffffff 100%);
+            background: linear-gradient(135deg, #ffb6f3 0%, #a7c9ff 35%, #a8ffcf 70%, #ffd6f5 100%);
             min-height: 100vh;
           }
           h1, h2 {
@@ -295,7 +295,7 @@ function CouponsReport() {
           }
 
           .card {
-            background: linear-gradient(135deg, #ffffff, #e9ecef);
+            background: linear-gradient(135deg, #ffffffd6, #e9ecefd2);
             padding: 1.2rem 2rem;
             border-radius: 16px;
             min-width: 150px;
@@ -349,7 +349,7 @@ function CouponsReport() {
           }
 
           .chart {
-            background-color: #fff;
+            background-color: #ffffffd5;
             padding: 1rem;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -373,7 +373,7 @@ function CouponsReport() {
 
           .table-container {
             overflow-x: auto;
-            background-color: #fff;
+            background-color: #ffffffd6;
             padding: 1rem;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -387,7 +387,7 @@ function CouponsReport() {
           }
 
           thead tr {
-            background: #40739e;
+            background: #40749ed4;
             color: #fff;
             text-transform: uppercase;
             letter-spacing: 0.03em;
@@ -400,11 +400,11 @@ function CouponsReport() {
           }
 
           tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
+            background-color: #f8f9fad2;
           }
 
           tbody tr:hover {
-            background-color: #e2e6ea;
+            background-color: #e2e6eace;
             transition: 0.3s;
           }
 

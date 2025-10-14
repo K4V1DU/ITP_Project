@@ -84,7 +84,7 @@ function OrdersDashboard() {
         .dashboard-container {
           padding: 2rem;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: linear-gradient(135deg, #dcdcdcff 0%, #ffffffff 100%);
+          background: linear-gradient(135deg, #ffb6f3 0%, #a7c9ff 35%, #a8ffcf 70%, #ffd6f5 100%);
           min-height: 100vh;
         }
 
@@ -93,7 +93,7 @@ function OrdersDashboard() {
           font-weight: 700;
           margin-bottom: 2rem;
           text-align: center;
-          color: #273c75;
+          color: #000000ff;
           text-transform: uppercase;
           letter-spacing: 1px;
         }
@@ -106,7 +106,7 @@ function OrdersDashboard() {
           border-radius: 10px;
           border: 1px solid #dcdde1;
           font-size: 1rem;
-          background-color: #fff;
+          background-color: #ffffffe1;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
           transition: all 0.2s ease-in-out;
         }
@@ -120,7 +120,7 @@ function OrdersDashboard() {
 
         .table-container {
           overflow-x: auto;
-          background-color: #fff;
+          background-color: #ffffffd6;
           border-radius: 15px;
           box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
           margin-top: 2rem;
@@ -134,7 +134,7 @@ function OrdersDashboard() {
         }
 
         thead tr {
-          background-color: #40739e;
+          background-color: #40749ed7;
           color: #ffffff;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -154,12 +154,12 @@ function OrdersDashboard() {
         }
 
         tbody tr {
-          border-bottom: 1px solid #ecf0f1;
+          border-bottom: 1px solid #ecf0f1dd;
           transition: all 0.2s ease-in-out;
         }
 
         tbody tr:hover {
-          background-color: #f8f9fa;
+          background-color: #f8f9fad3;
           transform: scale(1.005);
         }
 

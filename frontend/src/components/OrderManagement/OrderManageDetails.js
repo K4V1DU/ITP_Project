@@ -269,13 +269,13 @@ function OrderManageDetails() {
   const styles = {
     container: {
       padding: "2rem",
-      background: "linear-gradient(135deg, #dcdcdcff, #ffffffff)",
+      background: "linear-gradient(135deg, #ffb6f3 0%, #a7c9ff 35%, #a8ffcf 70%, #ffd6f5 100%)",
       minHeight: "100vh",
     },
     wrapper: {
       maxWidth: "950px",
       margin: "0 auto",
-      backgroundColor: "#ffffff",
+      backgroundColor: "#ffffffd0",
       padding: "2.5rem",
       borderRadius: "15px",
       boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
@@ -283,7 +283,7 @@ function OrderManageDetails() {
     section: {
       marginBottom: "1.8rem",
       padding: "1.2rem 1.5rem",
-      backgroundColor: "#fafafa",
+      backgroundColor: "#fafafad6",
       borderRadius: "10px",
       borderLeft: "5px solid #0984e3",
       transition: "0.3s",
@@ -299,7 +299,7 @@ function OrderManageDetails() {
     itemCard: {
       marginBottom: "1rem",
       padding: "1rem",
-      backgroundColor: "#ffffff",
+      backgroundColor: "#ffffffd4",
       border: "1px solid #dfe6e9",
       borderRadius: "8px",
       boxShadow: "0 2px 5px rgba(0,0,0,0.05)",

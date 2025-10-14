@@ -272,7 +272,7 @@ function CouponsDashboard() {
         .dashboard-container {
           padding: 2rem;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: linear-gradient(135deg, #dcdcdcff 0%, #ffffffff 100%);
+           background: linear-gradient(135deg, #ffb6f3 0%, #a7c9ff 35%, #a8ffcf 70%, #ffd6f5 100%);
           min-height: 100vh;
         }
 
@@ -281,12 +281,12 @@ function CouponsDashboard() {
           font-weight: bold;
           margin-bottom: 2rem;
           text-align: center;
-          color: #2f3640;
+          color: #000000ff;
         }
 
         /* Form Containers */
         .form-container {
-          background-color: #ffffff;
+          background-color: #ffffffd4;
           padding: 1.5rem 2rem;
           border-radius: 12px;
           box-shadow: 0 5px 15px rgba(0,0,0,0.05);
@@ -322,7 +322,7 @@ function CouponsDashboard() {
         }
 
         .disabled-input {
-          background-color: #f0f0f0; color: #7f8fa6;
+          background-color: #f0f0f0d2; color: #7f8fa6;
          }
 
         /* Buttons */
@@ -391,7 +391,7 @@ function CouponsDashboard() {
         /* Table Styling */
         .table-container { 
           overflow-x: auto; 
-          background-color: #fff;
+          background-color: #ffffffd7;
           border-radius: 12px; 
           box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
         }
@@ -402,7 +402,7 @@ function CouponsDashboard() {
         }
 
         thead tr { 
-          background-color: #40739e; 
+          background-color: #40749ece; 
           color: #fff; 
         }
 
@@ -417,7 +417,7 @@ function CouponsDashboard() {
         }
 
         tbody tr:hover { 
-          background-color: #f1f2f6; 
+          background-color: #f1f2f6d8; 
         }
 
         /* Badges */

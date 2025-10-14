@@ -8,12 +8,11 @@ function Profile() {
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({});
-  const userId = localStorage.getItem("userId");
+  const userId = localStorage.getItem("userId"); 
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!userId) return;
-
     axios
       .get(`http://localhost:5000/profile/${userId}`)
       .then((res) => setUser(res.data.user))
@@ -59,245 +58,362 @@ function Profile() {
       return Swal.fire("Error", "Mobile number must be exactly 10 digits", "error");
     }
 
+    // Remove profilePicture field to prevent schema validation errors
+    const { profilePicture, ...dataToSend } = editData;
+
     axios
-      .put(`http://localhost:5000/profile/${userId}`, editData)
+      .put(`http://localhost:5000/profile/${userId}`, dataToSend)
       .then((res) => {
         setUser(res.data.user);
         setEditMode(false);
         Swal.fire("Success", "Profile updated successfully!", "success");
       })
-      .catch((err) =>
-        Swal.fire("Error", err.response?.data?.message || "Update failed", "error")
-      );
+      .catch((err) => {
+        console.error("Update Error:", err.response);
+        Swal.fire("Error", err.response?.data?.message || "Update failed", "error");
+      });
   };
 
-  if (!user) {
-    return <div className="loading">Loading profile...</div>;
-  }
+  if (!user) return <div style={styles.loading}>Loading profile...</div>;
 
   return (
-    
     <>
-      <style>{`
-        body {
-          font-family: 'Inter', sans-serif;
-          background-color: #f6f7f8;
-          color: #0d141b;
-          margin: 0;
-        }
-        .profile-container {
-          min-height: 120vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 40px;
-        }
-        .profile-card {
-          background-color: #fff;
-          padding: 40px 50px;
-          border-radius: 16px;
-          box-shadow: 0 8px 22px rgba(0,0,0,0.12);
-          width: 90%;
-          max-width: 500px;
-          transition: all 0.3s ease-in-out;
-        }
-        .profile-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-        }
-        .profile-title {
-          text-align: center;
-          font-size: 32px;
-          font-weight: 700;
-          margin-bottom: 16px;
-        }
-        .profile-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 24px;
-          margin-bottom: 24px;
-        }
-        .profile-grid-single {
-          margin-bottom: 24px;
-        }
-        .profile-label {
-          font-size: 16px;
-          font-weight: 600;
-          color: #6b7280;
-          margin-bottom: 6px;
-        }
-        .profile-value {
-          font-size: 18px;
-          color: #0d141b;
-          padding: 10px;
-          border: 1px solid #d1d5db;
-          border-radius: 8px;
-          background: #f9fafb;
-        }
-        .profile-input {
-          width: 100%;
-          padding: 10px;
-          border: 1px solid #d1d5db;
-          border-radius: 8px;
-          font-size: 16px;
-        }
-        .edit-btn, .save-btn, .logout-btn {
-          width: 100%;
-          padding: 14px 0;
-          color: #fff;
-          font-size: 18px;
-          font-weight: 700;
-          border: none;
-          border-radius: 12px;
-          cursor: pointer;
-          transition: background 0.3s ease;
-          margin-top: 10px;
-        }
-        .edit-btn {
-          background-color: #1173d4;
-        }
-        .edit-btn:hover {
-          background-color: #0e5bb5;
-        }
-        .save-btn {
-          background-color: #16a34a;
-        }
-        .save-btn:hover {
-          background-color: #13863e;
-        }
-        .logout-btn {
-          background-color: #e63946;
-        }
-        .logout-btn:hover {
-          background-color: #c72c3c;
-        }
-        .loading {
-          text-align: center;
-          font-size: 20px;
-          padding: 60px;
-        }
-      `}</style>
-      <Navbar/>
-      <div className="profile-container">
-        <div className="profile-card">
-          <h2 className="profile-title">User Profile</h2>
+      <Navbar />
+      <div style={styles.container}>
+        {/* Animated Background */}
+        <div style={styles.backgroundAnimation}></div>
+        
+        <div style={styles.profileCard}>
+          {/* Header Section */}
+          <div style={styles.header}>
+            <h2 style={styles.title}>User Profile</h2>
+            <p style={styles.subtitle}>Manage your personal information</p>
+          </div>
 
-          <div className="profile-grid">
-            <div>
-              <div className="profile-label">First Name</div>
+          {/* Profile Information */}
+          <div style={styles.content}>
+            {/* First Row */}
+            <div style={styles.row}>
+              <div style={styles.fieldGroup}>
+                <label style={styles.label}>First Name</label>
+                {editMode ? (
+                  <input 
+                    type="text" 
+                    name="FirstName" 
+                    value={editData.FirstName} 
+                    onChange={handleInputChange}
+                    style={styles.input}
+                  />
+                ) : (
+                  <div style={styles.value}>{user.FirstName}</div>
+                )}
+              </div>
+              
+              <div style={styles.fieldGroup}>
+                <label style={styles.label}>Last Name</label>
+                {editMode ? (
+                  <input 
+                    type="text" 
+                    name="LastName" 
+                    value={editData.LastName} 
+                    onChange={handleInputChange}
+                    style={styles.input}
+                  />
+                ) : (
+                  <div style={styles.value}>{user.LastName}</div>
+                )}
+              </div>
+            </div>
+
+            {/* Second Row */}
+            <div style={styles.row}>
+              <div style={styles.fieldGroup}>
+                <label style={styles.label}>Username</label>
+                {editMode ? (
+                  <input 
+                    type="text" 
+                    name="UserName" 
+                    value={editData.UserName} 
+                    onChange={handleInputChange}
+                    style={styles.input}
+                  />
+                ) : (
+                  <div style={styles.value}>{user.UserName}</div>
+                )}
+              </div>
+              
+              <div style={styles.fieldGroup}>
+                <label style={styles.label}>Role</label>
+                <div style={styles.roleBadge}>
+                  {user.Role}
+                </div>
+              </div>
+            </div>
+
+            {/* Third Row */}
+            <div style={styles.fullWidthField}>
+              <label style={styles.label}>Email</label>
               {editMode ? (
-                <input
-                  type="text"
-                  name="FirstName"
-                  className="profile-input"
-                  value={editData.FirstName}
+                <input 
+                  type="email" 
+                  name="Email" 
+                  value={editData.Email} 
                   onChange={handleInputChange}
+                  style={styles.input}
                 />
               ) : (
-                <div className="profile-value">{user.FirstName}</div>
+                <div style={styles.value}>{user.Email}</div>
               )}
             </div>
-            <div>
-              <div className="profile-label">Last Name</div>
-              {editMode ? (
-                <input
-                  type="text"
-                  name="LastName"
-                  className="profile-input"
-                  value={editData.LastName}
-                  onChange={handleInputChange}
-                />
-              ) : (
-                <div className="profile-value">{user.LastName}</div>
-              )}
+
+            {/* Fourth Row */}
+            <div style={styles.row}>
+              <div style={styles.fieldGroup}>
+                <label style={styles.label}>Mobile</label>
+                {editMode ? (
+                  <input 
+                    type="text" 
+                    name="Mobile" 
+                    value={editData.Mobile} 
+                    onChange={handleInputChange}
+                    style={styles.input}
+                  />
+                ) : (
+                  <div style={styles.value}>{user.Mobile}</div>
+                )}
+              </div>
+              
+              <div style={styles.fieldGroup}>
+                <label style={styles.label}>Address</label>
+                {editMode ? (
+                  <input 
+                    type="text" 
+                    name="Address" 
+                    value={editData.Address} 
+                    onChange={handleInputChange}
+                    style={styles.input}
+                  />
+                ) : (
+                  <div style={styles.value}>{user.Address}</div>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="profile-grid-single">
-            <div className="profile-label">Username</div>
-            {editMode ? (
-              <input
-                type="text"
-                name="UserName"
-                className="profile-input"
-                value={editData.UserName}
-                onChange={handleInputChange}
-              />
+          {/* Action Buttons */}
+          <div style={styles.actions}>
+            {!editMode ? (
+              <button style={styles.editButton} onClick={handleEditClick}>
+                Edit Profile
+              </button>
             ) : (
-              <div className="profile-value">{user.UserName}</div>
+              <button style={styles.saveButton} onClick={handleSave}>
+                Save Changes
+              </button>
             )}
-          </div>
-
-          <div className="profile-grid-single">
-            <div className="profile-label">Email</div>
-            {editMode ? (
-              <input
-                type="email"
-                name="Email"
-                className="profile-input"
-                value={editData.Email}
-                onChange={handleInputChange}
-              />
-            ) : (
-              <div className="profile-value">{user.Email}</div>
-            )}
-          </div>
-
-          <div className="profile-grid-single">
-            <div className="profile-label">Role</div>
-            <div className="profile-value">{user.Role}</div>
-          </div>
-
-          <div className="profile-grid">
-            <div>
-              <div className="profile-label">Mobile</div>
-              {editMode ? (
-                <input
-                  type="text"
-                  name="Mobile"
-                  className="profile-input"
-                  value={editData.Mobile}
-                  onChange={handleInputChange}
-                />
-              ) : (
-                <div className="profile-value">{user.Mobile}</div>
-              )}
-            </div>
-            <div>
-              <div className="profile-label">Address</div>
-              {editMode ? (
-                <input
-                  type="text"
-                  name="Address"
-                  className="profile-input"
-                  value={editData.Address}
-                  onChange={handleInputChange}
-                />
-              ) : (
-                <div className="profile-value">{user.Address}</div>
-              )}
-            </div>
-          </div>
-
-          {!editMode && (
-            <button className="edit-btn" onClick={handleEditClick}>
-              Edit Your Details
+            <button style={styles.logoutButton} onClick={handleLogout}>
+              Logout
             </button>
-          )}
-
-          {editMode && (
-            <button className="save-btn" onClick={handleSave}>
-              Save Changes
-            </button>
-          )}
-
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          </div>
         </div>
       </div>
     </>
   );
 }
+
+// Professional CSS Styles with Enhanced Background Animation
+const styles = {
+  container: {
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+    padding: "40px 20px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    position: "relative",
+    overflow: "hidden",
+  },
+  backgroundAnimation: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: `
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%)
+    `,
+    animation: "float 6s ease-in-out infinite",
+  },
+  profileCard: {
+    backgroundColor: "white",
+    borderRadius: "20px",
+    padding: "40px",
+    width: "100%",
+    maxWidth: "700px",
+    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.1)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    position: "relative",
+    zIndex: 1,
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: "40px",
+    borderBottom: "2px solid #f8f9fa",
+    paddingBottom: "30px",
+  },
+  title: {
+    fontSize: "32px",
+    fontWeight: "700",
+    color: "#2c3e50",
+    margin: "0 0 8px 0",
+  },
+  subtitle: {
+    fontSize: "16px",
+    color: "#7f8c8d",
+    margin: "0",
+  },
+  content: {
+    marginBottom: "30px",
+  },
+  row: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "25px",
+    marginBottom: "25px",
+  },
+  fieldGroup: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  fullWidthField: {
+    display: "flex",
+    flexDirection: "column",
+    marginBottom: "25px",
+  },
+  label: {
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "#2c3e50",
+    marginBottom: "8px",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+  },
+  value: {
+    fontSize: "16px",
+    color: "#34495e",
+    padding: "12px 16px",
+    backgroundColor: "#f8f9fa",
+    border: "1px solid #e9ecef",
+    borderRadius: "8px",
+    minHeight: "44px",
+    display: "flex",
+    alignItems: "center",
+  },
+  input: {
+    padding: "12px 16px",
+    border: "2px solid #e9ecef",
+    borderRadius: "8px",
+    fontSize: "16px",
+    transition: "all 0.3s ease",
+    outline: "none",
+  },
+  roleBadge: {
+    padding: "12px 16px",
+    backgroundColor: "#e3f2fd",
+    color: "#1976d2",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: "600",
+    textAlign: "center",
+    border: "1px solid #bbdefb",
+    minHeight: "44px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actions: {
+    display: "flex",
+    gap: "15px",
+    flexDirection: "column",
+  },
+  editButton: {
+    padding: "14px 20px",
+    backgroundColor: "#3498db",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+  },
+  saveButton: {
+    padding: "14px 20px",
+    backgroundColor: "#27ae60",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+  },
+  logoutButton: {
+    padding: "14px 20px",
+    backgroundColor: "#e74c3c",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+  },
+  loading: {
+    textAlign: "center",
+    fontSize: "18px",
+    padding: "60px",
+    color: "#7f8c8d",
+  },
+};
+
+// Add CSS animation for background
+const styleSheet = document.styleSheets[0];
+if (styleSheet) {
+  styleSheet.insertRule(`
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(180deg); }
+    }
+  `, styleSheet.cssRules.length);
+}
+
+// Add hover effects
+styles.editButton = {
+  ...styles.editButton,
+  ":hover": {
+    backgroundColor: "#2980b9",
+    transform: "translateY(-2px)",
+  },
+};
+
+styles.saveButton = {
+  ...styles.saveButton,
+  ":hover": {
+    backgroundColor: "#219653",
+    transform: "translateY(-2px)",
+  },
+};
+
+styles.logoutButton = {
+  ...styles.logoutButton,
+  ":hover": {
+    backgroundColor: "#c0392b",
+    transform: "translateY(-2px)",
+  },
+};
 
 export default Profile;

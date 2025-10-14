@@ -50,7 +50,7 @@ function Checkout() {
         );
         return {
           ...item,
-          Stock: res.data.products.Quantity,
+          Stock: res.data.product.Quantity,
         };
       });
 

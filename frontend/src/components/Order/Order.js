@@ -32,7 +32,7 @@ useEffect(() => {
   const fetchHandler = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/inventory/${id}`);
-      const prod = res.data.products;
+      const prod = res.data.product;
       setProduct(prod);
 
       

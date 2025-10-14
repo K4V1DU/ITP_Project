@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 import React, { useEffect, useState } from "react";
 import Navbar from "../NavBar/NavBar";
 import axios from "axios";
@@ -145,7 +144,7 @@ function Inventory() {
                         key={item._id}
                         style={{
                           backgroundColor:
-                            item.Quantity < 100 ? "#f18484ff" : "transparent", //highlight low stock
+                            item.Quantity < 100 ? "#f8d2d2ff" : "transparent", // 🔴 highlight low stock
                         }}
                       >
                         <td>{item.ProductID}</td>
@@ -205,20 +204,8 @@ function Inventory() {
           </button>
         </div>
       </div>
-=======
-import React from 'react'
-
-function inventory() {
-  return (
-    <div>
-      <h1>Inventory</h1>
->>>>>>> Stashed changes
     </div>
   );
 }
 
-<<<<<<< Updated upstream
 export default Inventory;
-=======
-export default inventory
->>>>>>> Stashed changes

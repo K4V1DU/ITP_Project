@@ -1,6 +1,6 @@
 const Users = require("../Model/UsersModel");
 
-//GET profile
+// GET profile
 exports.getProfile = async (req, res) => {
   try {
     const user = await Users.findById(req.params.id).select("-Password");
@@ -12,7 +12,7 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-//UPDATE profile details
+// UPDATE profile details
 exports.updateProfile = async (req, res) => {
   const { FirstName, LastName, UserName, Email, Mobile, Address } = req.body;
 
@@ -39,33 +39,5 @@ exports.updateProfile = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
-  }
-};
-
-//UPDATE profile picture
-exports.updateProfilePicture = async (req, res) => {
-  try {
-    const userId = req.params.id;
-
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded" });
-    }
-
-    const filePath = `/profile_pics/${req.file.filename}`;
-
-    const user = await Users.findByIdAndUpdate(
-      userId,
-      { profilePicture: filePath },
-      { new: true }
-    );
-
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
-    res.json({ success: true, user });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: err.message });
   }
 };

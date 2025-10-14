@@ -1,5 +1,5 @@
 // src/components/Finance/PaymentReport.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Box, Typography, Container, Paper, Button, Card, CardContent,
@@ -29,8 +29,6 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { motion } from "framer-motion";
 import axios from "axios";
-
-// ✅ CORRECT IMPORTS FOR PDF
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -110,6 +108,48 @@ const iceColors = {
   gradient5: "linear-gradient(135deg, #fa8bff 0%, #2bd2ff 90%, #2bff88 100%)"
 };
 
+const StatCard = ({ icon, label, value, gradient, delay }) => (
+  <Grid item xs={12} sm={6} md={3}>
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, type: "spring", stiffness: 100 }}
+    >
+      <motion.div 
+        whileHover={{ scale: 1.08, rotate: 2 }} 
+        whileTap={{ scale: 0.95 }}
+      >
+        <Card
+          className="stats-card"
+          sx={{
+            borderRadius: 4,
+            background: gradient,
+            boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+            overflow: 'hidden',
+            cursor: 'pointer'
+          }}
+        >
+          <CardContent>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box>
+                <Typography variant="subtitle2" sx={{ color: 'white', opacity: 0.9, mb: 1 }}>
+                  {label}
+                </Typography>
+                <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'white' }}>
+                  {value}
+                </Typography>
+              </Box>
+              <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.3)', width: 60, height: 60 }}>
+                {icon}
+              </Avatar>
+            </Box>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </motion.div>
+  </Grid>
+);
+
 export default function PaymentReport() {
   const navigate = useNavigate();
   const [payments, setPayments] = useState([]);
@@ -121,12 +161,11 @@ export default function PaymentReport() {
 
   const API_URL = "http://localhost:5000";
 
-  useEffect(() => {
-    fetchPayments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const showNotification = useCallback((message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
   }, []);
 
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get(`${API_URL}/finance/payments`);
@@ -138,11 +177,11 @@ export default function PaymentReport() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_URL, showNotification]);
 
-  const showNotification = (message, severity = "success") => {
-    setSnackbar({ open: true, message, severity });
-  };
+  useEffect(() => {
+    fetchPayments();
+  }, [fetchPayments]);
 
   // Filter data
   const filteredData = payments.filter(p => {
@@ -208,96 +247,263 @@ export default function PaymentReport() {
     }
   };
 
-  // ✅ FIXED PDF EXPORT
+  // ✅ ICE CREAM THEMED PDF EXPORT (INSIDE COMPONENT)
   const exportPDF = () => {
     try {
       const doc = new jsPDF();
       
-      // Title
+      // Company Header
+      doc.setFillColor(255, 182, 193);
+      doc.rect(0, 0, 210, 35, 'F');
+      
+      // Ice cream cone decorations
+      doc.setFillColor(255, 223, 186);
+      doc.setDrawColor(255, 223, 186);
+      doc.setLineWidth(0);
+      doc.line(10, 18, 15, 8);
+      doc.line(15, 8, 20, 18);
+      doc.line(20, 18, 10, 18);
+      doc.setFillColor(255, 192, 203);
+      doc.circle(15, 7, 4, 'F');
+      
+      doc.setFillColor(255, 223, 186);
+      doc.line(190, 18, 195, 8);
+      doc.line(195, 8, 200, 18);
+      doc.line(200, 18, 190, 18);
+      doc.setFillColor(176, 224, 230);
+      doc.circle(195, 7, 4, 'F');
+      
+      // Company Name
+      doc.setFontSize(28);
+      doc.setTextColor(139, 69, 19);
+      doc.setFont("helvetica", "bold");
+      doc.text("CoolCart Ice Cream Agency", 105, 15, { align: "center" });
+      
+      // Tagline
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(139, 69, 19);
+      doc.text("Sweet Moments, Delivered with Love", 105, 23, { align: "center" });
+      
+      // Wavy line
+      doc.setLineWidth(2);
+      doc.setDrawColor(255, 228, 225);
+      for (let i = 0; i < 210; i += 10) {
+        doc.line(i, 28, i + 5, 30);
+        doc.line(i + 5, 30, i + 10, 28);
+      }
+      
+      // Report Title
       doc.setFontSize(22);
-      doc.setTextColor(255, 107, 157);
-      doc.text("Payment Report", 105, 20, { align: "center" });
+      doc.setTextColor(255, 105, 180);
+      doc.setFont("helvetica", "bold");
+      doc.text("Payment Report", 105, 45, { align: "center" });
       
-      // Subtitle line
-      doc.setLineWidth(0.5);
-      doc.setDrawColor(255, 107, 157);
-      doc.line(40, 25, 170, 25);
-      
-      // Date
+      // Date Generated
       doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text(`Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 105, 32, { align: "center" });
+      doc.setTextColor(60, 60, 60);
+      doc.setFont("helvetica", "normal");
+      const generatedDate = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      const generatedTime = new Date().toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      doc.text(`Generated: ${generatedDate} at ${generatedTime}`, 105, 52, { align: "center" });
       
       // Summary Box
-      doc.setFillColor(250, 112, 154);
-      doc.roundedRect(15, 38, 180, 32, 3, 3, 'F');
+      const boxY = 58;
+      const boxHeight = 35;
       
-      doc.setFontSize(12);
-      doc.setTextColor(255, 255, 255);
-      doc.text(`Total Payments: ${total}`, 20, 48);
-      doc.text(`Approved: ${approved}`, 20, 56);
-      doc.text(`Pending: ${pending}`, 20, 64);
-      doc.text(`Rejected: ${rejected}`, 120, 48);
+      doc.setFillColor(255, 250, 240);
+      doc.roundedRect(15, boxY, 180, boxHeight, 4, 4, 'F');
+      
+      doc.setDrawColor(255, 182, 193);
+      doc.setLineWidth(1.5);
+      doc.roundedRect(15, boxY, 180, boxHeight, 4, 4, 'S');
+      
+      // Ice cream scoops decoration
+      doc.setFillColor(255, 192, 203);
+      doc.circle(20, 63, 3, 'F');
+      doc.setFillColor(176, 224, 230);
+      doc.circle(190, 63, 3, 'F');
+      doc.setFillColor(152, 251, 152);
+      doc.circle(20, 88, 3, 'F');
+      doc.setFillColor(255, 218, 185);
+      doc.circle(190, 88, 3, 'F');
+      
+      // Summary Title
+      doc.setFontSize(13);
+      doc.setTextColor(255, 105, 180);
+      doc.setFont("helvetica", "bold");
+      doc.text("Summary Overview", 105, 65, { align: "center" });
+      
+      // Summary Details
+      doc.setFontSize(11);
+      doc.setTextColor(50, 50, 50);
+      doc.setFont("helvetica", "bold");
+      
+      doc.text(`Total Payments: ${total}`, 25, 73);
+      doc.setTextColor(34, 139, 34);
+      doc.text(`Approved: ${approved}`, 25, 80);
+      doc.setTextColor(255, 140, 0);
+      doc.text(`Pending: ${pending}`, 25, 87);
       
       const approvalRate = total > 0 ? Math.round((approved / total) * 100) : 0;
       const rejectionRate = total > 0 ? Math.round((rejected / total) * 100) : 0;
-      doc.text(`Approval Rate: ${approvalRate}%`, 120, 56);
-      doc.text(`Rejection Rate: ${rejectionRate}%`, 120, 64);
+      
+      doc.setTextColor(220, 20, 60);
+      doc.text(`Rejected: ${rejected}`, 115, 73);
+      doc.setTextColor(34, 139, 34);
+      doc.text(`Approval Rate: ${approvalRate}%`, 115, 80);
+      doc.setTextColor(220, 20, 60);
+      doc.text(`Rejection Rate: ${rejectionRate}%`, 115, 87);
       
       // Table Data
       const tableData = filteredData.map(p => [
         p.OrderNumber,
         p.Status,
-        new Date(p.UploadDate).toLocaleDateString(),
+        new Date(p.UploadDate).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }),
         (p.Notes || "N/A").substring(0, 50)
       ]);
       
-      // ✅ FIXED: Use autoTable function
+      // Table
       autoTable(doc, {
-        startY: 78,
+        startY: 98,
         head: [["Order #", "Status", "Upload Date", "Notes"]],
         body: tableData,
         theme: 'striped',
         headStyles: { 
-          fillColor: [255, 107, 157],
-          textColor: [255, 255, 255],
+          fillColor: [255, 182, 193],
+          textColor: [50, 50, 50],
           fontStyle: 'bold',
           fontSize: 11,
-          halign: 'center'
+          halign: 'center',
+          cellPadding: 5
         },
         styles: { 
           fontSize: 9,
           cellPadding: 4,
-          overflow: 'linebreak'
+          overflow: 'linebreak',
+          lineColor: [255, 228, 225],
+          lineWidth: 0.5,
+          textColor: [50, 50, 50]
         },
         columnStyles: {
-          0: { halign: 'center', fontStyle: 'bold' },
-          1: { halign: 'center' },
-          2: { halign: 'center' },
-          3: { halign: 'left' }
+          0: { halign: 'center', fontStyle: 'bold', cellWidth: 30, textColor: [255, 105, 180] },
+          1: { halign: 'center', cellWidth: 30 },
+          2: { halign: 'center', cellWidth: 40 },
+          3: { halign: 'left', cellWidth: 'auto' }
         },
         alternateRowStyles: {
-          fillColor: [245, 245, 245]
+          fillColor: [255, 250, 240]
         },
-        margin: { top: 78, left: 15, right: 15 }
+        bodyStyles: {
+          textColor: [50, 50, 50]
+        },
+        margin: { left: 15, right: 15 },
+        didParseCell: function(data) {
+          if (data.column.index === 1 && data.section === 'body') {
+            const status = data.cell.raw;
+            if (status === 'Approved') {
+              data.cell.styles.fillColor = [144, 238, 144];
+              data.cell.styles.textColor = [0, 100, 0];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (status === 'Pending') {
+              data.cell.styles.fillColor = [255, 218, 185];
+              data.cell.styles.textColor = [139, 69, 19];
+              data.cell.styles.fontStyle = 'bold';
+            } else if (status === 'Rejected') {
+              data.cell.styles.fillColor = [255, 192, 203];
+              data.cell.styles.textColor = [139, 0, 0];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        },
+        didDrawPage: function(data) {
+          const pageCount = doc.internal.getNumberOfPages();
+          const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+          
+          // Footer background
+          doc.setFillColor(255, 228, 225);
+          doc.rect(0, doc.internal.pageSize.height - 20, 210, 20, 'F');
+          
+          // Ice cream decoration in footer
+          doc.setFillColor(176, 224, 230);
+          doc.circle(18, doc.internal.pageSize.height - 13, 3, 'F');
+          
+          doc.setFontSize(9);
+          doc.setTextColor(50, 50, 50);
+          doc.setFont("helvetica", "bold");
+          doc.text(
+            `CoolCart Ice Cream Agency - Payment Report`,
+            25,
+            doc.internal.pageSize.height - 10
+          );
+          doc.setFont("helvetica", "normal");
+          doc.text(
+            `Page ${currentPage} of ${pageCount}`,
+            195,
+            doc.internal.pageSize.height - 10,
+            { align: 'right' }
+          );
+        }
       });
       
-      // Footer
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150);
-        doc.text(
-          `Page ${i} of ${pageCount}`,
-          105,
-          doc.internal.pageSize.height - 10,
-          { align: 'center' }
-        );
+      // Statistics Summary
+      const finalY = doc.lastAutoTable.finalY || 200;
+      
+      if (finalY < 220) {
+        doc.setFillColor(255, 250, 240);
+        doc.roundedRect(15, finalY + 10, 180, 35, 4, 4, 'F');
+        
+        doc.setDrawColor(255, 182, 193);
+        doc.setLineWidth(1.5);
+        doc.roundedRect(15, finalY + 10, 180, 35, 4, 4, 'S');
+        
+        // Decorative circles
+        doc.setFillColor(255, 192, 203);
+        doc.circle(20, finalY + 15, 3, 'F');
+        doc.setFillColor(152, 251, 152);
+        doc.circle(25, finalY + 15, 3, 'F');
+        doc.setFillColor(176, 224, 230);
+        doc.circle(30, finalY + 15, 3, 'F');
+        
+        doc.setFontSize(12);
+        doc.setTextColor(255, 105, 180);
+        doc.setFont("helvetica", "bold");
+        doc.text("Key Insights", 40, finalY + 18);
+        
+        doc.setFontSize(9);
+        doc.setTextColor(50, 50, 50);
+        doc.setFont("helvetica", "normal");
+        
+        const mostCommon = approved > pending && approved > rejected 
+          ? 'Approved (Mint Success!)' 
+          : pending > rejected 
+          ? 'Pending (Processing)' 
+          : 'Rejected (Alert)';
+        const pendingRate = total > 0 ? Math.round((pending / total) * 100) : 0;
+        
+        doc.text(`Most Common Status: ${mostCommon}`, 20, finalY + 26);
+        doc.text(`Pending Rate: ${pendingRate}%`, 20, finalY + 32);
+        doc.text(`Total Filtered Records: ${filteredData.length}`, 20, finalY + 38);
+        doc.text(`Generated By: Finance Team`, 115, finalY + 26);
+        doc.text(`Report Date: ${generatedDate}`, 115, finalY + 32);
+        doc.text(`Report Time: ${generatedTime}`, 115, finalY + 38);
       }
       
-      doc.save(`payment-report-${new Date().toISOString().split('T')[0]}.pdf`);
+      const fileName = `CoolCart_Payment_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
       showNotification("PDF exported successfully!", "success");
+      
     } catch (error) {
       console.error("PDF Export Error:", error);
       showNotification("Failed to export PDF: " + error.message, "error");
@@ -308,48 +514,6 @@ export default function PaymentReport() {
     window.print();
     showNotification("Opening print dialog...", "info");
   };
-
-  const StatCard = ({ icon, label, value, gradient, delay }) => (
-    <Grid item xs={12} sm={6} md={3}>
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay, type: "spring", stiffness: 100 }}
-      >
-        <motion.div 
-          whileHover={{ scale: 1.08, rotate: 2 }} 
-          whileTap={{ scale: 0.95 }}
-        >
-          <Card
-            className="stats-card"
-            sx={{
-              borderRadius: 4,
-              background: gradient,
-              boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-              overflow: 'hidden',
-              cursor: 'pointer'
-            }}
-          >
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="subtitle2" sx={{ color: 'white', opacity: 0.9, mb: 1 }}>
-                    {label}
-                  </Typography>
-                  <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'white' }}>
-                    {value}
-                  </Typography>
-                </Box>
-                <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.3)', width: 60, height: 60 }}>
-                  {icon}
-                </Avatar>
-              </Box>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </motion.div>
-    </Grid>
-  );
 
   return (
     <Box className="animated-bg" sx={{ minHeight: "100vh", py: 4, px: 2, position: "relative" }}>
@@ -362,7 +526,7 @@ export default function PaymentReport() {
       <TrendingUpIcon className="floating-icon icon-4" />
 
       <Container maxWidth="xl" sx={{ position: "relative", zIndex: 1 }}>
-        {/* ✅ UPDATED HEADER WITH DASHBOARD LINK */}
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -402,10 +566,8 @@ export default function PaymentReport() {
                 </Box>
               </Grid>
               
-              {/* ✅ ACTION BUTTONS */}
               <Grid item xs={12} md={6}>
                 <Box display="flex" gap={1} justifyContent="flex-end" flexWrap="wrap" mt={{ xs: 2, md: 0 }}>
-                  {/* Back to Dashboard Button */}
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button
                       variant="contained"
@@ -427,7 +589,6 @@ export default function PaymentReport() {
                     </Button>
                   </motion.div>
 
-                  {/* Refresh Button */}
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Tooltip title="Refresh Data">
                       <Button
@@ -452,7 +613,6 @@ export default function PaymentReport() {
                     </Tooltip>
                   </motion.div>
 
-                  {/* Date Chip */}
                   <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                     <Chip
                       icon={<CalendarTodayIcon />}
@@ -652,13 +812,13 @@ export default function PaymentReport() {
                     </TableRow>
                   ) : (
                     filteredData.map((payment, idx) => (
-                      <motion.tr
+                      <TableRow
                         key={payment._id}
                         className="table-row"
+                        component={motion.tr}
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.03 }}
-                        component="tr"
                       >
                         <TableCell>
                           <Typography variant="h6" fontWeight="bold" color="primary">
@@ -692,7 +852,7 @@ export default function PaymentReport() {
                             {payment.Notes || "No notes"}
                           </Typography>
                         </TableCell>
-                      </motion.tr>
+                      </TableRow>
                     ))
                   )}
                 </TableBody>

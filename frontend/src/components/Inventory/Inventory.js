@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable"; // ✅ Fixed import
+import autoTable from "jspdf-autotable"; 
 import "./Inventory.css";
 
 function Inventory() {
@@ -20,7 +20,7 @@ function Inventory() {
         const products = res.data.products || [];
         setInventory(products);
 
-        // ✅ Check for low stock and show notification
+        // Check for low stock and show notification
         const lowStockItems = products.filter((item) => item.Quantity < 100);
         if (lowStockItems.length > 0) {
           toast.warning(
@@ -60,7 +60,7 @@ function Inventory() {
     );
   });
 
-  // ✅ Fixed PDF Generator
+  // Fixed PDF Generator
   const generatePDF = () => {
     const doc = new jsPDF();
     const tableColumn = [
@@ -144,7 +144,7 @@ function Inventory() {
                         key={item._id}
                         style={{
                           backgroundColor:
-                            item.Quantity < 100 ? "#f8d2d2ff" : "transparent", // 🔴 highlight low stock
+                            item.Quantity < 100 ? "#f8bdbdff" : "transparent", //  highlight low stock
                         }}
                       >
                         <td>{item.ProductID}</td>

@@ -32,7 +32,9 @@ import OrdersReport from "./components/OrderManagement/OrderManageReport.js";
 import FinanceDashboard from "./components/Finance/FinanceDashboard";
 import EditReceipt from "./components/Finance/EditReceipt";
 import ReceiptView from "./components/Finance/ReceiptView";
+import PaymentReport from './components/Finance/PaymentReport';
 import ContactPage from "./components/Home/contact/contact.js";
+
 
 function App() {
   return (
@@ -71,7 +73,9 @@ function App() {
       <Route path="/FinanceDashboard" element={<FinanceDashboard />} />
       <Route path="/edit-receipt/:orderNumber" element={<EditReceipt />} />
       <Route path="/receipt/:id" element={<ReceiptView />} />
+      <Route path="/payment-report" element={<PaymentReport />} />
       <Route path="/Contact" element={<ContactPage />} />
+
     </Routes>
   );
 }

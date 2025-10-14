@@ -6,6 +6,7 @@ const products = require("../Model/InventoryModel");
 
 //insert controller
 const InventoryController = require("../Controllers/InventoryController");
+const { updateInventoryController } = require("../Controllers/updateInventoryController");
 
 router.get("/",InventoryController.getAllProducts);
 router.post("/", (req, res, next) => {
@@ -16,6 +17,8 @@ router.get("/:id",InventoryController.getById);
 router.put("/:id",InventoryController.updateProduct);
 router.delete("/:id",InventoryController.deleteProduct);
 router.put("/update/:id", InventoryController.updateInventory);
+router.put("/:id", updateInventoryController);
+
 
 //export
 module.exports = router;

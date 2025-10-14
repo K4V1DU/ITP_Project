@@ -1,5 +1,6 @@
 const Inventory = require("../Model/InventoryModel");
 
+
 const updateInventoryController = async (req, res) => {
   const { id } = req.params;
   const {

@@ -6,7 +6,6 @@ import Navbar from "../NavBar/NavBar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 function EditProduct() {
   const history = useNavigate();
   const { id } = useParams();
@@ -23,13 +22,33 @@ function EditProduct() {
     URL: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const res = await axios.get(`http://localhost:5000/Inventory/${id}`);
         console.log("Fetched product:", res.data);
-        setInputs(res.data.product || {}); // use singular key
+        
+        if (res.data.product) {
+          setInputs({
+            ProductID: res.data.product.ProductID || "",
+            Name: res.data.product.Name || "",
+            Price: res.data.product.Price || "",
+            Description: res.data.product.Description || "",
+            Quantity: res.data.product.Quantity || "",
+            Category: res.data.product.Category || "",
+            Flavour: res.data.product.Flavour || "",
+            Capacity: res.data.product.Capacity || "",
+            URL: res.data.product.URL || "",
+          });
+          
+          // Debug 
+          console.log("Category:", res.data.product.Category);
+          console.log("Flavour:", res.data.product.Flavour);
+        }
+        
       } catch (err) {
         console.error("Error fetching product:", err);
         toast.error("Failed to load product", { position: "top-center" });
@@ -43,8 +62,8 @@ function EditProduct() {
 
     // ProductID validation
     if (name === "ProductID") {
-      if (/^\d+$/.test(value)) {
-        toast.error("Product ID cannot be a number", {
+      if (/^\d+$/.test(value) && value !== "") {
+        toast.error("Product ID cannot be only numbers", {
           position: "top-center",
         });
         return;
@@ -59,7 +78,7 @@ function EditProduct() {
 
     // Name validation
     if (name === "Name") {
-      if (/^[a-zA-Z\s.,'-]*$/.test(value)) {
+      if (!/^[a-zA-Z\s.,'-]*$/.test(value) && value !== "") {
         toast.error(
           "Product Name can only contain letters and basic punctuation",
           { position: "top-center" }
@@ -70,9 +89,9 @@ function EditProduct() {
 
     // Description validation
     if (name === "Description") {
-      if (/^[a-zA-Z\s.,'-]*$/.test(value)) {
+      if (!/^[a-zA-Z0-9\s.,'-]*$/.test(value) && value !== "") {
         toast.error(
-          "Description can only contain letters and basic punctuation",
+          "Description can only contain letters, numbers and basic punctuation",
           { position: "top-center" }
         );
         return;
@@ -81,7 +100,7 @@ function EditProduct() {
 
     // Price validation
     if (name === "Price") {
-      if (Number(value) <= 0) {
+      if (Number(value) <= 0 && value !== "") {
         toast.error("Price must be greater than 0", { position: "top-center" });
         return;
       }
@@ -99,13 +118,35 @@ function EditProduct() {
       }
     }
 
+    // Capacity validation
+    if (name === "Capacity") {
+      if (value.trim() !== "") {
+        const validCapacityFormat = /^[0-9]+(\.[0-9]+)?\s?(ml|ML|l|L|g|G|kg|KG|oz|OZ|lb|LB)$/;
+        const validTextFormat = /^(Small|Medium|Large|small|medium|large|SMALL|MEDIUM|LARGE)$/;
+
+        if (!validCapacityFormat.test(value) && !validTextFormat.test(value)) {
+          toast.error(
+            "Capacity must be in valid format (e.g., 250ml, 1L, 500g) or text (Small, Medium, Large)",
+            { position: "top-center", autoClose: 3000 }
+          );
+          return;
+        }
+
+        if (!/^[0-9a-zA-Z.\s]+$/.test(value)) {
+          toast.error("Capacity cannot contain special characters", {
+            position: "top-center",
+          });
+          return;
+        }
+      }
+    }
+
     setInputs((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  // Send update request
   const sendRequest = async () => {
     try {
       const res = await axios.put(`http://localhost:5000/Inventory/${id}`, {
@@ -119,15 +160,22 @@ function EditProduct() {
         Capacity: String(inputs.Capacity),
         URL: String(inputs.URL),
       });
+      
       console.log("Product updated:", res.data);
+      toast.success("Product updated successfully!", { position: "top-center" });
       return res.data;
+      
     } catch (err) {
       console.error("Error updating product:", err.response?.data || err);
-      toast.error("Update failed", { position: "top-center" });
+      toast.error(
+        err.response?.data?.message || "Update failed. Please try again.",
+        { position: "top-center" }
+      );
+      throw err;
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!inputs.Category) {
@@ -138,12 +186,33 @@ function EditProduct() {
       toast.error("Please select a flavour", { position: "top-center" });
       return;
     }
-    if (!inputs.Capacity) {
-      toast.error("Please select a capacity", { position: "top-center" });
+    if (!inputs.Capacity || inputs.Capacity.trim() === "") {
+      toast.error("Please enter a capacity", { position: "top-center" });
       return;
     }
 
-    sendRequest().then(() => history("/Inventory"));
+    const validCapacityFormat = /^[0-9]+(\.[0-9]+)?\s?(ml|ML|l|L|g|G|kg|KG|oz|OZ|lb|LB)$/;
+    const validTextFormat = /^(Small|Medium|Large|small|medium|large|SMALL|MEDIUM|LARGE)$/;
+    
+    if (!validCapacityFormat.test(inputs.Capacity) && !validTextFormat.test(inputs.Capacity)) {
+      toast.error("Please enter a valid capacity format", { position: "top-center" });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await sendRequest();
+      
+      setTimeout(() => {
+        history("/Inventory");
+      }, 1500);
+      
+    } catch (err) {
+      console.error("Submit failed:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -208,6 +277,7 @@ function EditProduct() {
           required
         />
 
+        {/*  Category*/}
         <h5>Category : </h5>
         <select
           name="Category"
@@ -217,12 +287,18 @@ function EditProduct() {
           required
         >
           <option value="">-- Select Category --</option>
-          <option value="Cups">Cups</option>
-          <option value="Tubs">Tubs</option>
-          <option value="Cones">Cones</option>
-          <option value="Bar">Bar</option>
+          <option value="Cup">Cup</option>
+          <option value="Stick">Stick</option>
+          <option value="Cone">Cone</option>
+          <option value="Family pack">Family pack</option>
         </select>
 
+        {/* Debug info */}
+        <p style={{ fontSize: '11px', color: '#999', margin: '5px 0' }}>
+          Selected: {inputs.Category || 'None'}
+        </p>
+
+        {/* Flavour */}
         <h5>Flavour : </h5>
         <select
           name="Flavour"
@@ -238,17 +314,25 @@ function EditProduct() {
           <option value="Mango">Mango</option>
         </select>
 
+        {/*  Debug info */}
+        <p style={{ fontSize: '11px', color: '#999', margin: '5px 0' }}>
+          Selected: {inputs.Flavour || 'None'}
+        </p>
+
         <h5>Capacity : </h5>
         <input
-          type="Capacity"
+          type="text"
           name="Capacity"
           value={inputs.Capacity}
           onChange={handleChange}
-          disabled
+          placeholder="e.g., 250ml, 1L, 500g, Small, Medium, Large"
           required
         />
+        <p style={{ fontSize: '11px', color: '#666', margin: '5px 0 15px 0' }}>
+          Format: Numbers + Unit (250ml, 1L, 500g) or Text (Small, Medium, Large)
+        </p>
 
-        <h5>Image : </h5>
+        <h5>Image URL : </h5>
         <input
           type="text"
           name="URL"
@@ -259,8 +343,16 @@ function EditProduct() {
 
         <br />
         <br />
-        <button type="submit">Update Product</button>
-        <button type="button" onClick={() => history("/Inventory")}>
+        
+        <button type="submit" disabled={loading}>
+          {loading ? "Updating..." : "Update Product"}
+        </button>
+        
+        <button 
+          type="button" 
+          onClick={() => history("/Inventory")}
+          disabled={loading}
+        >
           Cancel
         </button>
       </form>

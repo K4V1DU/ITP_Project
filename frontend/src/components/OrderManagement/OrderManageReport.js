@@ -523,139 +523,231 @@ function OrdersReport() {
       </div>
 
       <style>{`
-        .dashboard-container {
-          padding: 2rem;
-          font-family: 'Segoe UI', sans-serif;
-          background: linear-gradient(180deg, #f5f6fa 0%, #ffffff 100%);
-          min-height: 100vh;
-        }
-        .dashboard-title {
-          text-align: center;
-          font-size: 2.5rem;
-          margin-bottom: 2rem;
-          font-weight: bold;
-          color: #2f3640;
-        }
-        .summary-cards {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-          gap: 1.5rem;
-          margin-bottom: 3rem;
-        }
-        .card {
-          background: #fff;
-          padding: 1.5rem;
-          border-radius: 15px;
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-          text-align: center;
-          font-weight: 600;
-          transition: 0.2s;
-        }
-        .card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-        .card span {
-          display: block;
-          margin-top: 0.5rem;
-          font-size: 1.3rem;
-          color: #40739e;
-        }
-        .charts-container {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 2rem;
-          margin-bottom: 3rem;
-        }
-        .chart-box {
-          background: #fff;
-          padding: 2rem;
-          border-radius: 15px;
-          box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-          text-align: center;
-        }
-        .chart-box.large-chart {
-          grid-column: span 2;
-        }
-        .orders-table-box {
-          margin-top: 2rem;
-          background: #fff;
-          padding: 2rem;
-          border-radius: 12px;
-          box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        }
-        .filter-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 1rem;
-          margin-bottom: 1rem;
-        }
-        .filter-grid input, .filter-grid select {
-          width: 100%;
-          padding: 0.5rem;
-          border-radius: 8px;
-          border: 1px solid #ccc;
-        }
-        .orders-table {
-          max-height: 450px;
-          overflow-y: auto;
-          border-radius: 10px;
-          border: 1px solid #e1e1e1;
-          background: #fff;
-        }
-        .orders-table table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        .orders-table th {
-          position: sticky;
-          top: 0;
-          background: #273c75;
-          color: #fff;
-          font-weight: 600;
-          text-align: left;
-          padding: 1rem;
-          font-size: 0.95rem;
-          border-bottom: 2px solid #192a56;
-        }
-        .orders-table td {
-          padding: 0.9rem 1rem;
-          border-bottom: 1px solid #eee;
-          font-size: 0.9rem;
-          color: #2f3640;
-        }
-        .orders-table tr:nth-child(even) {
-          background: #f9f9f9;
-        }
-        .orders-table tr:hover {
-          background: #dcdde133;
-          transition: background 0.2s ease;
-        }
-        .pagination-controls {
-          margin-top: 1.2rem;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 1rem;
-        }
-        .pagination-controls button {
-          padding: 0.5rem 1rem;
-          border: none;
-          border-radius: 5px;
-          background: #40739e;
-          color: #fff;
-          cursor: pointer;
-          font-weight: 600;
-          transition: background 0.2s;
-        }
-        .pagination-controls button:hover:not(:disabled) {
-          background: #273c75;
-        }
-        .pagination-controls button:disabled {
-          background: #ccc;
-          cursor: not-allowed;
-        }
-      `}</style>
+  .dashboard-container {
+    padding: 2rem;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f8f9fa;
+    min-height: 100vh;
+  }
+  
+  .dashboard-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  /* Export Buttons */
+  .dashboard-container > div:first-of-type {
+    text-align: right;
+    margin-bottom: 2rem;
+  }
+
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .card {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-weight: 600;
+    transition: transform 0.2s ease;
+    border-left: 4px solid #3498db;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .card span {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  .charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .chart-box {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .chart-box.large-chart {
+    grid-column: span 2;
+  }
+
+  .chart-box h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+  }
+
+  .orders-table-box {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .orders-table-box h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    text-align: center;
+  }
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+
+  .filter-grid label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .filter-grid input, .filter-grid select {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+  }
+
+  .filter-grid input:focus, .filter-grid select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  }
+
+  .orders-table {
+    max-height: 500px;
+    overflow-y: auto;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+
+  .orders-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .orders-table th {
+    position: sticky;
+    top: 0;
+    background: #007af4ff;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: center;
+    padding: 1.2rem;
+    font-size: 0.95rem;
+  }
+
+  .orders-table td {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 0.9rem;
+    color: #2c3e50;
+  }
+
+  .orders-table tr:nth-child(even) {
+    background: #f8f9fa;
+  }
+
+  .orders-table tr:hover {
+    background: #e3f2fd;
+  }
+
+  .pagination-controls {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .pagination-controls button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    background: #3498db;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease;
+  }
+
+  .pagination-controls button:hover:not(:disabled) {
+    background: #2980b9;
+  }
+
+  .pagination-controls button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+  }
+
+  .pagination-controls span {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  /* Export PDF and Print buttons */
+  button[onClick*="handleExportPDF"],
+  button[onClick*="handlePrint"] {
+    padding: 0.75rem 1.5rem !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    margin-left: 0.5rem !important;
+  }
+
+  button[onClick*="handleExportPDF"] {
+    background: #f39c12 !important;
+    color: #ffffff !important;
+  }
+
+  button[onClick*="handleExportPDF"]:hover {
+    background: #e67e22 !important;
+  }
+
+  button[onClick*="handlePrint"] {
+    background: #27ae60 !important;
+    color: #ffffff !important;
+  }
+
+  button[onClick*="handlePrint"]:hover {
+    background: #219a52 !important;
+  }
+`}</style>
     </div>
   );
 }

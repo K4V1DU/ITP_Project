@@ -115,14 +115,18 @@ function OrdersReport() {
     acc[s] = (acc[s] || 0) + 1;
     return acc;
   }, {});
+
   const paymentMethodCounts = orders.reduce((acc, o) => {
     const m = o.PaymentMethod || "Unknown";
     acc[m] = (acc[m] || 0) + 1;
     return acc;
   }, {});
-  const agentOrdersCounts = orders.reduce((acc, o) => {
-    const a = o.DeliveryAgentID ? agentMap[o.DeliveryAgentID] : "Unassigned";
-    acc[a] = (acc[a] || 0) + 1;
+
+  const agentOrdersCounts = orders
+  .filter((o) => o.DeliveryAgentID)
+  .reduce((acc, o) => {
+    const agentName = agentMap[o.DeliveryAgentID] || "Unknown Agent";
+    acc[agentName] = (acc[agentName] || 0) + 1;
     return acc;
   }, {});
 
@@ -526,7 +530,7 @@ function OrdersReport() {
   .dashboard-container {
     padding: 2rem;
     font-family: 'Segoe UI', sans-serif;
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #ffb6f3 0%, #a7c9ff 35%, #a8ffcf 70%, #ffd6f5 100%);
     min-height: 100vh;
   }
   
@@ -535,7 +539,7 @@ function OrdersReport() {
     font-size: 2.5rem;
     margin-bottom: 2rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: #1c2630ff;
   }
 
   /* Export Buttons */
@@ -552,7 +556,7 @@ function OrdersReport() {
   }
 
   .card {
-    background: #ffffff;
+    background: #ffffffcd;
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -583,7 +587,7 @@ function OrdersReport() {
   }
 
   .chart-box {
-    background: #ffffff;
+    background: #ffffffcd;
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -602,7 +606,7 @@ function OrdersReport() {
   }
 
   .orders-table-box {
-    background: #ffffff;
+    background: #ffffffd1;
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -662,7 +666,7 @@ function OrdersReport() {
   .orders-table th {
     position: sticky;
     top: 0;
-    background: #007af4ff;
+    background: #aa05e6ec;
     color: #ffffff;
     font-weight: 600;
     text-align: center;
@@ -678,11 +682,11 @@ function OrdersReport() {
   }
 
   .orders-table tr:nth-child(even) {
-    background: #f8f9fa;
+    background: #f8f9fad5;
   }
 
   .orders-table tr:hover {
-    background: #e3f2fd;
+    background: #e3f2fdd6;
   }
 
   .pagination-controls {
@@ -697,7 +701,7 @@ function OrdersReport() {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 6px;
-    background: #3498db;
+    background: #aa05e6ec;
     color: #ffffff;
     cursor: pointer;
     font-weight: 600;
@@ -705,7 +709,7 @@ function OrdersReport() {
   }
 
   .pagination-controls button:hover:not(:disabled) {
-    background: #2980b9;
+    background: #c049ebec;
   }
 
   .pagination-controls button:disabled {

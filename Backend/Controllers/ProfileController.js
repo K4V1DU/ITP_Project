@@ -12,11 +12,10 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// UPDATE profile with validation
+// UPDATE profile details
 exports.updateProfile = async (req, res) => {
   const { FirstName, LastName, UserName, Email, Mobile, Address } = req.body;
 
-  // Server-side validation
   if (!FirstName || !LastName || !UserName || !Email || !Mobile || !Address) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -30,16 +29,12 @@ exports.updateProfile = async (req, res) => {
     const user = await Users.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    user.FirstName = FirstName;
-    user.LastName = LastName;
-    user.UserName = UserName;
-    user.Email = Email;
-    user.Mobile = Mobile;
-    user.Address = Address;
+    Object.assign(user, { FirstName, LastName, UserName, Email, Mobile, Address });
 
     const updatedUser = await user.save();
     const userObj = updatedUser.toObject();
     delete userObj.Password;
+
     res.json({ user: userObj });
   } catch (err) {
     console.error(err);

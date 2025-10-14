@@ -272,7 +272,7 @@ function CouponsDashboard() {
         .dashboard-container {
           padding: 2rem;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background-color: #f5f6fa;
+          background: linear-gradient(135deg, #dcdcdcff 0%, #ffffffff 100%);
           min-height: 100vh;
         }
 

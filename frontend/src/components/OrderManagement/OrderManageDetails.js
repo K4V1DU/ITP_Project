@@ -248,14 +248,10 @@ function OrderManageDetails() {
     pdf.text(`Total: Rs ${order.Total}`, 20, y);
     y += 10;
 
-    addSection("Order Status");
-    pdf.text(`Current Status: ${status}`, 20, y);
-    y += 10;
-
     addSection("Delivery Agent");
     if (isAssigned)
       pdf.text(
-        `Assigned To: ${assignedAgentName} (${assignedAgent})`,
+        `Assigned To: ${assignedAgentName}`,
         20,
         y
       );
@@ -273,7 +269,7 @@ function OrderManageDetails() {
   const styles = {
     container: {
       padding: "2rem",
-      background: "linear-gradient(135deg, #e0f7fa, #ffffff)",
+      background: "linear-gradient(135deg, #dcdcdcff, #ffffffff)",
       minHeight: "100vh",
     },
     wrapper: {

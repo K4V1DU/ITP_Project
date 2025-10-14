@@ -526,7 +526,7 @@ function OrdersReport() {
   .dashboard-container {
     padding: 2rem;
     font-family: 'Segoe UI', sans-serif;
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #dcdcdcff 0%, #ffffffff 100%);
     min-height: 100vh;
   }
   
@@ -662,7 +662,7 @@ function OrdersReport() {
   .orders-table th {
     position: sticky;
     top: 0;
-    background: #007af4ff;
+    background: #0163c6ff;
     color: #ffffff;
     font-weight: 600;
     text-align: center;

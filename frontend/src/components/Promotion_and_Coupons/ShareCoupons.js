@@ -113,9 +113,9 @@ function ShareCoupons() {
       {/* CSS */}
       <style>{`
         .container {
-          max-width: 800px;
+          max-width: 850px;
           margin: auto;
-          background-color: #ffffff;
+          background: linear-gradient(135deg, #dcdcdcff 0%, #ffffffff 100%);
           padding: 2rem;
           border-radius: 15px;
           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);

@@ -84,7 +84,7 @@ function OrdersDashboard() {
         .dashboard-container {
           padding: 2rem;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: linear-gradient(135deg, #f5f7fa, #eaf0f7);
+          background: linear-gradient(135deg, #dcdcdcff 0%, #ffffffff 100%);
           min-height: 100vh;
         }
 

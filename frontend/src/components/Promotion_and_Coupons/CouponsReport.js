@@ -276,7 +276,7 @@ function CouponsReport() {
           .report-container {
             padding: 2rem;
             font-family: 'Roboto', sans-serif;
-            background-color: #f4f6f8;
+            background: linear-gradient(135deg, #dcdcdcff 0%, #ffffffff 100%);
             min-height: 100vh;
           }
           h1, h2 {

@@ -64,7 +64,7 @@ const ContactPage = () => {
       <style>{`
         .contact-container {
           min-height: 100vh;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #dcdcdcff 0%, #ffffffff 100%);
           padding: 2rem 0;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -78,14 +78,14 @@ const ContactPage = () => {
         .contact-header {
           text-align: center;
           margin-bottom: 3rem;
-          color: white;
+          color: back;
         }
 
         .contact-title {
           font-size: 3rem;
           font-weight: 700;
           margin-bottom: 1rem;
-          text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          text-shadow: 0 2px 4px rgba(33, 33, 33, 0.56);
         }
 
         .contact-subtitle {

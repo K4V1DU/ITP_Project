@@ -1,61 +1,57 @@
-// contact.js (Backend)
-import express from "express";
-import nodemailer from "nodemailer";
-import cors from "cors";
+const express = require("express");
+const router = express.Router();
+const nodemailer = require("nodemailer");
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-app.post("/contact", async (req, res) => {
+router.post("/contact", async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
 
-  console.log("Received form data:", req.body);
+  if (!name || !email || !subject || !message) {
+    return res.status(400).json({ success: false, message: "Please fill in all required fields." });
+  }
 
   try {
-    // Create transporter using Gmail SMTP
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465, // use 587 for TLS
-      secure: true, // true for 465, false for 587
+      service: "gmail",
       auth: {
-        user: "coolcarticecream@gmail.com", // your Gmail
-        pass: "hmjr bjdz wdhk qgfu",       // your Gmail App Password
+        user: "coolcarticecream@gmail.com", 
+        pass: "hmjr bjdz wdhk qgfu", 
       },
     });
 
+    // from customer
     const mailOptions = {
-      from: '"CoolCart Contact Form" <coolcarticecream@gmail.com>',
-      to: "coolcarticecream@gmail.com",
-      subject: `New Contact Form Message: ${subject}`,
+      from: `${name} <${email}>`,
+      to: "coolcarticecream@gmail.com", 
+      subject: `Customer Support: ${subject}`,
       html: `
-        <h3>New Inquiry from CoolCart Contact Form</h3>
-        <p><b>Name:</b> ${name}</p>
-        <p><b>Email:</b> ${email}</p>
-        <p><b>Phone:</b> ${phone}</p>
-        <p><b>Subject:</b> ${subject}</p>
-        <p><b>Message:</b></p>
+        <h2>New Customer Message</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone || "Not provided"}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Message:</strong></p>
         <p>${message}</p>
+        <hr />
+        <p style="font-size:12px;color:#666;">
+          This message was sent from the CoolCart Contact Page.
+        </p>
       `,
+      replyTo: email,
     };
 
-    // Send the email
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({ success: true, message: "Email sent successfully" });
-  } catch (err) {
-    console.error("Error sending email:", err);
-
-    // Return detailed error for easier debugging
-    let errorMessage = "Failed to send email";
-    if (err.response) {
-      errorMessage += `: ${err.response}`;
-    } else if (err.message) {
-      errorMessage += `: ${err.message}`;
-    }
-
-    res.status(500).json({ success: false, message: errorMessage });
+    res.json({
+      success: true,
+      message: "Your message has been sent successfully! We’ll get back to you soon.",
+    });
+  } catch (error) {
+    console.error("Email sending failed:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to send message. Please try again later.",
+    });
   }
 });
 
-app.listen(5000, () => console.log("Backend running on port 5000"));
+module.exports = router;

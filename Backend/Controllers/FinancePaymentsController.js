@@ -7,6 +7,16 @@ const toOrderQuery = (orderNumber) => ({ OrderNumber: String(orderNumber).trim()
 const pickDefined = (obj) =>
   Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
 
+
+const mapPaymentStatusToOrder = (paymentStatus) => {
+  const statusMap = {
+    "Approved": "Completed",
+    "Pending": "Pending",
+    "Rejected": "Rejected"
+  };
+  return statusMap[paymentStatus] || paymentStatus;
+};
+
 // ================= CREATE Payment =================
 const createPayment = async (req, res) => {
   try {
@@ -20,7 +30,6 @@ const createPayment = async (req, res) => {
 
     let receiptFile = null;
     if (req.file) {
-      // Using multer.memoryStorage so buffer is available
       receiptFile = {
         data: req.file.buffer,
         contentType: req.file.mimetype,
@@ -94,8 +103,13 @@ const editPayment = async (req, res) => {
 
     if (!updated) return res.status(404).json({ message: "Payment not found" });
 
+    
     if (payload.Status) {
-      await Order.findOneAndUpdate(toOrderQuery(updated.OrderNumber), { PaymentStatus: payload.Status });
+      const orderPaymentStatus = mapPaymentStatusToOrder(payload.Status); 
+      await Order.findOneAndUpdate(
+        toOrderQuery(updated.OrderNumber), 
+        { PaymentStatus: orderPaymentStatus } // Completed, Pending, or Rejected 
+      );
     }
 
     res.json({ message: "Payment updated", payment: updated });
@@ -132,7 +146,6 @@ const getReceiptById = async (req, res) => {
     const fname = payment.ReceiptFile.name || "receipt.pdf";
 
     res.setHeader("Content-Type", ct);
-    // IMPORTANT: inline to render in iframe
     res.setHeader("Content-Disposition", `inline; filename="${fname}"`);
 
     return res.status(200).send(payment.ReceiptFile.data);
@@ -205,7 +218,6 @@ const updatePaymentByOrderNumber = async (req, res) => {
         contentType: req.file.mimetype,
         name: req.file.originalname,
       };
-      // optional: updateData.UploadDate = new Date();
     }
 
     const updated = await Payment.findOneAndUpdate(
@@ -218,8 +230,13 @@ const updatePaymentByOrderNumber = async (req, res) => {
       return res.status(404).json({ message: "Payment not found" });
     }
 
+    
     if (status) {
-      await Order.findOneAndUpdate(toOrderQuery(orderNumber), { PaymentStatus: status });
+      const orderPaymentStatus = mapPaymentStatusToOrder(status);
+      await Order.findOneAndUpdate(
+        toOrderQuery(orderNumber), 
+        { PaymentStatus: orderPaymentStatus } // Completed, Pending, or Rejected 
+      );
     }
 
     res.json({ message: "Receipt updated successfully", payment: updated });
@@ -237,6 +254,6 @@ module.exports = {
   deletePayment,
   getReceiptById,
   getPaymentByOrderNumber,
-  getReceiptByOrderNumber,     // exported
+  getReceiptByOrderNumber,
   updatePaymentByOrderNumber,
 };

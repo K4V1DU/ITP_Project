@@ -24,7 +24,7 @@ const UsersRouter          = require("./Routes/UsersRoute");
 const Coupons              = require("./Routes/CouponsRoute");
 const orderRoutes          = require("./Routes/OrdersRoute");
 const orderManagerRoutes   = require("./Routes/orderManageRoute");
-const FinancePaymentsRoute = require("./routes/FinancePaymentsRoute");
+const FinancePaymentsRoute = require("./Routes/FinancePaymentsRoute");
 const PaymentsRoute        = require("./routes/PaymentsRoute");
 const PasswordResetRoute   = require("./Routes/PasswordResetRoute");
 const RegisterRoute        = require("./Routes/RegisterRoute");
@@ -52,6 +52,7 @@ app.use("/delivery", DeliveryRoutes);
 app.use("/sharecoupons", shareCouponsRoute);
 app.use("/profile", ProfileRoute);
 app.use("/admin", adminRoutes);
+app.use("/api/profile", ProfileRoute);
 app.use("/admin/carts", adminCartsRoutes);
 app.use("/", contactRoute);
 
@@ -75,6 +76,7 @@ function prettyLog(title, lines = [], color = "cyan") {
   const top = "┌" + "─".repeat(width) + "┐";
   const bottom = "└" + "─".repeat(width) + "┘";
   const line = (s) => "│ " + s.padEnd(width - 2, " ") + "│";
+
 
   console.log("\n" + (colors[color] || colors.cyan) + top);
   console.log(line(title));

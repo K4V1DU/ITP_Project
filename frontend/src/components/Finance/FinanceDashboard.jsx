@@ -38,7 +38,7 @@ ChartJS.register(ArcElement, ChartTooltip, Legend, CategoryScale, LinearScale, B
 
 const MotionCard = motion(Card);
 
-// ✅ Enhanced Stats Card Component - WITH VISIBLE COLORS
+
 const StatCard = ({ label, value, gradient, icon, delay }) => (
   <Grid item xs={12} sm={6} md={3}>
     <motion.div
@@ -109,7 +109,7 @@ const StatCard = ({ label, value, gradient, icon, delay }) => (
           </Box>
         </CardContent>
         
-        {/* ✅ Shimmer overlay */}
+        {/*  Shimmer overlay */}
         <Box 
           sx={{ 
             position: 'absolute', 
@@ -125,7 +125,7 @@ const StatCard = ({ label, value, gradient, icon, delay }) => (
           }} 
         />
 
-        {/* ✅ Decorative corner element */}
+        {/*  Decorative corner element */}
         <Box
           sx={{
             position: 'absolute',
@@ -162,12 +162,12 @@ export default function FinanceDashboard() {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [processing, setProcessing] = useState(false);
 
-  // ✅ Define showNotification first
+  //  Define showNotification first
   const showNotification = useCallback((message, severity) => {
     setSnackbar({ open: true, message, severity });
   }, []);
 
-  // ✅ Now fetchPayments can use showNotification
+  //  Now fetchPayments can use showNotification
   const fetchPayments = useCallback(async () => {
     try {
       setLoading(true);

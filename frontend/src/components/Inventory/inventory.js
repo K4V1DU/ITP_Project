@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useEffect, useState } from "react";
 import Navbar from "../NavBar/NavBar";
 import axios from "axios";
@@ -204,8 +205,20 @@ function Inventory() {
           </button>
         </div>
       </div>
+=======
+import React from 'react'
+
+function inventory() {
+  return (
+    <div>
+      <h1>Inventory</h1>
+>>>>>>> Stashed changes
     </div>
   );
 }
 
+<<<<<<< Updated upstream
 export default Inventory;
+=======
+export default inventory
+>>>>>>> Stashed changes

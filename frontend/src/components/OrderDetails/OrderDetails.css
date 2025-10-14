@@ -188,45 +188,45 @@
 
 /* Order Status Colors */
 .order-details__badge--pending {
-  background: #fff3cd;
-  color: #856404;
+  background: #ff9d00;
+  color: #ffffff;
   border: 1px solid #ffc107;
 }
 
 .order-details__badge--ready {
-  background: #d1ecf1;
-  color: #0c5460;
+  background: #0379e0;
+  color: #ffffff;
   border: 1px solid #17a2b8;
 }
 
 .order-details__badge--out-for-delivery {
-  background: #ffe5d0;
-  color: #8a4419;
-  border: 1px solid #fd7e14;
+  background: #2ec101;
+  color: #ffffff;
+  border: 1px solid #28fa03;
 }
 
 .order-details__badge--delivered {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #28a745;
+  background: #249501;
+  color: #ffffff;
+  border: 1px solid #28fa03;
 }
 
 .order-details__badge--cancelled {
-  background: #f8d7da;
-  color: #721c24;
+  background: #fe0015;
+  color: #ffffff;
   border: 1px solid #dc3545;
 }
 
 /* Payment Status Colors */
 .order-details__badge--completed {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #28a745;
+  background: #249501;
+  color: #ffffff;
+  border: 1px solid #28fa03;
 }
 
 .order-details__badge--declined {
-  background: #f8d7da;
-  color: #721c24;
+  background: #fe0015;
+  color: #ffffff;
   border: 1px solid #dc3545;
 }
 

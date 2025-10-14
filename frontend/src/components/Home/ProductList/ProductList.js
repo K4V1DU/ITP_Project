@@ -7,7 +7,6 @@ function ProductList({ products }) {
   const [selectedFlavours, setSelectedFlavours] = useState([]);
   const [SearchWord, Search] = useState("");
 
-  // Item is tempory variable hold Catogory value in each loop
   const categories = [
     ...new Set(products.map((Item) => Item.Category).filter(Boolean)),
   ];
@@ -15,7 +14,6 @@ function ProductList({ products }) {
     ...new Set(products.map((Item) => Item.Flavour).filter(Boolean)),
   ];
 
-  //ItemSelect check clickedItem is in SelectedItems and change state using setItems function
   const ItemSelect = (ClickedItem, SelectedItems, setItems) => {
     setItems(
       SelectedItems.includes(ClickedItem)
@@ -24,7 +22,10 @@ function ProductList({ products }) {
     );
   };
 
-  //check items are in selected list if not remove it
+  const clearFilters = () => {
+    setSelectedCategories([]);
+    setSelectedFlavours([]);
+  };
 
   const filteredProducts = products.filter(
     (p) =>
@@ -35,6 +36,9 @@ function ProductList({ products }) {
         p.Description.toLowerCase().includes(SearchWord.toLowerCase()) ||
         p.ProductID.toLowerCase().includes(SearchWord.toLowerCase()))
   );
+
+  const filtersActive =
+    selectedCategories.length > 0 || selectedFlavours.length > 0;
 
   return (
     <div className="main">
@@ -70,6 +74,12 @@ function ProductList({ products }) {
             </label>
           ))}
         </div>
+
+        {filtersActive && (
+          <button className="clearButton" onClick={clearFilters}>
+            Clear Filters
+          </button>
+        )}
       </div>
 
       <div className="rightSide">

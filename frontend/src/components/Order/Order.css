@@ -1,10 +1,13 @@
+
+.container{
+  background-color: #ffffff;
+}
 .order {
   max-width: 900px;
-  margin: 30px auto;
+  margin: 0px auto;
   padding: 20px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
   font-family: Arial, sans-serif;
 }
 
@@ -29,8 +32,8 @@
 }
 
 .image {
-  width: 400px;       /* Fixed width */
-  height: 400px;      /* Fixed height */
+  width: 400px;       
+  height: 400px;      
   object-fit: cover;
   border-radius: 8px;
   box-shadow: 0px 3px 8px rgba(0,0,0,0.0);
@@ -110,10 +113,10 @@
   margin-bottom: 10px;
 }
 
-/* Add to Cart Button Lower */
+
 .add {
   display: inline-block;
-  margin-top: 20px;   /* moved a little lower */
+  margin-top: 20px;   
   padding: 12px 20px;
   font-size: 16px;
   border: none;

@@ -102,7 +102,7 @@ function Orders() {
                   <td>
                     {Array.isArray(order.Items)
                       ? order.Items.reduce((sum, item) => sum + item.Quantity, 0)
-                      : 0}
+                      : 0} Items
                   </td>
                   <td>Rs {order.Total.toFixed(2)}</td>
                   <td>
@@ -126,7 +126,7 @@ function Orders() {
                       className="details-btn"
                       onClick={() => handleDetailsClick(order.OrderNumber)}
                     >
-                      View Details
+                      <img src="/images/search.png" alt="Click Me" width="25" height="25" />
                     </button>
                   </td>
                 </tr>

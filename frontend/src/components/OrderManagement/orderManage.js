@@ -84,53 +84,83 @@ function OrdersDashboard() {
         .dashboard-container {
           padding: 2rem;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background-color: #f5f6fa;
+          background: linear-gradient(135deg, #f5f7fa, #eaf0f7);
           min-height: 100vh;
         }
 
         .dashboard-title {
-          font-size: 2rem;
-          font-weight: bold;
+          font-size: 2.3rem;
+          font-weight: 700;
           margin-bottom: 2rem;
           text-align: center;
-          color: #2f3640;
+          color: #273c75;
+          text-transform: uppercase;
+          letter-spacing: 1px;
         }
 
-        .filter-input, .filter-select {
+        .filter-input,
+        .filter-select {
           width: 100%;
-          padding: 0.7rem;
+          padding: 0.75rem 1rem;
           margin-bottom: 1rem;
-          border-radius: 8px;
+          border-radius: 10px;
           border: 1px solid #dcdde1;
           font-size: 1rem;
+          background-color: #fff;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          transition: all 0.2s ease-in-out;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+          border-color: #40739e;
+          outline: none;
+          box-shadow: 0 0 6px rgba(64, 115, 158, 0.4);
         }
 
         .table-container {
           overflow-x: auto;
           background-color: #fff;
-          border-radius: 12px;
-          box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-          margin-top: 1rem;
+          border-radius: 15px;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+          margin-top: 2rem;
+          padding: 0.5rem;
         }
 
         table {
           width: 100%;
           border-collapse: collapse;
+          min-width: 900px;
         }
 
         thead tr {
           background-color: #40739e;
-          color: #fff;
+          color: #ffffff;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
 
-        thead th, tbody td {
-          padding: 1rem 0.5rem;
+        thead th {
+          padding: 1rem;
+          font-size: 0.95rem;
+          font-weight: 600;
+        }
+
+        tbody td {
+          padding: 1rem;
           text-align: center;
+          color: #2f3640;
+          font-weight: 500;
         }
 
         tbody tr {
-          border-bottom: 1px solid #dcdde1;
-          transition: background-color 0.2s;
+          border-bottom: 1px solid #ecf0f1;
+          transition: all 0.2s ease-in-out;
+        }
+
+        tbody tr:hover {
+          background-color: #f8f9fa;
+          transform: scale(1.005);
         }
 
         .view-btn {
@@ -138,45 +168,111 @@ function OrdersDashboard() {
           border-radius: 8px;
           border: none;
           cursor: pointer;
-          background: #40739e;
+          background: linear-gradient(135deg, #40739e, #273c75);
           color: #fff;
-          transition: background 0.3s ease, transform 0.2s ease;
+          font-weight: 600;
+          transition: all 0.3s ease-in-out;
         }
 
         .view-btn:hover {
-          background: #2c3e50;
-          transform: scale(1.05);
-        }
-
-        tbody tr:hover {
-          background-color: #f1f2f6;
+          background: linear-gradient(135deg, #2c3e50, #192a56);
+          transform: scale(1.08);
         }
 
         .badge {
-          padding: 0.3rem 0.6rem;
+          padding: 0.35rem 0.7rem;
           border-radius: 8px;
           font-size: 0.85rem;
           font-weight: 600;
+          display: inline-block;
+          min-width: 90px;
         }
 
-        .badge-status-pending { background: #e1b12c; color: #fff; }
-        .badge-status-ready { background: #0097e6; color: #fff; }
-        .badge-status-delivered { background: #44bd32; color: #fff; }
-        .badge-status-cancelled { background: #e84118; color: #fff; }
-        .badge-status-assigned { background: #273c75; color: #fff; }
-        .badge-status-out-for-delivery { background: #ff6a00ff; color: #fff; }
+        /* 🟡 Order Status */
+        .badge-status-pending {
+          background: #e1b12c;
+          color: #fff;
+        }
+        .badge-status-ready {
+          background: #0097e6;
+          color: #fff;
+        }
+        .badge-status-delivered {
+          background: #44bd32;
+          color: #fff;
+        }
+        .badge-status-cancelled {
+          background: #e84118;
+          color: #fff;
+        }
+        .badge-status-assigned {
+          background: #273c75;
+          color: #fff;
+        }
+        .badge-status-out-for-delivery {
+          background: #f39c12;
+          color: #fff;
+        }
 
-        .badge-agent { background: #718093; color: #fff; }
-        .badge-agent-assigned { background: #44bd32; color: #fff; }
+        /* 🧍 Delivery Agent */
+        .badge-agent {
+          background: #718093;
+          color: #fff;
+        }
+        .badge-agent-assigned {
+          background: #44bd32;
+          color: #fff;
+        }
 
-        .badge-method-cash-on-delivery { background: #2980b9; color: #fff; }
-        .badge-method-bank-deposit { background: #8e44ad; color: #fff; }
+        /* 💳 Payment Method */
+        .badge-method-cash-on-delivery {
+          background: #2980b9;
+          color: #fff;
+        }
+        .badge-method-bank-deposit {
+          background: #8e44ad;
+          color: #fff;
+        }
 
-        .badge-payment-pending { background: #e67e22; color: #fff; }
-        .badge-payment-completed { background: #2ecc71; color: #fff; }
-        .badge-payment-declined { background: #c0392b; color: #fff; }
+        /* 💰 Payment Status */
+        .badge-payment-pending {
+          background: #e67e22;
+          color: #fff;
+        }
+        .badge-payment-completed {
+          background: #2ecc71;
+          color: #fff;
+        }
+        .badge-payment-approved {
+          background: #27ae60;
+          color: #fff;
+        }
+        .badge-payment-declined,
+        .badge-payment-rejected {
+          background: #c0392b;
+          color: #fff;
+        }
 
+        /* 🔍 Responsive */
+        @media (max-width: 768px) {
+          .dashboard-title {
+            font-size: 1.7rem;
+          }
 
+          .filter-input,
+          .filter-select {
+            font-size: 0.9rem;
+          }
+
+          table {
+            font-size: 0.9rem;
+          }
+
+          .view-btn {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.85rem;
+          }
+        }
       `}</style>
 
       <div className="dashboard-container">
@@ -216,6 +312,8 @@ function OrdersDashboard() {
           <option value="all">All Payment Status</option>
           <option value="Pending">Pending</option>
           <option value="Completed">Completed</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Approved">Approved</option>
           <option value="Declined">Declined</option>
         </select>
 

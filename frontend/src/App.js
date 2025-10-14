@@ -13,7 +13,7 @@ import DashboardOverview from "./components/AdminDashboard/DashboardOverview.js"
 import ProtionReport from "./components/Promotion_and_Coupons/CouponsReport.js";
 import AddProducts from './components/AddProducts/AddProducts.js';
 import EditProduct from './components/EditProduct/EditProduct.js';
-import Inventory from "./components/Inventory/inventory.js";
+import Inventory from "./components/Inventory/Inventory.js";
 import ManageOrders from "./components/OrderManagement/orderManage.js";
 import Orders  from "./components/Orders/Orders.js";
 import OrderDetails from "./components/OrderDetails/OrderDetails.js";
@@ -28,12 +28,12 @@ import CouponShare from "./components/Promotion_and_Coupons/ShareCoupons.js";
 import DeliveryDashboard from "./components/DeliveryManagement/DeliveryDashboard.js";
 import Profile from "./components/Profile/Profile.js";
 import UsersCarts from "./components/AdminDashboard/UsersCarts/usersCarts.js";
-
-// 👇 New Finance Dashboard import
+import OrdersReport from "./components/OrderManagement/OrderManageReport.js";
 import FinanceDashboard from "./components/Finance/FinanceDashboard";
 import EditReceipt from "./components/Finance/EditReceipt";
 import ReceiptView from "./components/Finance/ReceiptView";
 import PaymentReport from './components/Finance/PaymentReport';
+import ContactPage from "./components/Home/contact/contact.js";
 
 
 function App() {
@@ -69,12 +69,13 @@ function App() {
       <Route path="/DeliveryDashboard" element={<DeliveryDashboard />} />
       <Route path="/Profile" element={<Profile />} />
       <Route path="/Coupon-Management" element={<ProtionReport />} />
-
-      {/* 🚀 New Finance Dashboard Route */}
+      <Route path="/Orders-Log" element={<OrdersReport />} />
       <Route path="/FinanceDashboard" element={<FinanceDashboard />} />
       <Route path="/edit-receipt/:orderNumber" element={<EditReceipt />} />
       <Route path="/receipt/:id" element={<ReceiptView />} />
       <Route path="/payment-report" element={<PaymentReport />} />
+      <Route path="/Contact" element={<ContactPage />} />
+
     </Routes>
   );
 }

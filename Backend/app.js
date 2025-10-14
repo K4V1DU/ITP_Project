@@ -33,6 +33,8 @@ const shareCouponsRoute    = require("./Routes/shareCouponsRoute");
 const ProfileRoute         = require("./Routes/ProfileRoute");
 const adminRoutes          = require("./Routes/AdminRoute");
 const adminCartsRoutes     = require("./Routes/AdminCartsRoute");
+const contactRoute = require("./Controllers/contact");
+
 
 // Mount routes (same base paths you used)
 app.use("/Inventory", inventoryRouter);
@@ -51,6 +53,8 @@ app.use("/sharecoupons", shareCouponsRoute);
 app.use("/profile", ProfileRoute);
 app.use("/admin", adminRoutes);
 app.use("/admin/carts", adminCartsRoutes);
+app.use("/", contactRoute);
+
 
 // Health check
 app.get("/", (req, res) => {

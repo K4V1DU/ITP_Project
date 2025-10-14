@@ -70,28 +70,33 @@
 
 /* Order Status Colors */
 .status.ready {
-  background: #858585;  
+  background: #0379e0;
   color: #ffffff;
+  border: 1px solid #17a2b8;
 }
 
 .status.pending {
-  background: #797979;  
+  background: #ff9d00;
   color: #ffffff;
+  border: 1px solid #ffc107;
 }
 
 .status.out-for-delivery {
-  background: #007bff;  
+  background: #2ec101;
   color: #ffffff;
+  border: 1px solid #28fa03;
 }
 
 .status.delivered {
-  background: #16a600; 
+  background: #249501;
   color: #ffffff;
+  border: 1px solid #28fa03;
 }
 
 .status.cancelled {
-  background: #ff0015;  
+  background: #fe0015;
   color: #ffffff;
+  border: 1px solid #dc3545;
 }
 
 /* ---------------- Payment Status ---------------- */
@@ -156,18 +161,13 @@
 }
 
 .details-btn {
-  padding: 5px 10px;
+  
   background-color: #fff;
   color: #000;
-  border: 2px solid #000;
+  border: 2px solid #ffffff;
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: bold;
 }
 
-.details-btn:hover {
-  background-color: #000;
-  color: #fff;
-  border-color: #fff;
-}

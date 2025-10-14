@@ -35,12 +35,13 @@ function Login() {
         } else if (role === "Supply Manager") {
           history("/Inventory");
         } else if (role === "Order Manager") {
-          history("/order-Manage");
+          history("/Orders-Log");
         } else if (role === "Finance Manager") {
           history("/FinanceDashboard");
         } else if (role === "Delivery Staff") {
           history("/DeliveryDashboard");
         } 
+        
         else {
           history("/login");
         }
@@ -60,7 +61,7 @@ function Login() {
           align-items: center;
           justify-content: center;
           min-height: 100vh;
-          background: url('/images/bg1.png') no-repeat center center/cover;
+          background: url('/images/bg2.jpg') no-repeat center center/cover;
           font-family: 'Epilogue', sans-serif;
           position: relative;
         }

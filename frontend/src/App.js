@@ -28,15 +28,17 @@ import CouponShare from "./components/Promotion_and_Coupons/ShareCoupons.js";
 import DeliveryDashboard from "./components/DeliveryManagement/DeliveryDashboard.js";
 import Profile from "./components/Profile/Profile.js";
 import UsersCarts from "./components/AdminDashboard/UsersCarts/usersCarts.js";
-
-
+import OrdersReport from "./components/OrderManagement/OrderManageReport.js";
+import FinanceDashboard from "./components/Finance/FinanceDashboard";
+import EditReceipt from "./components/Finance/EditReceipt";
+import ReceiptView from "./components/Finance/ReceiptView";
+import PaymentReport from './components/Finance/PaymentReport';
+import ContactPage from "./components/Home/contact/contact.js";
 
 
 function App() {
-
   return (
     <Routes>
-
       <Route path="/" element={<Login />} />
       <Route path="/home" element={<Home />} />
       <Route path="/cart" element={<Cart />} />
@@ -67,14 +69,15 @@ function App() {
       <Route path="/DeliveryDashboard" element={<DeliveryDashboard />} />
       <Route path="/Profile" element={<Profile />} />
       <Route path="/Coupon-Management" element={<ProtionReport />} />
-
-
-
+      <Route path="/Orders-Log" element={<OrdersReport />} />
+      <Route path="/FinanceDashboard" element={<FinanceDashboard />} />
+      <Route path="/edit-receipt/:orderNumber" element={<EditReceipt />} />
+      <Route path="/receipt/:id" element={<ReceiptView />} />
+      <Route path="/payment-report" element={<PaymentReport />} />
+      <Route path="/Contact" element={<ContactPage />} />
 
     </Routes>
   );
 }
 
 export default App;
-
-//rfce

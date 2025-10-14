@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import "./Checkout.css";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "../NavBar/NavBar";
+import "./Checkout.css";
 
 function Checkout() {
   const location = useLocation();
@@ -113,12 +113,13 @@ function Checkout() {
 
       await axios.delete(`http://localhost:5000/Cart/user/${userId}`);
 
-      toast.success("Order placed successfully! Redirecting...", { autoClose: 2000 });
+      toast.success("Order placed successfully! Redirecting...", {
+        autoClose: 2000,
+      });
 
       setTimeout(() => {
         navigate(`/OrderDetails/${createdOrderNumber}`);
       }, 2000);
-
     } catch (err) {
       console.error(err);
       toast.error("Failed to place order");
@@ -129,76 +130,96 @@ function Checkout() {
     <div>
       <Navbar />
       <div className="checkout-page">
-        <h2>Checkout</h2>
+        
 
-        <div className="extra-fields">
+        <div className="checkout-container">
+          {/* LEFT SIDE - User Info Form */}
+          <div className="checkout-form">
+            <h3>Shipping & Payment</h3>
 
-        <label>User ID:</label>
-          <input
-            type="text"
-            value={userId}
-            
-          />
+            <label>Shipping Address:</label>
+            <input
+              type="text"
+              value={shippingAddress}
+              onChange={(e) => {
+                if (e.target.value.length <= 100) {
+                  setShippingAddress(e.target.value);
+                }
+              }}
+              maxLength="100"
+              placeholder="Enter your address (max 100 characters)"
+            />
 
+            <label>Contact Number:</label>
+            <input
+              type="text"
+              value={contactNumber}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+                if (value.length <= 10) setContactNumber(value);
+              }}
+              maxLength="10"
+              placeholder="Enter 10-digit number"
+            />
 
+            <label>Schedule Delivery Date (optional):</label>
+            <input
+              type="date"
+              value={scheduleDate}
+              min={minDate}
+              onChange={(e) => setScheduleDate(e.target.value)}
+            />
 
-          <label>Shipping Address:</label>
-          <input
-            type="text"
-            value={shippingAddress}
-            onChange={(e) => setShippingAddress(e.target.value)}
-          />
+            <label>Payment Method:</label>
+            <select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              <option value="Cash on Delivery">Cash on Delivery</option>
+              <option value="Bank Deposit">Bank Deposit</option>
+            </select>
+          </div>
 
-          <label>Contact Number:</label>
-          <input
-            type="text"
-            value={contactNumber}
-            onChange={(e) => setContactNumber(e.target.value)}
-          />
+          {/* RIGHT SIDE - Order Summary */}
+          <div className="checkout-summary">
+            <h3>Order Summary</h3>
 
-          <label>Schedule Delivery Date (optional):</label>
-          <input
-            type="date"
-            value={scheduleDate}
-            min={minDate}
-            onChange={(e) => setScheduleDate(e.target.value)}
-          />
+            <ul>
+              {items?.map((item) => (
+                <li key={item._id}>
+                  <span>{item.Name} x {item.Quantity}</span>
+                  <span>Rs {item.Total.toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
 
-          <label>Payment Method:</label>
-          <select
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-          >
-            <option value="Cash on Delivery">Cash on Delivery</option>
-            <option value="Bank Deposit">Bank Deposit</option>
-          </select>
+            <p>
+              <span>Subtotal:</span>
+              <span>Rs {subtotal?.toFixed(2)}</span>
+            </p>
+            <p>
+              <span>Discount:</span>
+              <span>Rs {discount?.toFixed(2)}</span>
+            </p>
+            {appliedCoupon && (
+              <p>
+                <span>Coupon Applied:</span>
+                <span>{appliedCoupon.code}</span>
+              </p>
+            )}
+            <p className="checkout-total">
+              <span>Total:</span>
+              <span>Rs {totalCost?.toFixed(2)}</span>
+            </p>
+
+            <button onClick={handlePlaceOrder}>Place Order</button>
+          </div>
         </div>
-
-        <ul>
-          {items?.map((item) => (
-            <li key={item._id}>
-              {item.Name} x {item.Quantity} = Rs {item.Total.toFixed(2)}
-            </li>
-          ))}
-        </ul>
-        <p>
-          <strong>Subtotal:</strong> Rs {subtotal?.toFixed(2)}
-        </p>
-        <p>
-          <strong>Discount:</strong> Rs {discount?.toFixed(2)}
-        </p>
-        {appliedCoupon && <p>Coupon Applied: {appliedCoupon.code}</p>}
-        <p>
-          <strong>Total: Rs {totalCost?.toFixed(2)}</strong>
-        </p>
-
-        <button onClick={handlePlaceOrder}>Place Order</button>
 
         <ToastContainer
           position="top-right"
           autoClose={3000}
           hideProgressBar={false}
-          newestOnTop={false}
           closeOnClick={false}
           closeButton={false}
           pauseOnFocusLoss
@@ -212,4 +233,3 @@ function Checkout() {
 }
 
 export default Checkout;
-

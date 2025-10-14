@@ -1,0 +1,54 @@
+.container__slider {
+  position: relative;
+  width: 100%;
+  height: 175px;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+
+.slider__item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.slider__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Active slide */
+.slider__item.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.slider__item.inactive {
+  opacity: 0;
+  z-index: 1;
+}
+
+/* Navigation buttons */
+.slider__btn-prev,
+.slider__btn-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0,0,0,0.4);
+  border: none;
+  color: #fff;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.slider__btn-prev { left: 10px; }
+.slider__btn-next { right: 10px; }

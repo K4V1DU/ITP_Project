@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Navbar from "../NavBar/NavBar";
 import { ToastContainer, toast } from "react-toastify";
@@ -17,6 +17,8 @@ import {
   Legend,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+//import html2canvas from "html2canvas";
 
 const API_URL = "http://localhost:5000/Coupons";
 const COLORS = ["#28a745", "#dc3545", "#ffc107"];
@@ -36,6 +38,8 @@ function CouponsReport() {
   const [typeFilter, setTypeFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+
+  const reportRef = useRef();
 
   const fetchCoupons = async () => {
     try {
@@ -113,15 +117,166 @@ function CouponsReport() {
     }
   };
 
+    const handleExportPDF = async () => {
+    const now = new Date();
+    const formattedDate = now.toLocaleString();
+
+    // Create PDF
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    let y = 20;
+
+    const logoUrl = "/images/logo99.png";
+    try {
+      const img = new Image();
+      img.src = logoUrl;
+      pdf.addImage(img, "PNG", 15, 10, 25, 25);
+    } catch (err) {
+      console.warn("Logo not found or failed to load.");
+    }
+
+    pdf.setFontSize(18);
+    pdf.setTextColor(33, 37, 41);
+    pdf.text("Coupons & Promotions Report", pageWidth / 2, y + 10, { align: "center" });
+    y += 25;
+
+    pdf.setFontSize(12);
+    pdf.setTextColor(40, 40, 40);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Summary", 15, y);
+    y += 8;
+
+    pdf.setFont("helvetica", "normal");
+    const summaryData = [
+      ["Total Coupons", stats.total],
+      ["Active", stats.active],
+      ["Expired", stats.expired],
+      ["Used Up", stats.usedUp],
+      ["Total Discount Given", `Rs ${stats.totalDiscountGiven.toFixed(2)}`],
+    ];
+
+    summaryData.forEach(([label, value]) => {
+      pdf.text(`${label}:`, 20, y);
+      pdf.text(String(value), 80, y);
+      y += 7;
+    });
+
+    y += 5;
+    pdf.line(15, y, pageWidth - 15, y);
+    y += 10;
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(11);
+    pdf.text("Coupons & Promotions Details", 15, y);
+    y += 8;
+
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "bold");
+    const headers = ["Code", "Type", "Discount", "Min Amt", "Usage", "Limit", "Expiry", "Status"];
+    const colWidths = [25, 25, 20, 20, 20, 20, 25, 25];
+    let x = 15;
+    headers.forEach((h, i) => {
+      pdf.text(h, x, y);
+      x += colWidths[i];
+    });
+    y += 6;
+
+    pdf.setFont("helvetica", "normal");
+
+    coupons.forEach((c, idx) => {
+      if (y > 260) {
+        pdf.addPage();
+        y = 20;
+      }
+
+      const expiryDate = new Date(c.ExpiryDate);
+      const usageReached = c.UsageCount >= c.UsageLimit;
+      const status = expiryDate < new Date() ? "Expired" : usageReached ? "Used Up" : "Active";
+
+      const row = [
+        c.Code,
+        c.discountType,
+        `${c.DiscountValue}%`,
+        `Rs ${c.MinAmount}`,
+        String(c.UsageCount),
+        String(c.UsageLimit),
+        new Date(c.ExpiryDate).toLocaleDateString(),
+        status,
+      ];
+
+      x = 15;
+      row.forEach((text, i) => {
+        pdf.text(String(text), x, y);
+        x += colWidths[i];
+      });
+
+      y += 6;
+    });
+
+    y += 10;
+    pdf.line(15, y, pageWidth - 15, y);
+    y += 10;
+
+    pdf.setFont("helvetica", "italic");
+    pdf.setFontSize(9);
+    pdf.text(`Report generated on: ${formattedDate}`, 15, y);
+    y += 15;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(11);
+    pdf.text("_________________________", pageWidth - 80, y);
+    pdf.text("Authorized Signature", pageWidth - 75, y + 6);
+
+    pdf.save("Coupons_Report.pdf");
+  };
+
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div>
       <Navbar />
-      <div className="report-container">
+      <div className="report-container" ref={reportRef}>
+        <div style={{ textAlign: "right", marginBottom: "1rem" }}>
+          
+          <button
+            onClick={handleExportPDF}
+            style={{
+              background: "#e1b12c",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              padding: "0.5rem 1rem",
+              marginRight: "0.5rem",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Export as PDF
+          </button>
+          <button
+            onClick={handlePrint}
+            style={{
+              background: "#44bd32",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              padding: "0.5rem 1rem",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Print
+          </button>
+        </div>
+
         <style>{`
           .report-container {
             padding: 2rem;
             font-family: 'Roboto', sans-serif;
-            background-color: #f4f6f8;
+            background: linear-gradient(135deg, #ffb6f3 0%, #a7c9ff 35%, #a8ffcf 70%, #ffd6f5 100%);
             min-height: 100vh;
           }
           h1, h2 {
@@ -140,7 +295,7 @@ function CouponsReport() {
           }
 
           .card {
-            background: linear-gradient(135deg, #ffffff, #e9ecef);
+            background: linear-gradient(135deg, #ffffffd6, #e9ecefd2);
             padding: 1.2rem 2rem;
             border-radius: 16px;
             min-width: 150px;
@@ -194,7 +349,7 @@ function CouponsReport() {
           }
 
           .chart {
-            background-color: #fff;
+            background-color: #ffffffd5;
             padding: 1rem;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -218,7 +373,7 @@ function CouponsReport() {
 
           .table-container {
             overflow-x: auto;
-            background-color: #fff;
+            background-color: #ffffffd6;
             padding: 1rem;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -232,7 +387,7 @@ function CouponsReport() {
           }
 
           thead tr {
-            background: #40739e;
+            background: #40749ed4;
             color: #fff;
             text-transform: uppercase;
             letter-spacing: 0.03em;
@@ -245,11 +400,11 @@ function CouponsReport() {
           }
 
           tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
+            background-color: #f8f9fad2;
           }
 
           tbody tr:hover {
-            background-color: #e2e6ea;
+            background-color: #e2e6eace;
             transition: 0.3s;
           }
 

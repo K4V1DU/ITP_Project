@@ -113,101 +113,140 @@ function ShareCoupons() {
       {/* CSS */}
       <style>{`
         .container {
-          max-width: 800px;
+          max-width: 850px;
           margin: auto;
-          background-color: #f5f6fa;
+          background: linear-gradient(135deg, #ffb6f3 0%, #a7c9ff 35%, #a8ffcf 70%, #ffd6f5 100%);
           padding: 2rem;
-          border-radius: 12px;
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+          border-radius: 15px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         h2 {
           text-align: center;
           margin-bottom: 2rem;
-          color: #2f3640;
+          color: #1f2830ff;
+          font-weight: 700;
         }
 
         label {
           font-weight: 600;
           margin-bottom: 0.5rem;
           display: block;
-          color: #273c75;
+          color: #2f3640;
         }
 
         select.form-control {
           width: 100%;
-          padding: 0.6rem;
+          padding: 0.65rem 0.75rem;
           font-size: 1rem;
-          border-radius: 8px;
+          border-radius: 10px;
           border: 1px solid #dcdde1;
-          margin-bottom: 1rem;
-          transition: border-color 0.2s;
+          margin-bottom: 1.2rem;
+          transition: all 0.3s ease;
+          box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
 
         select.form-control:focus {
           border-color: #44bd32;
           outline: none;
+          box-shadow: 0 0 8px rgba(68, 189, 50, 0.3);
         }
 
         .customer-list {
-          background-color: #ffffff;
+          background-color: #f8f9fadc;
           border-radius: 12px;
           padding: 1rem;
-          margin-bottom: 1.5rem;
+          margin-bottom: 1.8rem;
           max-height: 300px;
           overflow-y: auto;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
+          transition: all 0.3s ease;
+        }
+
+        .customer-list:hover {
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
         .customer-list div {
-          padding: 0.5rem 0;
-          border-bottom: 1px solid #f0f0f0;
+          padding: 0.6rem 0.8rem;
+          border-bottom: 1px solid #e0e0e0;
+          display: flex;
+          align-items: center;
+          border-radius: 8px;
+          transition: background 0.2s, transform 0.2s;
         }
 
         .customer-list div:last-child {
           border-bottom: none;
         }
 
+        /* Hover highlight effect on each row */
+        .customer-list div:hover {
+          background-color: #e8f0fee0;
+          transform: translateX(2px);
+        }
+
         .customer-list label {
           cursor: pointer;
           font-weight: 500;
           color: #2f3640;
+          display: flex;
+          align-items: center;
         }
 
-        .btn {
-          padding: 0.6rem 1.2rem;
-          border-radius: 8px;
-          font-weight: 500;
-          border: none;
+        .customer-list input[type="checkbox"] {
+          margin-right: 0.8rem;
+          width: 18px;
+          height: 18px;
+          accent-color: #273c75;
           cursor: pointer;
           transition: all 0.2s ease;
         }
 
+        .btn {
+          padding: 0.65rem 1.4rem;
+          border-radius: 10px;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 1rem;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
         .btn-primary {
           background-color: #273c75;
-          color: #fff;
+          color: #ffffff;
         }
 
         .btn-primary:hover {
-          background-color: #192a56;
+          background-color: #1e2a50;
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(0,0,0,0.15);
         }
 
         @media (max-width: 768px) {
           .container {
-            padding: 1rem;
+            padding: 1.5rem;
           }
 
           .customer-list {
-            max-height: 200px;
-            padding: 0.8rem;
+            max-height: 220px;
+            padding: 0.9rem;
           }
 
           h2 {
-            font-size: 1.8rem;
+            font-size: 1.7rem;
+          }
+
+          .btn {
+            width: 100%;
+            padding: 0.7rem;
           }
         }
       `}</style>
+
     </div>
   );
 }

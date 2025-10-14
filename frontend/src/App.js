@@ -13,7 +13,7 @@ import DashboardOverview from "./components/AdminDashboard/DashboardOverview.js"
 import ProtionReport from "./components/Promotion_and_Coupons/CouponsReport.js";
 import AddProducts from './components/AddProducts/AddProducts.js';
 import EditProduct from './components/EditProduct/EditProduct.js';
-import Inventory from "./components/Inventory/Inventory.js";
+import Inventory from "./components/Inventory/inventory.js";
 import ManageOrders from "./components/OrderManagement/orderManage.js";
 import Orders  from "./components/Orders/Orders.js";
 import OrderDetails from "./components/OrderDetails/OrderDetails.js";

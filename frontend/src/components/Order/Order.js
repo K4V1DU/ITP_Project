@@ -88,7 +88,7 @@ const handleSubmit = async (e) => {
   };
 
   return (
-    <div>
+    <div className="container">
     <Navbar/>
     <Banners />
     <div className="order">

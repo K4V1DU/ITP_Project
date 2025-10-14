@@ -118,6 +118,9 @@
 .payment-status.declined {
   color: #dc3545; /* Red */
 }
+.payment-status.rejected {
+  color: #dc3545; /* Red */
+}
 
 /* ---------------- Empty & Loader ---------------- */
 .empty {

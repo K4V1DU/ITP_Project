@@ -558,7 +558,7 @@ function OrderDetails() {
                     </div>
                   )}
 
-                  {["pending", "declined"].includes(
+                  {["pending", "declined","rejected"].includes(
                     order.PaymentStatus?.toLowerCase()
                   ) && (
                     <div

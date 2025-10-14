@@ -217,6 +217,12 @@
   border: 1px solid #dc3545;
 }
 
+.order-details__badge--rejected {
+  background: #fe0015;
+  color: #ffffff;
+  border: 1px solid #dc3545;
+}
+
 /* Payment Status Colors */
 .order-details__badge--completed {
   background: #249501;

@@ -32,7 +32,7 @@ function Cart() {
             );
             return {
               ...item,
-              Stock: stockRes.data.products.Quantity,
+              Stock: stockRes.data.product.Quantity,
             };
           } catch (err) {
             console.warn(`Removing invalid product: ${item.ProductID}`);

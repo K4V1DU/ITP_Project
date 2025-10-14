@@ -113,9 +113,9 @@ function ShareCoupons() {
       {/* CSS */}
       <style>{`
         .container {
-          max-width: 800px;
+          max-width: 850px;
           margin: auto;
-          background-color: #ffffff;
+          background: linear-gradient(135deg, #ffb6f3 0%, #a7c9ff 35%, #a8ffcf 70%, #ffd6f5 100%);
           padding: 2rem;
           border-radius: 15px;
           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
@@ -125,7 +125,7 @@ function ShareCoupons() {
         h2 {
           text-align: center;
           margin-bottom: 2rem;
-          color: #1e272e;
+          color: #1f2830ff;
           font-weight: 700;
         }
 
@@ -154,7 +154,7 @@ function ShareCoupons() {
         }
 
         .customer-list {
-          background-color: #f8f9fa;
+          background-color: #f8f9fadc;
           border-radius: 12px;
           padding: 1rem;
           margin-bottom: 1.8rem;
@@ -183,7 +183,7 @@ function ShareCoupons() {
 
         /* Hover highlight effect on each row */
         .customer-list div:hover {
-          background-color: #e8f0fe;
+          background-color: #e8f0fee0;
           transform: translateX(2px);
         }
 

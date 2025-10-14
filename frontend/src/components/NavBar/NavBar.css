@@ -55,15 +55,15 @@
 .profileImageContainer {
   margin-left: auto; 
   display: flex;
-  padding-right: 10px;
+  padding-right: 15px;
   padding-top: 5px;
   align-items: center;
   z-index: 2;
 }
 
 .profileImage {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   object-fit: cover;
 
 }

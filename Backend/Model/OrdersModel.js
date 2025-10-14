@@ -1,3 +1,4 @@
+// Model/OrdersModel.js
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -22,7 +23,11 @@ const OrderSchema = new Schema(
     Total: { type: Number, required: true },
 
     PaymentMethod: { type: String, required: true }, 
-    PaymentStatus: { type: String, default: "Pending" }, 
+    PaymentStatus: { 
+      type: String, 
+      enum: ["Pending", "Completed", "Rejected"], 
+      default: "Pending" 
+    }, 
 
     Status: { type: String, default: "Pending" }, 
 
@@ -31,8 +36,6 @@ const OrderSchema = new Schema(
 
     EstimatedDelivery: { type: Date },  
     ScheduledDelivery: { type: Date }  
-
-    
   },
   { timestamps: true }
 );

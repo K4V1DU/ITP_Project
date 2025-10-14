@@ -6,70 +6,22 @@ import {
   Box, Typography, Container, Paper, Button, Card, CardContent, Grid,
   InputLabel, FormControl, Select, MenuItem, TextField, Chip, Breadcrumbs,
   LinearProgress, Snackbar, Alert, Tooltip, Dialog, DialogTitle, DialogContent,
-  DialogActions, IconButton
+  DialogActions, IconButton, Avatar, Stack
 } from "@mui/material";
-
-import IcecreamIcon from "@mui/icons-material/Icecream";
-import HomeIcon from "@mui/icons-material/Home";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import SaveIcon from "@mui/icons-material/Save";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VerifiedIcon from "@mui/icons-material/Verified";
-import BlockIcon from "@mui/icons-material/Block";
-import PendingActionsIcon from "@mui/icons-material/PendingActions";
-
-const styles = `
-@keyframes rotate { from {transform: rotate(0)} to {transform: rotate(360deg)} }
-.rotating { animation: rotate 1s linear infinite; }
-
-.upload-zone {
-  background: #fff;
-  border: 2px dashed #e0e0e0;
-  border-radius: 12px;
-  padding: 24px;
-  text-align: center;
-  transition: all .25s ease;
-}
-.upload-zone:hover {
-  border-color: #f5576c;
-  background: #fff8fb;
-}
-.upload-zone--active {
-  border-color: #fa709a;
-  background: #fff0f5;
-  box-shadow: 0 10px 30px rgba(250,112,154,.15);
-}
-.file-meta {
-  display:flex; align-items:center; justify-content:center; gap:10px; margin-top:10px;
-}
-.pdf-viewer {
-  width: 100%; height: 380px; border: none; border-radius: 12px; background: #f5f5f5;
-}
-`;
-
-// Ice cream theme colors
-const iceColors = {
-  vanilla: "#FFF8E7",
-  strawberry: "#FFE4E1",
-  mint: "#E0F7FA",
-  blueberry: "#E3F2FD",
-  primary: "#FF6B9D",
-  gradient1: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-  gradient2: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-  gradient3: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-  gradient4: "linear-gradient(135deg, #30cfd0 0%, #330867 100%)"
-};
-
-const statusStyles = {
-  Approved: { color: "success", icon: <VerifiedIcon /> },
-  Pending: { color: "warning", icon: <PendingActionsIcon /> },
-  Rejected: { color: "error", icon: <BlockIcon /> }
-};
+import {
+  Home as HomeIcon,
+  Dashboard as DashboardIcon,
+  ArrowBack as ArrowBackIcon,
+  Refresh as RefreshIcon,
+  CloudUpload as CloudUploadIcon,
+  DeleteOutline as DeleteOutlineIcon,
+  RestartAlt as RestartAltIcon,
+  Save as SaveIcon,
+  Visibility as VisibilityIcon,
+  Edit as EditIcon
+} from "@mui/icons-material";
+import { motion } from "framer-motion";
+import { financeColors, financeStyles, statusConfig } from "./shared/FinanceStyles";
 
 const ALLOWED_TYPES = [
   "application/pdf",
@@ -85,13 +37,11 @@ export default function EditReceipt() {
   const { orderNumber } = useParams();
   const navigate = useNavigate();
 
-  // Data states
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState("Pending");
   const [file, setFile] = useState(null);
   const [currentReceiptUrl, setCurrentReceiptUrl] = useState(null);
 
-  // UI states
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -100,7 +50,6 @@ export default function EditReceipt() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [errors, setErrors] = useState({ notes: "", status: "", file: "" });
 
-  // Keep initial values to allow reset
   const [initial, setInitial] = useState({ notes: "", status: "Pending" });
 
   useEffect(() => {
@@ -115,8 +64,6 @@ export default function EditReceipt() {
         setInitial({ notes: res.data.Notes || "", status: res.data.Status || "Pending" });
         if (res.data?._id) {
           setCurrentReceiptUrl(`http://localhost:5000/finance/payments/${res.data._id}/receipt`);
-        } else {
-          setCurrentReceiptUrl(`http://localhost:5000/finance/payments/order/${orderNumber}/receipt`);
         }
       } catch (err) {
         console.error(err);
@@ -133,7 +80,6 @@ export default function EditReceipt() {
     setSnackbar({ open: true, message, severity });
   };
 
-  // Validation
   const validate = () => {
     const e = { notes: "", status: "", file: "" };
     if (notes.trim().length > 300) e.notes = "Notes cannot exceed 300 characters.";
@@ -148,7 +94,7 @@ export default function EditReceipt() {
 
   const onFilePicked = (picked) => {
     if (!picked) return;
-    if (!ALLOWED_TYPES.includes(picked.type)) return showNotification("Only PDF or image files are allowed.", "error");
+    if (!ALLOWED_TYPES.includes(picked.type)) return showNotification("Only PDF or image files allowed.", "error");
     if (picked.size > MAX_SIZE) return showNotification("File too large (max 10MB).", "error");
     setFile(picked);
   };
@@ -158,8 +104,7 @@ export default function EditReceipt() {
   const handleDrop = (e) => {
     e.preventDefault();
     setDragActive(false);
-    const picked = e.dataTransfer.files?.[0];
-    onFilePicked(picked);
+    onFilePicked(e.dataTransfer.files?.[0]);
   };
 
   const handleSave = () => {
@@ -173,7 +118,6 @@ export default function EditReceipt() {
     setUploadProgress(0);
     try {
       const formData = new FormData();
-      // Match backend fields used elsewhere
       formData.append("Notes", notes);
       formData.append("Status", status);
       if (file) formData.append("receipt", file);
@@ -214,262 +158,358 @@ export default function EditReceipt() {
   if (loading) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
-        <LinearProgress />
+        <LinearProgress className="shimmer" />
         <Typography sx={{ mt: 2 }}>Loading payment details...</Typography>
       </Box>
     );
   }
 
   return (
-    <Container maxWidth="xl">
-      <style>{styles}</style>
+    <Box className="finance-bg-light" sx={{ minHeight: "100vh", py: 4, px: 2 }}>
+      <style>{financeStyles}</style>
 
-      <Box sx={{
-        background: `linear-gradient(135deg, ${iceColors.vanilla} 0%, ${iceColors.mint} 100%)`,
-        minHeight: "100vh",
-        py: 4,
-        px: 2
-      }}>
+      <Container maxWidth="xl">
         {/* Header */}
-        <Paper elevation={0} sx={{ p: 3, mb: 3, background: iceColors.gradient3, borderRadius: 4 }}>
-          <Grid container alignItems="center" justifyContent="space-between">
-            <Grid item xs={12} md={6}>
-              <Box display="flex" alignItems="center" gap={2}>
-                <IcecreamIcon sx={{ fontSize: 40, color: "white" }} />
-                <Box>
-                  <Typography variant="h4" sx={{ fontWeight: "bold", color: "white" }}>
-                    Edit Receipt
-                  </Typography>
-                  <Breadcrumbs sx={{ color: "rgba(255,255,255,0.85)" }}>
-                    <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
-                      <Box display="flex" alignItems="center" gap={0.5}>
-                        <HomeIcon fontSize="small" /> Home
-                      </Box>
-                    </Link>
-                    <Link to="/FinanceDashboard" style={{ color: "inherit", textDecoration: "none" }}>
-                      <Box display="flex" alignItems="center" gap={0.5}>
-                        <DashboardIcon fontSize="small" /> Dashboard
-                      </Box>
-                    </Link>
-                    <Typography color="white">Order #{orderNumber}</Typography>
-                  </Breadcrumbs>
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="animate-fadeInDown"
+        >
+          <Paper
+            elevation={0}
+            sx={{
+              p: 4,
+              mb: 4,
+              background: financeColors.bgGradient2,
+              borderRadius: 5,
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+          >
+            <div className="particles">
+              {[...Array(5)].map((_, i) => <div key={i} className="particle" />)}
+            </div>
+
+            <Grid container alignItems="center" spacing={3} sx={{ position: 'relative', zIndex: 1 }}>
+              <Grid item xs={12} md={6}>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Avatar sx={{ width: 80, height: 80, bgcolor: 'white' }}>
+                    <EditIcon sx={{ fontSize: 50, color: financeColors.primary }} />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h3" sx={{ fontWeight: 900, color: 'white', mb: 0.5 }}>
+                      Edit Receipt
+                    </Typography>
+                    <Breadcrumbs sx={{ color: 'rgba(255,255,255,0.9)' }}>
+                      <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <Box display="flex" alignItems="center" gap={0.5}>
+                          <HomeIcon fontSize="small" /> Home
+                        </Box>
+                      </Link>
+                      <Link to="/FinanceDashboard" style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <Box display="flex" alignItems="center" gap={0.5}>
+                          <DashboardIcon fontSize="small" /> Dashboard
+                        </Box>
+                      </Link>
+                      <Typography color="white" fontWeight={600}>Order #{orderNumber}</Typography>
+                    </Breadcrumbs>
+                  </Box>
                 </Box>
-              </Box>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Stack direction="row" spacing={2} justifyContent="flex-end" flexWrap="wrap">
+                  <Chip
+                    label={`Order #${orderNumber}`}
+                    sx={{ bgcolor: 'white', color: financeColors.primary, fontWeight: 'bold' }}
+                  />
+                  <Chip
+                    label={status}
+                    sx={{
+                      background: statusConfig[status]?.gradient || statusConfig.Pending.gradient,
+                      color: 'white',
+                      fontWeight: 'bold'
+                    }}
+                  />
+                </Stack>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <Box display="flex" gap={1} justifyContent="flex-end" flexWrap="wrap">
-                <Chip
-                  label={`Order #${orderNumber}`}
-                  sx={{ bgcolor: "white", color: iceColors.primary, fontWeight: "bold" }}
-                />
-                <Chip
-                  icon={statusStyles[status]?.icon}
-                  label={status}
-                  color={statusStyles[status]?.color || "warning"}
-                  sx={{ fontWeight: "bold" }}
-                />
-              </Box>
-            </Grid>
-          </Grid>
-        </Paper>
+          </Paper>
+        </motion.div>
 
         {/* Actions Bar */}
-        <Paper elevation={3} sx={{ p: 2, mb: 3, borderRadius: 3, background: "white" }}>
-          <Grid container alignItems="center" spacing={2}>
-            <Grid item xs={12} md={8}>
-              <Box display="flex" gap={1} flexWrap="wrap">
-                <Button
-                  variant="contained"
-                  startIcon={<ArrowBackIcon />}
-                  onClick={() => navigate("/FinanceDashboard")}
-                  sx={{ background: iceColors.gradient4 }}
-                >
-                  Back to Dashboard
-                </Button>
-                <Button
-                  variant="contained"
-                  startIcon={<RefreshIcon className={loading ? "rotating" : ""} />}
-                  onClick={() => window.location.reload()}
-                  sx={{ background: iceColors.gradient1 }}
-                >
-                  Refresh
-                </Button>
-                {currentReceiptUrl && (
-                  <Tooltip title="Open current receipt in new tab">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="animate-fadeInUp"
+        >
+          <Paper className="glass-card hover-lift" sx={{ p: 2, mb: 3, borderRadius: 4 }}>
+            <Grid container alignItems="center" spacing={2}>
+              <Grid item xs={12} md={8}>
+                <Stack direction="row" spacing={1} flexWrap="wrap">
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<ArrowBackIcon />}
+                      onClick={() => navigate("/FinanceDashboard")}
+                      className="finance-button"
+                      sx={{ background: financeColors.bgGradient3 }}
+                    >
+                      Back to Dashboard
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.05, rotate: 180 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<RefreshIcon className={loading ? "rotating" : ""} />}
+                      onClick={() => window.location.reload()}
+                      className="finance-button"
+                      sx={{ background: financeColors.bgGradient1 }}
+                    >
+                      Refresh
+                    </Button>
+                  </motion.div>
+                  {currentReceiptUrl && (
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Tooltip title="Open current receipt">
+                        <Button
+                          variant="outlined"
+                          startIcon={<VisibilityIcon />}
+                          onClick={() => window.open(currentReceiptUrl, "_blank")}
+                          className="hover-lift"
+                        >
+                          View Current
+                        </Button>
+                      </Tooltip>
+                    </motion.div>
+                  )}
+                </Stack>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Stack direction="row" spacing={1} justifyContent="flex-end" flexWrap="wrap">
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button
                       variant="outlined"
-                      startIcon={<VisibilityIcon />}
-                      onClick={() => window.open(currentReceiptUrl, "_blank", "noopener,noreferrer")}
+                      startIcon={<RestartAltIcon />}
+                      onClick={handleReset}
+                      disabled={saving}
+                      className="hover-lift"
                     >
-                      View Current Receipt
+                      Reset
                     </Button>
-                  </Tooltip>
-                )}
-              </Box>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<SaveIcon />}
+                      onClick={handleSave}
+                      disabled={saving}
+                      className="finance-button"
+                      sx={{ background: financeColors.bgGradient4 }}
+                    >
+                      {saving ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </motion.div>
+                </Stack>
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={4}>
-              <Box display="flex" gap={1} justifyContent="flex-end" flexWrap="wrap">
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  startIcon={<RestartAltIcon />}
-                  onClick={handleReset}
-                  disabled={saving}
-                >
-                  Reset
-                </Button>
-                <Button
-                  variant="contained"
-                  startIcon={<SaveIcon />}
-                  onClick={handleSave}
-                  disabled={saving}
-                  sx={{ background: iceColors.gradient2 }}
-                >
-                  {saving ? "Saving..." : "Save Changes"}
-                </Button>
-              </Box>
-            </Grid>
-          </Grid>
-        </Paper>
+          </Paper>
+        </motion.div>
 
         {/* Form + Preview */}
-        <Card sx={{ borderRadius: 4, boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}>
-          {saving && (
-            <LinearProgress
-              variant={uploadProgress ? "determinate" : "indeterminate"}
-              value={uploadProgress}
-              sx={{ borderTopLeftRadius: 4, borderTopRightRadius: 4 }}
-            />
-          )}
-          <CardContent>
-            <Grid container spacing={3}>
-              {/* Left: Form */}
-              <Grid item xs={12} md={6}>
-                <Paper elevation={0} sx={{ p: 2, borderRadius: 3, background: iceColors.blueberry }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 2 }}>
-                    Details
-                  </Typography>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3 }}
+          className="animate-scaleIn"
+        >
+          <Card className="glass-card hover-lift" sx={{ borderRadius: 5, overflow: 'hidden' }}>
+            {saving && (
+              <LinearProgress
+                variant={uploadProgress ? "determinate" : "indeterminate"}
+                value={uploadProgress}
+                className="shimmer"
+              />
+            )}
+            <CardContent>
+              <Grid container spacing={3}>
+                {/* Left: Form */}
+                <Grid item xs={12} md={6}>
+                  <Paper className="glass-dark" sx={{ p: 3, borderRadius: 4 }}>
+                    <Typography variant="h6" sx={{ fontWeight: "bold", mb: 3, color: financeColors.primary }}>
+                      Receipt Details
+                    </Typography>
 
-                  <TextField
-                    fullWidth
-                    label="Notes"
-                    multiline
-                    rows={4}
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    error={!!errors.notes}
-                    helperText={errors.notes || `${notes.length}/300`}
-                    inputProps={{ maxLength: 300 }}
-                    sx={{ mb: 2, background: "white", borderRadius: 2 }}
-                  />
+                    <TextField
+                      fullWidth
+                      label="Notes"
+                      multiline
+                      rows={4}
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      error={!!errors.notes}
+                      helperText={errors.notes || `${notes.length}/300`}
+                      inputProps={{ maxLength: 300 }}
+                      sx={{ mb: 3, '& .MuiOutlinedInput-root': { bgcolor: 'white', borderRadius: 3 } }}
+                    />
 
-                  <FormControl fullWidth sx={{ mb: 2 }}>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      label="Status"
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                      error={!!errors.status}
-                      sx={{ background: "white", borderRadius: 2 }}
+                    <FormControl fullWidth sx={{ mb: 3 }}>
+                      <InputLabel>Status</InputLabel>
+                      <Select
+                        label="Status"
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                        error={!!errors.status}
+                        sx={{ bgcolor: 'white', borderRadius: 3 }}
+                      >
+                        <MenuItem value="Pending">Pending</MenuItem>
+                        <MenuItem value="Approved">Approved</MenuItem>
+                        <MenuItem value="Rejected">Rejected</MenuItem>
+                      </Select>
+                      {errors.status && (
+                        <Typography variant="caption" color="error">{errors.status}</Typography>
+                      )}
+                    </FormControl>
+
+                    {/* Upload Zone */}
+                    <Box
+                      onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+                      onDragLeave={() => setDragActive(false)}
+                      onDrop={handleDrop}
+                      sx={{
+                        border: `2px dashed ${dragActive ? financeColors.primary : '#e0e0e0'}`,
+                        borderRadius: 3,
+                        p: 3,
+                        textAlign: 'center',
+                        bgcolor: dragActive ? 'rgba(99, 102, 241, 0.05)' : 'white',
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer'
+                      }}
+                      className="hover-lift"
                     >
-                      <MenuItem value="Pending">Pending</MenuItem>
-                      <MenuItem value="Approved">Approved</MenuItem>
-                      <MenuItem value="Rejected">Rejected</MenuItem>
-                    </Select>
-                    {errors.status && (
-                      <Typography variant="caption" color="error">{errors.status}</Typography>
-                    )}
-                  </FormControl>
+                      <CloudUploadIcon sx={{ fontSize: 60, color: financeColors.primary, mb: 2 }} />
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                        Drag & drop receipt here
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                        or click to select a file (PDF or image, max 10MB)
+                      </Typography>
 
-                  {/* Upload */}
-                  <Box
-                    className={`upload-zone ${dragActive ? "upload-zone--active" : ""}`}
-                    onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
-                    onDragLeave={() => setDragActive(false)}
-                    onDrop={handleDrop}
-                  >
-                    <CloudUploadIcon sx={{ fontSize: 48, color: iceColors.primary }} />
-                    <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: "bold" }}>
-                      Drag & drop receipt here
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      or click to select a file (PDF or image, max 10MB)
-                    </Typography>
+                      <Button 
+                        variant="outlined" 
+                        component="label" 
+                        sx={{ borderRadius: 3 }}
+                        className="hover-scale"
+                      >
+                        Choose File
+                        <input type="file" hidden accept=".pdf,image/*" onChange={handleFileChange} />
+                      </Button>
 
-                    <Button variant="outlined" component="label" sx={{ mt: 2 }}>
-                      Choose File
-                      <input type="file" hidden accept=".pdf,image/*" onChange={handleFileChange} />
-                    </Button>
-
-                    {file && (
-                      <Box className="file-meta">
-                        <Chip label={file.name} variant="outlined" />
-                        <Typography variant="body2" color="textSecondary">
-                          {(file.size / 1024 / 1024).toFixed(2)} MB
-                        </Typography>
-                        <Tooltip title="Remove Selected File">
-                          <IconButton color="error" onClick={() => setFile(null)}>
+                      {file && (
+                        <Box display="flex" alignItems="center" justifyContent="center" gap={2} mt={2}>
+                          <Chip label={file.name} variant="outlined" />
+                          <Typography variant="body2" color="textSecondary">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </Typography>
+                          <IconButton color="error" onClick={() => setFile(null)} size="small">
                             <DeleteOutlineIcon />
                           </IconButton>
-                        </Tooltip>
+                        </Box>
+                      )}
+                      {errors.file && (
+                        <Typography variant="caption" color="error" sx={{ display: "block", mt: 1 }}>
+                          {errors.file}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Paper>
+                </Grid>
+
+                {/* Right: Current Receipt Preview */}
+                <Grid item xs={12} md={6}>
+                  <Paper className="glass-dark" sx={{ p: 3, borderRadius: 4 }}>
+                    <Typography variant="h6" sx={{ fontWeight: "bold", mb: 3, color: financeColors.primary }}>
+                      Current Receipt
+                    </Typography>
+
+                    {currentReceiptUrl ? (
+                      <Box
+                        sx={{
+                          width: '100%',
+                          height: 500,
+                          borderRadius: 3,
+                          overflow: 'hidden',
+                          bgcolor: '#f5f5f5'
+                        }}
+                        className="custom-scrollbar"
+                      >
+                        <iframe
+                          title={`Receipt Preview - ${orderNumber}`}
+                          src={currentReceiptUrl}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            border: 'none'
+                          }}
+                        />
+                      </Box>
+                    ) : (
+                      <Box 
+                        sx={{ 
+                          p: 5, 
+                          textAlign: 'center', 
+                          bgcolor: 'white', 
+                          borderRadius: 3,
+                          border: '2px dashed #e0e0e0'
+                        }}
+                      >
+                        <Typography color="textSecondary">No receipt available</Typography>
                       </Box>
                     )}
-                    {errors.file && (
-                      <Typography variant="caption" color="error" sx={{ display: "block", mt: 1 }}>
-                        {errors.file}
-                      </Typography>
-                    )}
-                  </Box>
-                </Paper>
-              </Grid>
 
-              {/* Right: Current Receipt Preview */}
-              <Grid item xs={12} md={6}>
-                <Paper elevation={0} sx={{ p: 2, borderRadius: 3, background: "white" }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 2 }}>
-                    Current Receipt
-                  </Typography>
-
-                  {currentReceiptUrl ? (
-                    <iframe
-                      className="pdf-viewer"
-                      title={`Receipt Preview - ${orderNumber}`}
-                      src={currentReceiptUrl}
-                    />
-                  ) : (
-                    <Box sx={{ p: 3, textAlign: "center", bgcolor: iceColors.strawberry, borderRadius: 2 }}>
-                      <Typography color="textSecondary">No receipt available</Typography>
-                    </Box>
-                  )}
-
-                  <Box display="flex" gap={1} justifyContent="flex-end" mt={2}>
                     {currentReceiptUrl && (
-                      <Button
-                        variant="outlined"
-                        startIcon={<VisibilityIcon />}
-                        onClick={() => window.open(currentReceiptUrl, "_blank", "noopener,noreferrer")}
-                      >
-                        Open in New Tab
-                      </Button>
+                      <Box display="flex" justifyContent="flex-end" mt={2}>
+                        <Button
+                          variant="outlined"
+                          startIcon={<VisibilityIcon />}
+                          onClick={() => window.open(currentReceiptUrl, "_blank")}
+                          className="hover-scale"
+                        >
+                          Open in New Tab
+                        </Button>
+                      </Box>
                     )}
-                  </Box>
-                </Paper>
+                  </Paper>
+                </Grid>
               </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        {/* Confirm Save */}
-        <Dialog open={confirmOpen} onClose={() => !saving && setConfirmOpen(false)} PaperProps={{ sx: { borderRadius: 3, minWidth: 420 } }}>
-          <DialogTitle>Confirm Save</DialogTitle>
-          <DialogContent>
+        {/* Confirm Save Dialog */}
+        <Dialog 
+          open={confirmOpen} 
+          onClose={() => !saving && setConfirmOpen(false)} 
+          PaperProps={{ sx: { borderRadius: 4, minWidth: 420 } }}
+        >
+          <DialogTitle sx={{ background: financeColors.bgGradient2, color: 'white' }}>
+            Confirm Save
+          </DialogTitle>
+          <DialogContent sx={{ mt: 2 }}>
             <Typography>
               Save changes to Order <strong>#{orderNumber}</strong>?
             </Typography>
           </DialogContent>
           <DialogActions sx={{ p: 2 }}>
             <Button onClick={() => setConfirmOpen(false)} disabled={saving}>Cancel</Button>
-            <Button variant="contained" onClick={doSave} disabled={saving} startIcon={<SaveIcon />}>
+            <Button 
+              variant="contained" 
+              onClick={doSave} 
+              disabled={saving} 
+              startIcon={<SaveIcon />}
+              sx={{ background: financeColors.bgGradient4 }}
+            >
               {saving ? "Saving..." : "Save"}
             </Button>
           </DialogActions>
@@ -486,12 +526,11 @@ export default function EditReceipt() {
             onClose={() => setSnackbar({ ...snackbar, open: false })}
             severity={snackbar.severity}
             variant="filled"
-            sx={{ minWidth: 250 }}
           >
             {snackbar.message}
           </Alert>
         </Snackbar>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }

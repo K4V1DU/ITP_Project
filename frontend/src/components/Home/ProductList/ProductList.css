@@ -3,25 +3,25 @@
   display: flex;
   gap: 10px;
   padding-top: 20px;
+  background-color: #ffffff;
 }
 
 
 .sidebar {
   width: 260px;
   padding: 20px;
-  border: 1px solid #ccc;
   border-radius: 8px;
+  border: 1px solid #ccc;
   background-color: #ffffff;
   flex-shrink: 0;
   position: sticky;
   min-height: 100%; 
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar h2 {
   margin-bottom: 10px;
   padding-left: 10px;
-  font-size: 26px;
+  font-size: 20px;
   background-color: rgba(124, 124, 124, 0);
   border-radius: 5px;
 }
@@ -31,13 +31,13 @@
   align-items: center;
   margin-left: 30px;
   padding: 10px;
-  font-size: larger;
+  font-size:large;
   background-color: rgba(206, 206, 206, 0);
 }
 .sidebar input {
   margin-right: 10px;
-  width: 20px; 
-  height: 20px;
+  width: 15px; 
+  height: 15px;
   cursor: pointer;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -129,3 +129,19 @@
 }
 
 
+.clearButton {
+  margin-top: 20px;
+  width: 100%;
+  padding: 10px;
+  background-color: #000000;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s ease;
+}
+
+.clearButton:hover {
+  background-color: #000000;
+}

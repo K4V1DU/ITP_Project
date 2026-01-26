@@ -27,13 +27,14 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ClearIcon from "@mui/icons-material/Clear";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
 // Import logo
-import CoolCartLogo from "../../assets/images/logo99.png"; 
+import CoolCartLogo from "../../assets/images/logo99.png";
 
 ChartJS.register(ArcElement, ChartTooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
@@ -52,8 +53,16 @@ const styles = `
   from { transform: rotate(0deg); } 
   to { transform: rotate(360deg); } 
 }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
 .rotating { 
   animation: rotate 1s linear infinite; 
+}
+.shaking {
+  animation: shake 0.5s ease;
 }
 .animated-bg {
   background: linear-gradient(-45deg, #FFF8E7, #FFE4E1, #E0F7FA, #E3F2FD, #F3E5F5);
@@ -82,7 +91,6 @@ const styles = `
 
 /* ==================== PRINT STYLES ==================== */
 @media print {
-  /* Hide non-printable elements */
   .no-print,
   .MuiButton-root,
   .MuiSnackbar-root,
@@ -95,7 +103,6 @@ const styles = `
     display: none !important;
   }
 
-  /* Reset page background */
   body {
     background: white !important;
     margin: 0;
@@ -107,13 +114,11 @@ const styles = `
     animation: none !important;
   }
 
-  /* Page setup */
   @page {
     size: A4;
     margin: 15mm;
   }
 
-  /* Print header */
   .print-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -166,7 +171,6 @@ const styles = `
     opacity: 0.9;
   }
 
-  /* Summary cards for print */
   .print-summary {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -207,7 +211,6 @@ const styles = `
   .card-pending { background: linear-gradient(135deg, #F59E0B, #FCD34D); }
   .card-rejected { background: linear-gradient(135deg, #EF4444, #F87171); }
 
-  /* Filter info box */
   .print-filters {
     background: #f5f7ff;
     padding: 12px 15px;
@@ -230,7 +233,6 @@ const styles = `
     color: #666;
   }
 
-  /* Section titles */
   .print-section-title {
     font-size: 16px;
     font-weight: bold;
@@ -241,7 +243,6 @@ const styles = `
     page-break-after: avoid;
   }
 
-  /* Table styles for print */
   .MuiTable-root {
     border-collapse: collapse;
     width: 100%;
@@ -276,7 +277,6 @@ const styles = `
     color: #333 !important;
   }
 
-  /* Status chips */
   .MuiChip-root {
     font-size: 9px !important;
     height: 22px !important;
@@ -298,7 +298,6 @@ const styles = `
     color: #EF4444 !important;
   }
 
-  /* Footer */
   .print-footer {
     position: fixed;
     bottom: 0;
@@ -347,12 +346,10 @@ const styles = `
     font-size: 9px;
   }
 
-  /* Hide charts for print */
   canvas {
     display: none !important;
   }
 
-  /* Optimize for printing */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -384,10 +381,7 @@ const StatCard = ({ icon, label, value, gradient, delay }) => (
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, type: "spring", stiffness: 100 }}
     >
-      <motion.div 
-        whileHover={{ scale: 1.08, rotate: 2 }} 
-        whileTap={{ scale: 0.95 }}
-      >
+      <motion.div whileHover={{ scale: 1.08, rotate: 2 }} whileTap={{ scale: 0.95 }}>
         <Card
           className="stats-card"
           sx={{
@@ -430,12 +424,69 @@ export default function PaymentReport() {
   const [dateTo, setDateTo] = useState("");
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
+  // ✅ VALIDATION STATE
+  const [errors, setErrors] = useState({ dateFrom: "", dateTo: "" });
+
   const API_URL = "http://localhost:5000";
 
   // ==================== NOTIFICATION HANDLER ====================
   const showNotification = useCallback((message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
   }, []);
+
+  // ==================== ✅ VALIDATION FUNCTION ====================
+  const validateFilters = useCallback(() => {
+    const e = { dateFrom: "", dateTo: "" };
+
+    const df = dateFrom ? new Date(dateFrom) : null;
+    const dt = dateTo ? new Date(dateTo) : null;
+    const now = new Date();
+    now.setHours(23, 59, 59, 999); // End of today
+
+    // Check valid dates
+    if (dateFrom && isNaN(df?.getTime())) {
+      e.dateFrom = "Invalid start date";
+    }
+    if (dateTo && isNaN(dt?.getTime())) {
+      e.dateTo = "Invalid end date";
+    }
+
+    // Check future dates
+    if (!e.dateFrom && df && df > now) {
+      e.dateFrom = "Start date cannot be in the future";
+    }
+    if (!e.dateTo && dt && dt > now) {
+      e.dateTo = "End date cannot be in the future";
+    }
+
+    // Check range logic
+    if (!e.dateFrom && !e.dateTo && df && dt && df > dt) {
+      e.dateTo = "End date must be after start date";
+    }
+
+    // Optional: Max range limit (1 year = 366 days)
+    if (!e.dateFrom && !e.dateTo && df && dt) {
+      const daysDiff = (dt - df) / (1000 * 60 * 60 * 24);
+      if (daysDiff > 366) {
+        e.dateTo = "Date range cannot exceed 1 year";
+      }
+    }
+
+    setErrors(e);
+    return !e.dateFrom && !e.dateTo;
+  }, [dateFrom, dateTo]);
+
+  // ✅ Auto-validate when dates change
+  useEffect(() => {
+    if (dateFrom || dateTo) {
+      validateFilters();
+    } else {
+      setErrors({ dateFrom: "", dateTo: "" });
+    }
+  }, [dateFrom, dateTo, validateFilters]);
+
+  // ✅ Computed flag
+  const filtersValid = !errors.dateFrom && !errors.dateTo;
 
   // ==================== FETCH PAYMENTS ====================
   const fetchPayments = useCallback(async () => {
@@ -471,23 +522,21 @@ export default function PaymentReport() {
   const pending = filteredData.filter(p => p.Status === "Pending").length;
   const total = filteredData.length;
 
-  // Calculate percentages
   const approvalRate = total ? Math.round((approved / total) * 100) : 0;
   const rejectionRate = total ? Math.round((rejected / total) * 100) : 0;
   const pendingRate = total ? Math.round((pending / total) * 100) : 0;
 
-  // Date formatting
-  const currentDate = new Date().toLocaleDateString("en-GB", { 
-    year: "numeric", month: "long", day: "numeric" 
+  const currentDate = new Date().toLocaleDateString("en-GB", {
+    year: "numeric", month: "long", day: "numeric"
   });
-  const currentTime = new Date().toLocaleTimeString([], { 
-    hour: "2-digit", minute: "2-digit" 
+  const currentTime = new Date().toLocaleTimeString([], {
+    hour: "2-digit", minute: "2-digit"
   });
 
   const dateRangeText = dateFrom && dateTo
     ? `${new Date(dateFrom).toLocaleDateString()} - ${new Date(dateTo).toLocaleDateString()}`
-    : (dateFrom ? `From ${new Date(dateFrom).toLocaleDateString()}` 
-       : (dateTo ? `Until ${new Date(dateTo).toLocaleDateString()}` : "All Time"));
+    : (dateFrom ? `From ${new Date(dateFrom).toLocaleDateString()}`
+      : (dateTo ? `Until ${new Date(dateTo).toLocaleDateString()}` : "All Time"));
 
   // ==================== CHART DATA ====================
   const doughnutData = {
@@ -512,13 +561,13 @@ export default function PaymentReport() {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { 
-        position: 'bottom', 
-        labels: { 
-          padding: 20, 
+      legend: {
+        position: 'bottom',
+        labels: {
+          padding: 20,
           font: { size: 14 },
           usePointStyle: true
-        } 
+        }
       },
       tooltip: {
         backgroundColor: 'rgba(0,0,0,0.9)',
@@ -547,14 +596,33 @@ export default function PaymentReport() {
     }
   };
 
-  // ==================== ENHANCED PDF EXPORT (NO EMOJIS) ====================
+  // ==================== ✅ ENHANCED PDF EXPORT WITH VALIDATION ====================
   const exportPDFPro = async () => {
+    // ✅ STEP 1: Validate filters
+    if (!validateFilters()) {
+      showNotification("Please fix date filter errors before exporting", "error");
+      return;
+    }
+
+    // ✅ STEP 2: Check for empty data
+    if (filteredData.length === 0) {
+      showNotification("No records to export. Please adjust your filters.", "warning");
+      return;
+    }
+
+    // ✅ STEP 3: Performance guard
+    if (filteredData.length > 5000) {
+      showNotification("Too many records (max 5000). Please narrow your filters.", "warning");
+      return;
+    }
+
     try {
+      showNotification("Generating PDF...", "info");
+
       const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
 
-      // PDF METADATA
       doc.setProperties({
         title: 'CoolCart Payment Report',
         subject: 'Financial Payment Analysis',
@@ -563,7 +631,6 @@ export default function PaymentReport() {
         creator: 'CoolCart System'
       });
 
-      // LOAD LOGO
       let logoDataUrl = null;
       try {
         logoDataUrl = await toDataURL(CoolCartLogo);
@@ -571,16 +638,14 @@ export default function PaymentReport() {
         console.warn("Logo loading failed:", e);
       }
 
-      // DATE INFO
       const generatedDate = new Date();
-      const dateStr = generatedDate.toLocaleDateString("en-GB", { 
-        year: "numeric", month: "long", day: "numeric" 
+      const dateStr = generatedDate.toLocaleDateString("en-GB", {
+        year: "numeric", month: "long", day: "numeric"
       });
-      const timeStr = generatedDate.toLocaleTimeString([], { 
-        hour: "2-digit", minute: "2-digit" 
+      const timeStr = generatedDate.toLocaleTimeString([], {
+        hour: "2-digit", minute: "2-digit"
       });
 
-      // DESIGN CONSTANTS
       const colors = {
         primary: [255, 107, 157],
         secondary: [102, 126, 234],
@@ -595,11 +660,10 @@ export default function PaymentReport() {
       const margin = 15;
       const headerHeight = 45;
 
-      // HEADER FUNCTION
       const drawHeader = () => {
         doc.setFillColor(...colors.headerBg);
         doc.rect(0, 0, pageWidth, headerHeight, 'F');
-        
+
         doc.setFillColor(...colors.primary);
         doc.rect(0, headerHeight - 2, pageWidth, 2, 'F');
 
@@ -622,7 +686,7 @@ export default function PaymentReport() {
         doc.setFontSize(18);
         doc.setTextColor(255, 255, 255);
         doc.text("CoolCart", margin + 28, 16);
-        
+
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
         doc.setTextColor(240, 240, 255);
@@ -632,7 +696,7 @@ export default function PaymentReport() {
         doc.setFontSize(16);
         doc.setTextColor(255, 255, 255);
         doc.text("PAYMENT REPORT", pageWidth - margin, 16, { align: "right" });
-        
+
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
         doc.setTextColor(240, 240, 255);
@@ -644,10 +708,9 @@ export default function PaymentReport() {
         doc.circle(pageWidth - 5, 5, 3, 'F');
       };
 
-      // FOOTER FUNCTION
       const drawFooter = (pageNumber) => {
         const footerY = pageHeight - 15;
-        
+
         doc.setDrawColor(...colors.borderColor);
         doc.setLineWidth(0.5);
         doc.line(margin, footerY, pageWidth - margin, footerY);
@@ -658,41 +721,37 @@ export default function PaymentReport() {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         doc.setTextColor(100, 100, 120);
-        
+
         doc.text("CoolCart Finance (c) 2024", margin, footerY + 8);
         doc.text("Confidential Document", pageWidth / 2, footerY + 8, { align: "center" });
-        
+
         doc.setFont("helvetica", "bold");
         doc.text(`Page ${pageNumber}`, pageWidth - margin, footerY + 8, { align: "right" });
-        
+
         doc.setFillColor(...colors.primary);
         doc.circle(margin + 2, footerY + 11, 0.5, 'F');
         doc.circle(pageWidth - margin - 2, footerY + 11, 0.5, 'F');
       };
 
-      // FIRST PAGE
       drawHeader();
 
-      // EXECUTIVE SUMMARY
       let y = headerHeight + 12;
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(13);
       doc.setTextColor(60, 60, 80);
       doc.text("EXECUTIVE SUMMARY", margin, y);
-      
+
       doc.setDrawColor(...colors.primary);
       doc.setLineWidth(0.8);
       doc.line(margin, y + 1, margin + 50, y + 1);
-      
+
       y += 8;
 
-      // Summary cards
       const cardWidth = (pageWidth - (margin * 2) - 6) / 2;
       const cardHeight = 24;
       const cardSpacing = 3;
 
-      // Card 1: Total
       doc.setFillColor(102, 126, 234);
       doc.roundedRect(margin, y, cardWidth, cardHeight, 3, 3, 'F');
       doc.setFillColor(255, 255, 255, 0.3);
@@ -707,7 +766,6 @@ export default function PaymentReport() {
       doc.setFont("helvetica", "normal");
       doc.text("Overall Records", margin + 4, y + 21);
 
-      // Card 2: Approved
       doc.setFillColor(...colors.success);
       doc.roundedRect(margin + cardWidth + cardSpacing, y, cardWidth, cardHeight, 3, 3, 'F');
       doc.setFillColor(255, 255, 255, 0.3);
@@ -724,7 +782,6 @@ export default function PaymentReport() {
 
       y += cardHeight + cardSpacing;
 
-      // Card 3: Pending
       doc.setFillColor(...colors.warning);
       doc.roundedRect(margin, y, cardWidth, cardHeight, 3, 3, 'F');
       doc.setFillColor(255, 255, 255, 0.3);
@@ -739,7 +796,6 @@ export default function PaymentReport() {
       doc.setFont("helvetica", "normal");
       doc.text(`${pendingRate}% Awaiting Review`, margin + 4, y + 21);
 
-      // Card 4: Rejected
       doc.setFillColor(...colors.danger);
       doc.roundedRect(margin + cardWidth + cardSpacing, y, cardWidth, cardHeight, 3, 3, 'F');
       doc.setFillColor(255, 255, 255, 0.3);
@@ -756,7 +812,6 @@ export default function PaymentReport() {
 
       y += cardHeight + 8;
 
-      // FILTER INFO BOX
       doc.setFillColor(245, 247, 255);
       doc.setDrawColor(...colors.borderColor);
       doc.setLineWidth(0.3);
@@ -775,22 +830,20 @@ export default function PaymentReport() {
 
       y += 21;
 
-      // TABLE TITLE
       doc.setFont("helvetica", "bold");
       doc.setFontSize(13);
       doc.setTextColor(60, 60, 80);
       doc.text("DETAILED PAYMENT RECORDS", margin, y);
-      
+
       doc.setDrawColor(...colors.primary);
       doc.setLineWidth(0.8);
       doc.line(margin, y + 1, margin + 70, y + 1);
-      
+
       y += 2;
 
-      // TABLE DATA
       const tableData = filteredData.map((p, idx) => {
-        const date = new Date(p.UploadDate).toLocaleDateString("en-GB", { 
-          year: "numeric", month: "short", day: "numeric" 
+        const date = new Date(p.UploadDate).toLocaleDateString("en-GB", {
+          year: "numeric", month: "short", day: "numeric"
         });
         const notes = (p.Notes || "No notes").substring(0, 80);
         return [
@@ -847,7 +900,7 @@ export default function PaymentReport() {
               data.cell.styles.fillColor = [254, 226, 226];
             }
           }
-          
+
           if (data.section === "body" && data.column.index === 0) {
             data.cell.styles.textColor = [120, 120, 140];
           }
@@ -858,7 +911,6 @@ export default function PaymentReport() {
         }
       });
 
-      // SIGNATURE
       const finalY = doc.lastAutoTable?.finalY || y;
       const signatureY = pageHeight - 45;
 
@@ -866,16 +918,16 @@ export default function PaymentReport() {
         doc.setDrawColor(...colors.borderColor);
         doc.setLineWidth(0.3);
         doc.line(pageWidth - margin - 60, signatureY, pageWidth - margin, signatureY);
-        
+
         doc.setFont("helvetica", "italic");
         doc.setFontSize(9);
         doc.setTextColor(120, 120, 140);
         doc.text("Authorized Signature", pageWidth - margin - 30, signatureY + 5, { align: "center" });
-        
+
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         doc.text(dateStr, pageWidth - margin - 30, signatureY + 10, { align: "center" });
-        
+
         doc.setDrawColor(...colors.primary);
         doc.setLineWidth(0.5);
         doc.roundedRect(pageWidth - margin - 50, signatureY + 15, 40, 15, 2, 2, 'S');
@@ -884,11 +936,10 @@ export default function PaymentReport() {
         doc.text("FINANCE DEPT", pageWidth - margin - 30, signatureY + 23, { align: "center" });
       }
 
-      // SAVE PDF
       const fileName = `CoolCart_Payment_Report_${new Date().toISOString().split("T")[0]}.pdf`;
       doc.save(fileName);
-      
-      showNotification("Professional PDF exported successfully!", "success");
+
+      showNotification("PDF exported successfully!", "success");
 
     } catch (error) {
       console.error("PDF Export Error:", error);
@@ -896,10 +947,36 @@ export default function PaymentReport() {
     }
   };
 
-  // ==================== PRINT HANDLER ====================
+  // ==================== ✅ PRINT HANDLER WITH VALIDATION ====================
   const handlePrint = () => {
+    // ✅ STEP 1: Validate filters
+    if (!validateFilters()) {
+      showNotification("Please fix date filter errors before printing", "error");
+      return;
+    }
+
+    // ✅ STEP 2: Check for empty data
+    if (filteredData.length === 0) {
+      showNotification("No records to print. Please adjust your filters.", "warning");
+      return;
+    }
+
+    // ✅ STEP 3: Performance warning
+    if (filteredData.length > 1000) {
+      showNotification("Large dataset may take time to print...", "info");
+    }
+
     window.print();
     showNotification("Opening print dialog...", "info");
+  };
+
+  // ==================== ✅ CLEAR FILTERS ====================
+  const handleClearFilters = () => {
+    setFilterStatus("All");
+    setDateFrom("");
+    setDateTo("");
+    setErrors({ dateFrom: "", dateTo: "" });
+    showNotification("Filters cleared", "info");
   };
 
   // ==================== RENDER ====================
@@ -909,7 +986,6 @@ export default function PaymentReport() {
 
       {/* ==================== PRINT ONLY CONTENT ==================== */}
       <Box sx={{ display: 'none', '@media print': { display: 'block' } }}>
-        {/* Print Header */}
         <div className="print-header">
           <div className="print-header-left">
             <img src={CoolCartLogo} alt="CoolCart Logo" onError={(e) => e.target.style.display = 'none'} />
@@ -925,7 +1001,6 @@ export default function PaymentReport() {
           </div>
         </div>
 
-        {/* Print Summary Cards */}
         <div className="print-summary">
           <div className="print-summary-card card-total">
             <h3>TOTAL PAYMENTS</h3>
@@ -949,17 +1024,15 @@ export default function PaymentReport() {
           </div>
         </div>
 
-        {/* Print Filters */}
         <div className="print-filters">
           <h3>APPLIED FILTERS</h3>
           <p>Status: <strong>{filterStatus}</strong> | Date Range: <strong>{dateRangeText}</strong></p>
         </div>
 
-        {/* Section Title */}
         <h2 className="print-section-title">DETAILED PAYMENT RECORDS</h2>
       </Box>
 
-      {/* Floating Background Icons (Hidden on print) */}
+      {/* Floating Background Icons */}
       <AssessmentIcon className="floating-icon icon-2" />
       <AttachMoneyIcon className="floating-icon icon-3" />
       <TrendingUpIcon className="floating-icon icon-4" />
@@ -976,8 +1049,8 @@ export default function PaymentReport() {
             <Grid container alignItems="center" justifyContent="space-between">
               <Grid item xs={12} md={6}>
                 <Box display="flex" alignItems="center" gap={2}>
-                  <motion.div 
-                    animate={{ rotate: [0, 360] }} 
+                  <motion.div
+                    animate={{ rotate: [0, 360] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                   >
                     <AssessmentIcon sx={{ fontSize: 50, color: "white" }} />
@@ -1002,23 +1075,23 @@ export default function PaymentReport() {
                   </Box>
                 </Box>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <Box display="flex" gap={1} justifyContent="flex-end" flexWrap="wrap" mt={{ xs: 2, md: 0 }}>
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button 
-                      variant="contained" 
-                      startIcon={<ArrowBackIcon />} 
+                    <Button
+                      variant="contained"
+                      startIcon={<ArrowBackIcon />}
                       onClick={() => navigate("/FinanceDashboard")}
                       sx={{
-                        bgcolor: "white", 
-                        color: iceColors.primary, 
-                        fontWeight: "bold", 
+                        bgcolor: "white",
+                        color: iceColors.primary,
+                        fontWeight: "bold",
                         px: 3,
-                        "&:hover": { 
-                          bgcolor: "rgba(255,255,255,0.9)", 
-                          transform: "translateY(-2px)", 
-                          boxShadow: "0 8px 20px rgba(0,0,0,0.2)" 
+                        "&:hover": {
+                          bgcolor: "rgba(255,255,255,0.9)",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 8px 20px rgba(0,0,0,0.2)"
                         }
                       }}
                     >
@@ -1028,20 +1101,20 @@ export default function PaymentReport() {
 
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Tooltip title="Refresh Data">
-                      <Button 
-                        variant="outlined" 
-                        onClick={fetchPayments} 
+                      <Button
+                        variant="outlined"
+                        onClick={fetchPayments}
                         disabled={loading}
                         sx={{
-                          bgcolor: "white", 
-                          color: iceColors.primary, 
-                          borderColor: "white", 
-                          fontWeight: "bold", 
-                          minWidth: "auto", 
+                          bgcolor: "white",
+                          color: iceColors.primary,
+                          borderColor: "white",
+                          fontWeight: "bold",
+                          minWidth: "auto",
                           px: 2,
-                          "&:hover": { 
-                            bgcolor: "rgba(255,255,255,0.9)", 
-                            borderColor: "white" 
+                          "&:hover": {
+                            bgcolor: "rgba(255,255,255,0.9)",
+                            borderColor: "white"
                           }
                         }}
                       >
@@ -1051,14 +1124,14 @@ export default function PaymentReport() {
                   </motion.div>
 
                   <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                    <Chip 
-                      icon={<CalendarTodayIcon />} 
+                    <Chip
+                      icon={<CalendarTodayIcon />}
                       label={new Date().toLocaleDateString()}
-                      sx={{ 
-                        bgcolor: "white", 
-                        color: iceColors.primary, 
-                        fontWeight: "bold", 
-                        border: "2px solid white" 
+                      sx={{
+                        bgcolor: "white",
+                        color: iceColors.primary,
+                        fontWeight: "bold",
+                        border: "2px solid white"
                       }}
                     />
                   </motion.div>
@@ -1068,54 +1141,67 @@ export default function PaymentReport() {
           </Paper>
         </motion.div>
 
-        {/* Loading Progress */}
         {loading && <LinearProgress sx={{ mb: 2 }} className="no-print" />}
 
         {/* ==================== STATISTICS CARDS ==================== */}
         <Grid container spacing={3} mb={4}>
-          <StatCard 
-            icon={<AttachMoneyIcon sx={{ fontSize: 30, color: 'white' }} />} 
-            label="Total Payments" 
-            value={total} 
-            gradient={iceColors.gradient4} 
-            delay={0.1} 
+          <StatCard
+            icon={<AttachMoneyIcon sx={{ fontSize: 30, color: 'white' }} />}
+            label="Total Payments"
+            value={total}
+            gradient={iceColors.gradient4}
+            delay={0.1}
           />
-          <StatCard 
-            icon={<VerifiedIcon sx={{ fontSize: 30, color: 'white' }} />} 
-            label="Approved" 
-            value={approved} 
-            gradient="linear-gradient(135deg, #10B981, #34D399)" 
-            delay={0.2} 
+          <StatCard
+            icon={<VerifiedIcon sx={{ fontSize: 30, color: 'white' }} />}
+            label="Approved"
+            value={approved}
+            gradient="linear-gradient(135deg, #10B981, #34D399)"
+            delay={0.2}
           />
-          <StatCard 
-            icon={<PendingActionsIcon sx={{ fontSize: 30, color: 'white' }} />} 
-            label="Pending" 
-            value={pending} 
-            gradient="linear-gradient(135deg, #F59E0B, #FCD34D)" 
-            delay={0.3} 
+          <StatCard
+            icon={<PendingActionsIcon sx={{ fontSize: 30, color: 'white' }} />}
+            label="Pending"
+            value={pending}
+            gradient="linear-gradient(135deg, #F59E0B, #FCD34D)"
+            delay={0.3}
           />
-          <StatCard 
-            icon={<BlockIcon sx={{ fontSize: 30, color: 'white' }} />} 
-            label="Rejected" 
-            value={rejected} 
-            gradient="linear-gradient(135deg, #EF4444, #F87171)" 
-            delay={0.4} 
+          <StatCard
+            icon={<BlockIcon sx={{ fontSize: 30, color: 'white' }} />}
+            label="Rejected"
+            value={rejected}
+            gradient="linear-gradient(135deg, #EF4444, #F87171)"
+            delay={0.4}
           />
         </Grid>
 
-        {/* ==================== FILTERS SECTION ==================== */}
+        {/* ==================== ✅ FILTERS SECTION WITH VALIDATION ==================== */}
         <Fade in timeout={800}>
           <Paper elevation={3} sx={{ p: 3, mb: 3, borderRadius: 3, background: "white" }} className="no-print">
-            <Typography variant="h6" gutterBottom sx={{ color: iceColors.primary, fontWeight: "bold", mb: 2 }}>
-              Filter Options
-            </Typography>
-            <Grid container spacing={2} alignItems="center">
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <Typography variant="h6" sx={{ color: iceColors.primary, fontWeight: "bold" }}>
+                Filter Options
+              </Typography>
+              <Tooltip title="Clear all filters">
+                <Button
+                  size="small"
+                  startIcon={<ClearIcon />}
+                  onClick={handleClearFilters}
+                  disabled={filterStatus === "All" && !dateFrom && !dateTo}
+                  sx={{ textTransform: "none" }}
+                >
+                  Clear Filters
+                </Button>
+              </Tooltip>
+            </Box>
+
+            <Grid container spacing={2} alignItems="flex-start">
               <Grid item xs={12} md={3}>
                 <FormControl fullWidth size="small">
                   <InputLabel>Status</InputLabel>
-                  <Select 
-                    value={filterStatus} 
-                    onChange={(e) => setFilterStatus(e.target.value)} 
+                  <Select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
                     label="Status"
                   >
                     <MenuItem value="All">All Status</MenuItem>
@@ -1125,63 +1211,152 @@ export default function PaymentReport() {
                   </Select>
                 </FormControl>
               </Grid>
+
               <Grid item xs={12} md={3}>
-                <TextField 
-                  fullWidth 
-                  size="small" 
-                  label="Date From" 
-                  type="date" 
-                  value={dateFrom} 
-                  onChange={(e) => setDateFrom(e.target.value)} 
-                  InputLabelProps={{ shrink: true }} 
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Date From"
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                  error={!!errors.dateFrom}
+                  helperText={errors.dateFrom || " "}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      bgcolor: 'white',
+                      '&.Mui-error': {
+                        '& fieldset': { borderColor: '#EF4444', borderWidth: 2 }
+                      }
+                    }
+                  }}
                 />
               </Grid>
+
               <Grid item xs={12} md={3}>
-                <TextField 
-                  fullWidth 
-                  size="small" 
-                  label="Date To" 
-                  type="date" 
-                  value={dateTo} 
-                  onChange={(e) => setDateTo(e.target.value)} 
-                  InputLabelProps={{ shrink: true }} 
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Date To"
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                  error={!!errors.dateTo}
+                  helperText={errors.dateTo || " "}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      bgcolor: 'white',
+                      '&.Mui-error': {
+                        '& fieldset': { borderColor: '#EF4444', borderWidth: 2 }
+                      }
+                    }
+                  }}
                 />
               </Grid>
+
               <Grid item xs={12} md={3}>
                 <Box display="flex" gap={1}>
-                  <Tooltip title="Export PDF">
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} style={{ flex: 1 }}>
-                      <Button 
-                        fullWidth 
-                        variant="contained" 
-                        startIcon={<PictureAsPdfIcon />} 
-                        onClick={exportPDFPro} 
-                        sx={{ background: iceColors.gradient2 }}
-                      >
-                        PDF
-                      </Button>
-                    </motion.div>
+                  <Tooltip
+                    title={
+                      !filtersValid ? "Fix filter errors first" :
+                        filteredData.length === 0 ? "No data to export" :
+                          "Export PDF"
+                    }
+                  >
+                    <span style={{ flex: 1 }}>
+                      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} style={{ flex: 1 }}>
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          startIcon={<PictureAsPdfIcon />}
+                          onClick={exportPDFPro}
+                          disabled={loading || !filtersValid || filteredData.length === 0}
+                          sx={{
+                            background: filtersValid && filteredData.length > 0
+                              ? iceColors.gradient2
+                              : '#ccc',
+                            cursor: !filtersValid || filteredData.length === 0 ? 'not-allowed' : 'pointer',
+                            '&:disabled': {
+                              color: 'rgba(0,0,0,0.4)'
+                            }
+                          }}
+                        >
+                          PDF
+                        </Button>
+                      </motion.div>
+                    </span>
                   </Tooltip>
-                  <Tooltip title="Print Report">
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} style={{ flex: 1 }}>
-                      <Button 
-                        fullWidth 
-                        variant="contained" 
-                        startIcon={<PrintIcon />} 
-                        onClick={handlePrint} 
-                        sx={{ background: iceColors.gradient1 }}
-                      >
-                        Print
-                      </Button>
-                    </motion.div>
+
+                  <Tooltip
+                    title={
+                      !filtersValid ? "Fix filter errors first" :
+                        filteredData.length === 0 ? "No data to print" :
+                          "Print Report"
+                    }
+                  >
+                    <span style={{ flex: 1 }}>
+                      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} style={{ flex: 1 }}>
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          startIcon={<PrintIcon />}
+                          onClick={handlePrint}
+                          disabled={loading || !filtersValid || filteredData.length === 0}
+                          sx={{
+                            background: filtersValid && filteredData.length > 0
+                              ? iceColors.gradient1
+                              : '#ccc',
+                            '&:disabled': {
+                              color: 'rgba(0,0,0,0.4)'
+                            }
+                          }}
+                        >
+                          Print
+                        </Button>
+                      </motion.div>
+                    </span>
                   </Tooltip>
                 </Box>
               </Grid>
             </Grid>
+
+            {/* ✅ VALIDATION ALERT */}
+            {(errors.dateFrom || errors.dateTo) && (
+              <Fade in>
+                <Alert severity="error" sx={{ mt: 2, borderRadius: 2 }} className="shaking">
+                  <Typography variant="body2" fontWeight="bold">
+                    Please fix the following errors:
+                  </Typography>
+                  <ul style={{ margin: '8px 0 0 0', paddingLeft: '20px' }}>
+                    {errors.dateFrom && <li>{errors.dateFrom}</li>}
+                    {errors.dateTo && <li>{errors.dateTo}</li>}
+                  </ul>
+                </Alert>
+              </Fade>
+            )}
+
+            {/* ✅ EMPTY DATA ALERT */}
+            {filtersValid && filteredData.length === 0 && !loading && (
+              <Fade in>
+                <Alert
+                  severity="warning"
+                  sx={{ mt: 2, borderRadius: 2 }}
+                  icon={<AssessmentIcon />}
+                >
+                  <Typography fontWeight="bold">No payments found</Typography>
+                  <Typography variant="body2">
+                    Try adjusting your filters: Status = <strong>{filterStatus}</strong>,
+                    Date Range = <strong>{dateRangeText}</strong>
+                  </Typography>
+                </Alert>
+              </Fade>
+            )}
           </Paper>
         </Fade>
 
-        {/* ==================== CHARTS SECTION (Hidden on print) ==================== */}
+        {/* ==================== CHARTS SECTION ==================== */}
         <Grid container spacing={3} mb={4} className="no-print">
           <Grid item xs={12} md={6}>
             <Grow in timeout={1000}>
@@ -1223,13 +1398,13 @@ export default function PaymentReport() {
                 <TableHead>
                   <TableRow>
                     {["Order #", "Status", "Upload Date", "Notes"].map((header, idx) => (
-                      <TableCell 
-                        key={idx} 
-                        sx={{ 
-                          bgcolor: iceColors.blueberry, 
-                          fontWeight: "bold", 
-                          fontSize: "1rem", 
-                          borderBottom: `3px solid ${iceColors.primary}` 
+                      <TableCell
+                        key={idx}
+                        sx={{
+                          bgcolor: iceColors.blueberry,
+                          fontWeight: "bold",
+                          fontSize: "1rem",
+                          borderBottom: `3px solid ${iceColors.primary}`
                         }}
                       >
                         {header}
@@ -1251,12 +1426,12 @@ export default function PaymentReport() {
                     </TableRow>
                   ) : (
                     filteredData.map((payment, idx) => (
-                      <TableRow 
-                        key={payment._id} 
-                        className="table-row" 
-                        component={motion.tr} 
-                        initial={{ opacity: 0, x: -50 }} 
-                        animate={{ opacity: 1, x: 0 }} 
+                      <TableRow
+                        key={payment._id}
+                        className="table-row"
+                        component={motion.tr}
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.03 }}
                       >
                         <TableCell>
@@ -1265,11 +1440,11 @@ export default function PaymentReport() {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Chip 
+                          <Chip
                             label={payment.Status}
                             color={
                               payment.Status === "Approved" ? "success" :
-                              payment.Status === "Rejected" ? "error" : "warning"
+                                payment.Status === "Rejected" ? "error" : "warning"
                             }
                             sx={{ fontWeight: "bold" }}
                           />
@@ -1308,7 +1483,7 @@ export default function PaymentReport() {
           <span>CoolCart Finance © 2024</span>
           <span>Confidential Document</span>
         </Box>
-        
+
         {/* ==================== SNACKBAR NOTIFICATIONS ==================== */}
         <Snackbar
           open={snackbar.open}
@@ -1317,10 +1492,10 @@ export default function PaymentReport() {
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           className="no-print"
         >
-          <Alert 
-            onClose={() => setSnackbar({ ...snackbar, open: false })} 
-            severity={snackbar.severity} 
-            variant="filled" 
+          <Alert
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            severity={snackbar.severity}
+            variant="filled"
             sx={{ minWidth: 250 }}
           >
             {snackbar.message}

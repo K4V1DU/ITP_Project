@@ -245,6 +245,24 @@ const updatePaymentByOrderNumber = async (req, res) => {
     res.status(500).json({ message: "Error updating receipt", error: err.message });
   }
 };
+const deleteReceiptFile = async (req, res) => {
+  try {
+    const updated = await Payment.findByIdAndUpdate(
+      req.params.paymentId,
+      { $unset: { ReceiptFile: "" } },
+      { new: true }
+    );
+    
+    if (!updated) {
+      return res.status(404).json({ message: "Payment not found" });
+    }
+    
+    res.json({ message: "Receipt file deleted successfully" });
+  } catch (err) {
+    console.error("❌ Error deleting receipt file:", err);
+    res.status(500).json({ message: "Error deleting receipt file", error: err.message });
+  }
+};
 
 module.exports = {
   createPayment,
@@ -256,4 +274,5 @@ module.exports = {
   getPaymentByOrderNumber,
   getReceiptByOrderNumber,
   updatePaymentByOrderNumber,
+  deleteReceiptFile,
 };

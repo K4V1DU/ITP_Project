@@ -242,6 +242,7 @@ export default function FinanceDashboard() {
     total: payments.length
   }), [payments]);
 
+  // Search and Filter Logic
   const filtered = useMemo(() => {
     let list = [...payments];
     if (filter !== "All") list = list.filter(p => p.Status === filter);

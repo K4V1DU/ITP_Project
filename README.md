@@ -27,9 +27,9 @@ A full-stack MERN platform built for shop owners to browse products, manage thei
 
 ## Tech Stack
 
-**Frontend:** React, Material UI (MUI), Chart.js, Recharts, SweetAlert2, React-Toastify, jsPDF  
-**Backend:** Node.js, Express, Nodemailer  
-**Database:** MongoDB
+- **Frontend:** React, Material UI (MUI), Chart.js, Recharts, SweetAlert2, React-Toastify, jsPDF  
+- **Backend:** Node.js, Express, Nodemailer  
+- **Database:** MongoDB
 
 ---
 

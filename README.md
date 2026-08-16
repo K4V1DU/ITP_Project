@@ -27,9 +27,9 @@ A full-stack MERN platform built for shop owners to browse products, manage thei
 
 ## Tech Stack
 
-- **Frontend:** React, Material UI (MUI), Chart.js, Recharts, SweetAlert2, React-Toastify, jsPDF
-- **Backend:** Node.js, Express, Nodemailer
-- **Database:** MongoDB
+**Frontend:** React, Material UI (MUI), Chart.js, Recharts, SweetAlert2, React-Toastify, jsPDF  
+**Backend:** Node.js, Express, Nodemailer  
+**Database:** MongoDB
 
 ---
 
@@ -66,27 +66,11 @@ npm install jspdf jspdf-autotable
 npm install html2canvas
 ```
 
-### Environment Variables
+### Configuration
 
-Create a `.env` file in the `Frontend` directory:
+This project currently has configuration values (e.g. MongoDB connection string, Nodemailer credentials, port) hardcoded directly in the source files rather than loaded from environment variables.
 
-```env
-REACT_APP_API_BASE_URL=http://localhost:8000
-```
-
-Create a `.env` file in the `Backend` directory:
-
-```env
-MONGO_URI=your_mongodb_connection_string
-PORT=8000
-NODE_ENV=development
-
-# Nodemailer (email notifications)
-EMAIL_USER=your_email_address
-EMAIL_PASS=your_email_app_password
-```
-
-> Never commit your actual `.env` file. Add it to `.gitignore` and share only a `.env.example` with placeholder values.
+> **Recommended improvement:** Move these values into a `.env` file (using a package like `dotenv`) and add `.env` to `.gitignore`. Hardcoded credentials get committed to git history and are exposed to anyone with repo access — this is especially risky if the repo is or becomes public.
 
 ### Run Locally
 
